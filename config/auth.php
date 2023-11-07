@@ -40,6 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // admin用
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -63,6 +69,12 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+
+        // admin用に追加
+        'admins' => [
+            'driver' => 'eloquent', // Illuminate\Foundation\Auth\Userをextendsして認証が可能となる。
+            'model' => App\Models\Admin::class, //認証対象のモデルを指定
         ],
 
         // 'users' => [
