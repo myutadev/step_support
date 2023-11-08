@@ -15,24 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('last_name');
             $table->string('first_name');
-            $table->integer('emp_number')->unique()->nullable();;
-            $table->date('hire_date')->nullable();;
-            $table->date('termination_date')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-            $table->foreignId('role_id')
-                ->default(1)
-                ->constrained()
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-            $table->foreignId('company_id')
-                ->default(1)
-                ->constrained()
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
         });
     }
 

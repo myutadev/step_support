@@ -44,6 +44,16 @@ class Admin extends Authenticatable
         'password' => 'hashed',
     ];
 
+    // adminインスタンス作成後、adminDetailインスタンス作成
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            $user->adminDetail()->create([]);
+        });
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class);
@@ -57,5 +67,10 @@ class Admin extends Authenticatable
     public function attendances()
     {
         return $this->hasManyThrough(Attendance::class, Company::class);
+    }
+
+    public function adminDetail()
+    {
+        return $this->hasOne(AdminDetail::class);
     }
 }

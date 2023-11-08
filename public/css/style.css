@@ -1,0 +1,141 @@
+@charset "utf-8";
+
+:root {
+    --dark-navy: #06283B;
+    --dark-text: #525F84;
+    --light-text: #B4BFCC;
+    --bg-attend: #1881CE;
+    --bg-leave: #DD434E;
+    --bg-break: #EECC3C;
+    --bg-overtime: #54BF89;
+}
+
+.app-title {
+    color: #B4BFCC;
+    text-align: center;
+}
+
+.side-bar {
+    background-color: var(--dark-navy) !important;
+}
+
+.menu-text-light {
+    color: #B4BFCC;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.menu-text-dark {
+    color: #525F84;
+    text-align: center;
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.side-bar-icon {
+    color: #B4BFCC;
+
+
+}
+
+.bi {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.digital-clock {
+    color: #545454;
+    text-align: center;
+    font-family: Roboto;
+    font-size: 76px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.date-display {
+    color: #545454;
+    text-align: center;
+    font-family: Roboto;
+    font-size: 26px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 4.68px;
+}
+
+.btn-attend {
+    width: 268px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 21px !important;
+    border: 1px solid #545454 !important;
+    background: #1881CE !important;
+    color: #FFF !important;
+    text-align: center !important;
+    font-family: Roboto !important;
+    font-size: 27px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+}
+
+.btn-leave {
+    width: 268px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 21px !important;
+    border: 1px solid #545454 !important;
+    background: var(--leave-button, #DC434E) !important;
+    color: #FFF !important;
+    text-align: center !important;
+    font-family: Roboto !important;
+    font-size: 27px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+
+}
+
+.btn-break,
+.btn-overtime {
+    color: #545454 !important;
+    text-align: center !important;
+    font-family: Roboto !important;
+    font-size: 16px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+
+    border-radius: 21px !important;
+    border: 1px solid #545454 !important;
+    background: rgba(24, 129, 206, 0.00) !important;
+
+    width: 114px !important;
+    height: 36px !important;
+    flex-shrink: 0 !important;
+}
+
+.edit-btn {
+    color: #4874B4;
+    font-family: Roboto;
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 700;
+    border-radius: 3px;
+    border: 0.5px solid #C1C1C1;
+    background: #F8F8F8;
+    
+}
+
+.attend-record {
+
+    fill: #1881CE !important;
+}

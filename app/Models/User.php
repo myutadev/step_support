@@ -18,7 +18,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'last_name',
+        'first_name',
         'email',
         'password',
     ];
@@ -51,5 +52,25 @@ class User extends Authenticatable
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    //userインスタンスが作られたら自動で紐づいたuser_detailsテーブルのインスタンスを作成
+    protected static function boot()
+    {
+
+        parent::boot();
+
+        static::created(function ($user) {
+
+            $user->userDetail()->create([
+                // 必要に応じてデフォルト値を設定する
+
+            ]);
+        });
+    }
+
+    public function userDetail()
+    {
+        return $this->hasOne(UserDetail::class);
     }
 }

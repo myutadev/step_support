@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('counselors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('contact_name');
-            $table->string('contact_phone');
-            $table->string('contact_email');
+            $table->string('contact_phone')->nullable();
+            $table->string('contact_mail')->nullable();
             $table->timestamps();
         });
     }
@@ -26,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::disableForeignKeyConstraints();
-        Schema::dropIfExists('companies');
-        Schema::enableForeignKeyConstraints();
+        Schema::dropIfExists('counselors');
     }
 };
