@@ -37,7 +37,12 @@
 
                         <!-- ボタンのグループ -->
                         <div class="col d-flex justify-content-between pt-2">
-                            <button class="btn btn-attend me-3">出勤</button>
+                            <form action="{{ route('attendances.store') }}" method="post">
+                                @csrf
+                                <input type="hidden" value="36.2" name="body_temp" id="body_temp">
+                                <input type="submit" value="出勤" class="btn btn-attend me-3">
+                            </form>
+                            {{-- <button class="btn btn-attend me-3">出勤</button> --}}
                             <button class="btn btn-leave">退勤</button>
                         </div>
                         <div class="col d-flex justify-content-between pt-4">

@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class AttendanceType extends Model
 {
     use HasFactory;
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }

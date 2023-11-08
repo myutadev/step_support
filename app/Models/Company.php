@@ -9,13 +9,18 @@ class Company extends Model
 {
     use HasFactory;
 
-    public function users()
+    public function userDetail()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(userDetail::class);
     }
 
     public function admins()
     {
         return $this->hasMany(Admin::class);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
     }
 }

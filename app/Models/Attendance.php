@@ -18,4 +18,9 @@ class Attendance extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function attendanceType()
+    {
+        return $this->belongsTo(AttendanceType::class);
+    }
 }
