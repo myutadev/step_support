@@ -211,7 +211,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            @if ($attendancesArray)
+                                @foreach ($attendancesArray as $attendance)
+                                    <tr>
+                                        <td>{{ $attendance['type'] }}</td>
+                                        <td>{{ $attendance['dateTime'] }}</td>
+                                        <td>{{ $attendance['body_temp'] }}</td>
+                                        <td>{{ $attendance['work_description'] }}</td>
+                                        <td>{{ $attendance['work_comment'] }}</td>
+                                        <td>{{ $attendance['edit_button'] }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                            {{-- <tr>
                                 <td class="attend-record">出勤</td>
                                 <td>11/3(金) 08:55</td>
                                 <td>36.2</td>
@@ -227,7 +239,7 @@
                                 <td>今日はインスタの作業の工程を教わりました。でも自分の中でまだ何をやったらいいのかわかっていないので混乱しています。明日は定期通院でお休みするので、その間に忘れてしまいそうで心配です。
                                 </td>
                                 <td><button class="edit-btn">編集</button></td>
-                            </tr>
+                            </tr> --}}
                         </tbody>
                     </table>
 

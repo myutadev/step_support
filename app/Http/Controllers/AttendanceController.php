@@ -17,7 +17,42 @@ class AttendanceController extends Controller
      */
     public function index() // タイムカードの画面
     {
-        return view('attendances.index');
+        // DBから当日の勤務情報を取り出して、配列に格納してViewに渡す。
+        //[]種別、打刻日時、体温、作業内容、作業コメント
+        // 1.当日のレコードの有無→退勤レコードの有無
+        $userId = Auth::id();
+        $today = Carbon::today();
+        $attendance = Attendance::where('user_id', $userId)->whereDate('date', $today)->first();
+        $attendancesArray = [];
+
+        if ($attendance) {
+            $checkIn = [
+                'type' => '出勤',
+                'dateTime' => $attendance->date . ' ' .  $attendance->check_in_time,
+                'body_temp' => $attendance->body_temp,
+                'work_description' => "",
+                'work_comment' => "",
+                "edit_button" => "",
+            ];
+            array_push($attendancesArray, $checkIn);
+
+            if (!$attendance->check_out_time == "") {
+                $checkOut = [
+                    'type' => '退勤',
+                    'dateTime' => $attendance->date . ' ' .  $attendance->check_out_time,
+                    'body_temp' => "",
+                    'work_description' => $attendance->work_description,
+                    'work_comment' => $attendance->work_comment,
+                    "edit_button" => "",
+
+                ];
+                array_push($attendancesArray, $checkOut);
+            }
+
+
+            // dd($attendancesArray);
+        }
+        return view('attendances.index', compact('attendancesArray'));
     }
 
     /**
