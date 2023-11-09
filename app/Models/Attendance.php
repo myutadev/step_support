@@ -23,4 +23,13 @@ class Attendance extends Model
     {
         return $this->belongsTo(AttendanceType::class);
     }
+
+    public function rests()
+    {
+        return $this->hasMany(Rest::class);
+    }
+    public function overtimes()
+    {
+        return $this->hasMany(Overtime::class);
+    }
 }

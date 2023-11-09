@@ -41,9 +41,9 @@ Route::resource('attendances', AttendanceController::class)
 
 Route::post('attendances/checkin', [AttendanceController::class, 'checkin'])->name('attendances.checkin')->middleware('auth');
 
-Route::post('attendances/break-start', [AttendanceController::class, 'breakStart'])->name('attendances.break.start')->middleware('auth');
+Route::post('attendances/rest-start', [AttendanceController::class, 'restStart'])->name('attendances.rest.start')->middleware('auth');
 
-Route::post('attendances/break-end', [AttendanceController::class, 'breakEnd'])->name('attendances.break.end')->middleware('auth');
+Route::post('attendances/rest-end', [AttendanceController::class, 'restEnd'])->name('attendances.rest.end')->middleware('auth');
 
 Route::post('attendances/overtime-start', [AttendanceController::class, 'overtimeStart'])->name('attendances.overtime.start')->middleware('auth');
 

@@ -76,39 +76,6 @@
                                 </div>
                             </div>
 
-                            {{-- フラッシュメッセージがセッションにある場合はモーダルを表示 --}}
-                            @if (session('checkedIn'))
-                                <script>
-                                    window.onload = function() {
-                                        // ブートストラップのモーダルを使用している場合
-                                        const successModal = new bootstrap.Modal(document.getElementById('checkedIn'));
-                                        successModal.show();
-                                    }
-                                </script>
-                            @endif
-
-
-                            {{-- 出勤用確認メッセージのモーダル --}}
-                            <div class="modal" tabindex="-1" id="checkedIn">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header modal-header-no-border">
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-title modal-title-centered">
-                                            {!! nl2br(e(session('checkedIn'))) !!}
-                                        </div>
-                                        <div class="modal-footer modal-footer-no-border d-flex justify-content-center">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">閉じる</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
                             <!-- 退勤ボタン -->
                             <button type="button" class="btn btn-leave" data-bs-toggle="modal"
                                 data-bs-target="#leaveModal">
@@ -152,50 +119,191 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col d-flex justify-content-between pt-4">
 
 
-                            {{-- フラッシュメッセージがセッションにある場合はモーダルを表示 --}}
-                            @if (session('checkedOut'))
-                                <script>
-                                    window.onload = function() {
-                                        // ブートストラップのモーダルを使用している場合
-                                        const successModal = new bootstrap.Modal(document.getElementById('checkedOut'));
-                                        successModal.show();
-                                    }
-                                </script>
-                            @endif
 
+                            {{-- <button class="btn btn-break">休憩開始</button> --}}
 
-                            {{-- 退勤用確認メッセージのモーダル --}}
-                            <div class="modal" tabindex="-1" id="checkedOut">
+                            <!-- 休憩開始ボタン -->
+                            <button type="button" class="btn btn-break" data-bs-toggle="modal"
+                                data-bs-target="#startRestModal">
+                                休憩開始
+                            </button>
+
+                            <!-- 休憩開始モーダル -->
+                            <div class="modal fade" id="startRestModal" tabindex="-1" aria-labelledby="startRestModalLabel"
+                                aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header modal-header-no-border">
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                         </div>
-                                        <div class="modal-title modal-title-centered">
-                                            {!! nl2br(e(session('checkedOut'))) !!}
-                                            </p>
+                                        <div class="modal-body">
+                                            <h5 class="modal-title modal-title-centered mb-3" id="startRestModalLabel">
+                                                休憩を開始します。<br>
+                                            </h5>
+
+                                            {{-- form in modal --}}
+                                            <form id="attendance-form" action="{{ route('attendances.rest.start') }}"
+                                                method="post">
+                                                @csrf
+                                                <div
+                                                    class="modal-footer modal-footer-no-border d-flex justify-content-center">
+                                                    <button type="submit" class="btn btn-secondary">休憩開始</button>
+                                                </div>
+                                            </form>
+                                            {{-- form in modal --}}
                                         </div>
-                                        <div class="modal-footer modal-footer-no-border d-flex justify-content-center">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">閉じる</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 休憩終了ボタン -->
+                            <button type="button" class="btn btn-break" data-bs-toggle="modal"
+                                data-bs-target="#endRestModal">
+                                休憩終了
+                            </button>
+
+                            <!-- 休憩終了モーダル -->
+                            <div class="modal fade" id="endRestModal" tabindex="-1" aria-labelledby="endRestModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header modal-header-no-border">
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h5 class="modal-title modal-title-centered mb-3" id="endRestModalLabel">
+                                                休憩を終了します。<br>
+                                            </h5>
+
+                                            {{-- form in modal --}}
+                                            <form id="attendance-form" action="{{ route('attendances.rest.end') }}"
+                                                method="post">
+                                                @csrf
+                                                <div
+                                                    class="modal-footer modal-footer-no-border d-flex justify-content-center">
+                                                    <button type="submit" class="btn btn-secondary">休憩終了</button>
+                                                </div>
+                                            </form>
+                                            {{-- form in modal --}}
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- 残業開始ボタン -->
+                            <button type="button" class="btn btn-overtime" data-bs-toggle="modal"
+                                data-bs-target="#startOvertimeModal">
+                                残業開始
+                            </button>
 
-                        </div>
-                        <div class="col d-flex justify-content-between pt-4">
-                            <button class="btn btn-break">休憩開始</button>
-                            <button class="btn btn-break">休憩終了</button>
-                            <button class="btn btn-overtime">残業開始</button>
-                            <button class="btn btn-overtime">残業終了</button>
+                            <!-- 残業開始モーダル -->
+                            <div class="modal fade" id="startOvertimeModal" tabindex="-1"
+                                aria-labelledby="startOvertimeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header modal-header-no-border">
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h5 class="modal-title modal-title-centered mb-3"
+                                                id="startOvertimeModalLabel">
+                                                残業を開始します。<br>
+                                            </h5>
+
+                                            {{-- form in modal --}}
+                                            <form id="attendance-form" action="{{ route('attendances.overtime.start') }}"
+                                                method="post">
+                                                @csrf
+                                                <div
+                                                    class="modal-footer modal-footer-no-border d-flex justify-content-center">
+                                                    <button type="submit" class="btn btn-secondary">残業開始</button>
+                                                </div>
+                                            </form>
+                                            {{-- form in modal --}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 残業開始モーダル  ここまで-->
+
+
+                            <!-- 残業終了ボタン -->
+                            <button type="button" class="btn btn-overtime" data-bs-toggle="modal"
+                                data-bs-target="#endOvertimeModal">
+                                残業終了
+                            </button>
+
+                            <!-- 残業終了モーダル -->
+                            <div class="modal fade" id="endOvertimeModal" tabindex="-1"
+                                aria-labelledby="endOvertimeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header modal-header-no-border">
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h5 class="modal-title modal-title-centered mb-3" id="endOvertimeModalLabel">
+                                                残業を終了します。<br>
+                                            </h5>
+
+                                            {{-- form in modal --}}
+                                            <form id="attendance-form" action="{{ route('attendances.overtime.end') }}"
+                                                method="post">
+                                                @csrf
+                                                <div
+                                                    class="modal-footer modal-footer-no-border d-flex justify-content-center">
+                                                    <button type="submit" class="btn btn-secondary">残業終了</button>
+                                                </div>
+                                            </form>
+                                            {{-- form in modal --}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 残業開始モーダル  ここまで-->
+
                         </div>
                     </div>
                 </div>
+
+
+                {{-- フラッシュメッセージがセッションにある場合はモーダルを表示 --}}
+                @if (session('requested'))
+                    <script>
+                        window.onload = function() {
+                            // ブートストラップのモーダルを使用している場合
+                            const successModal = new bootstrap.Modal(document.getElementById('requested'));
+                            successModal.show();
+                        }
+                    </script>
+                @endif
+
+
+                {{-- 共通の確認メッセージのモーダル --}}
+                <div class="modal" tabindex="-1" id="requested">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header modal-header-no-border">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-title modal-title-centered">
+                                {!! nl2br(e(session('requested'))) !!}
+                            </div>
+                            <div class="modal-footer modal-footer-no-border d-flex justify-content-center">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- テーブルのグループ -->
 
                 <div class="record-list mt-5">
@@ -223,23 +331,6 @@
                                     </tr>
                                 @endforeach
                             @endif
-                            {{-- <tr>
-                                <td class="attend-record">出勤</td>
-                                <td>11/3(金) 08:55</td>
-                                <td>36.2</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>退勤</td>
-                                <td>11/3(金) 15:05</td>
-                                <td></td>
-                                <td>インスタグラム投稿作成、いいね周り</td>
-                                <td>今日はインスタの作業の工程を教わりました。でも自分の中でまだ何をやったらいいのかわかっていないので混乱しています。明日は定期通院でお休みするので、その間に忘れてしまいそうで心配です。
-                                </td>
-                                <td><button class="edit-btn">編集</button></td>
-                            </tr> --}}
                         </tbody>
                     </table>
 
