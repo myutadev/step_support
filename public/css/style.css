@@ -132,10 +132,65 @@
     border-radius: 3px;
     border: 0.5px solid #C1C1C1;
     background: #F8F8F8;
-    
+
 }
 
 .attend-record {
 
     fill: #1881CE !important;
+}
+
+
+/* モーダルのデザイン */
+.modal-header-no-border {
+    border-bottom: none !important;
+}
+
+.modal-footer-no-border {
+    border-top: none !important;
+
+}
+
+.modal-title-centered {
+    width: 100%;
+    text-align: center;
+    color: #545454;
+    font-family: Inter;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+
+.btn-modal-attend {
+    border-radius: 4px !important;
+    background: #10649A !important;
+    width: 191px !important;
+    height: 64px !important;
+    flex-shrink: 0 !important;
+    color: #FFF !important;
+    text-align: center !important;
+    font-family: Roboto !important;
+    font-size: 18px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+}
+
+.modal-label {
+    color: #545454;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+#work_comment {
+    height: 30vh;
+}
+
+#work_description {
+    height: 10vh;
 }

@@ -36,6 +36,21 @@ Route::resource('attendances', AttendanceController::class)
     ->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy'])
     ->middleware('auth');
 
+
+// 利用者さん用出退勤route
+
+Route::post('attendances/checkin', [AttendanceController::class, 'checkin'])->name('attendances.checkin')->middleware('auth');
+
+Route::post('attendances/break-start', [AttendanceController::class, 'breakStart'])->name('attendances.break.start')->middleware('auth');
+
+Route::post('attendances/break-end', [AttendanceController::class, 'breakEnd'])->name('attendances.break.end')->middleware('auth');
+
+Route::post('attendances/overtime-start', [AttendanceController::class, 'overtimeStart'])->name('attendances.overtime.start')->middleware('auth');
+
+Route::post('attendances/overtime-end', [AttendanceController::class, 'overtimeEnd'])->name('attendances.overtime.end')->middleware('auth');
+
+Route::post('attendances/checkout', [AttendanceController::class, 'checkout'])->name('attendances.checkout')->middleware('auth');
+
 /*
 |--------------------------------------------------------------------------
 | 管理者用ルーティング

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Expr\FuncCall;
 
 class AttendanceController extends Controller
 {
@@ -32,6 +33,15 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
+    }
+
+
+    /**
+     *   利用者さん出退勤登録用Postメソッド
+
+     */
+    public function checkin(Request $request)
+    {
         $attendance = new Attendance;
         //requestからuser()メソッドを使うのはミドルウェアを通過したリクエストで使えるようになる。
         $attendance->user_id = $request->user()->id;
@@ -46,8 +56,52 @@ class AttendanceController extends Controller
         $attendance->body_temp = $request->body_temp;
         $attendance->save();
 
-        return redirect()->route('attendances.create');
+        return redirect()->route('attendances.index')->with(
+            'checkedIn',
+            '打刻が完了しました! 
+        今日も一日がんばりましょう!'
+        );
     }
+
+
+    public function checkout(Request $request)
+    {
+        $userId = $request->user()->id;
+        $today = Carbon::today();
+        $attendance = Attendance::where('user_id', $userId)->whereDate('date', $today)->first();
+        $attendance->check_out_time = Carbon::now()->toTimeString();
+        $attendance->work_description = $request->work_description;
+        $attendance->work_comment = $request->work_comment;
+        $attendance->update();
+
+        return redirect()->route('attendances.index')->with(
+            'checkedOut',
+            '打刻が完了しました!
+        今日も一日お疲れ様でした!'
+        );
+    }
+
+    public function breakStart()
+    {
+    }
+
+    public function breakEnd()
+    {
+    }
+
+    public function overtimeStart()
+    {
+    }
+
+    public function overtimeEnd()
+    {
+    }
+
+
+
+
+
+
 
     /**
      * Display the specified resource.
