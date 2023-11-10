@@ -194,3 +194,7 @@
 #work_description {
     height: 10vh;
 }
+
+.side-menu-link {
+    text-decoration: none;
+}

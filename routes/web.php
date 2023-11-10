@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
 use App\Http\Controllers\AttendanceController;
+use App\Models\Attendance;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,10 +32,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// 利用者さん用出退勤route
+Route::get('attendances/timecard', [AttendanceController::class, 'timecard'])->name('attendances.timecard')->middleware('auth');
+
 
 Route::resource('attendances', AttendanceController::class)
     ->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy'])
     ->middleware('auth');
+
 
 
 // 利用者さん用出退勤route

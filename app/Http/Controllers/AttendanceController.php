@@ -235,7 +235,14 @@ class AttendanceController extends Controller
         return redirect()->route('attendances.index')->with('requested', "残業終了しました");
     }
 
+    public function timecard()
+    {
+        //カレンダー情報と出勤日情報を持ってくる→カレンダーテーブルが必要
+        //出勤種別テーブルが必要 day_type ユーザーとその月の日付で一致するものを同じ連想配列の中に入れて配列化
+        //view側でforeachで情報を抜き出す。
 
+        return view('attendances.timecard');
+    }
 
 
 

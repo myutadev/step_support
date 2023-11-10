@@ -16,14 +16,19 @@
                     <div class="menu-text-dark ms-3">
                         <p>メイン</p>
                     </div>
-                    <div class="menu-text-light ms-3 my-4 d-flex align-items-center">
-                        <i class="bi bi-alarm"></i>
-                        <p class="mb-0 ms-2">打刻</p>
-                    </div>
-                    <div class="menu-text-light ms-3 my-4 d-flex align-items-center">
-                        <i class="bi bi-card-checklist"></i>
-                        <p class="mb-0 ms-2">タイムカード</p>
-                    </div>
+                    <a href="{{ '/attendances' }}" class="side-menu-link">
+                        <div class="menu-text-light ms-3 my-4 d-flex
+                        align-items-center">
+                            <i class="bi bi-alarm"></i>
+                            <p class="mb-0 ms-2">打刻</p>
+                        </div>
+                    </a>
+                    <a href="{{ '/attendances/timecard' }}" class="side-menu-link">
+                        <div class="menu-text-light ms-3 my-4 d-flex align-items-center">
+                            <i class="bi bi-card-checklist"></i>
+                            <p class="mb-0 ms-2">タイムカード</p>
+                        </div>
+                    </a>
                 </div>
             </div>
 
