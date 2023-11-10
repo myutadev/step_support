@@ -32,4 +32,9 @@ class Attendance extends Model
     {
         return $this->hasMany(Overtime::class);
     }
+
+    public function work_schedule()
+    {
+        return $this->belongsTo(WorkSchedule::class);
+    }
 }

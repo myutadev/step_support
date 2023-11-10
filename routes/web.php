@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
 
 // 利用者さん用出退勤route
 Route::get('attendances/timecard', [AttendanceController::class, 'timecard'])->name('attendances.timecard')->middleware('auth');
+Route::post('attendances/timecard/submit-month', [AttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
 
 
 Route::resource('attendances', AttendanceController::class)

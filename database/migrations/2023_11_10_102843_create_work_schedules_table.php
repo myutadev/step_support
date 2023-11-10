@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rests', function (Blueprint $table) {
+        Schema::create('work_schedules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('attendance_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->time('start_time');
-            $table->time('end_time')->nullable();
+            $table->date('date');
+            $table->year('year');
+            $table->unsignedTinyInteger('month');
+            $table->unsignedTinyInteger('day');
+            $table->foreignId('schedule_type_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rests');
+        Schema::dropIfExists('work_schedules');
     }
 };

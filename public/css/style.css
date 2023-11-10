@@ -198,3 +198,15 @@
 .side-menu-link {
     text-decoration: none;
 }
+
+.btn-edit {
+    border-radius: 3px !important;
+    border: 0.5px solid #C1C1C1 !important;
+    background: #F8F8F8 !important;
+    color: #4874B4 !important;
+    font-family: Roboto !important;
+    font-size: 9px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+}
