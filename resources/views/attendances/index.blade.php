@@ -138,8 +138,8 @@
                             </button>
 
                             <!-- 休憩開始モーダル -->
-                            <div class="modal fade" id="startRestModal" tabindex="-1" aria-labelledby="startRestModalLabel"
-                                aria-hidden="true">
+                            <div class="modal fade" id="startRestModal" tabindex="-1"
+                                aria-labelledby="startRestModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header modal-header-no-border">
@@ -332,9 +332,15 @@
                                         <td>{{ $attendance['body_temp'] }}</td>
                                         <td>{{ $attendance['work_description'] }}</td>
                                         <td>{{ $attendance['work_comment'] }}</td>
-                                        <td>{{ $attendance['edit_button'] }}</td>
-                                    </tr>
-                                @endforeach
+                                        <td>
+                                            @if ($attendance['edit_button'] == 1)
+                                                <button type="submit" class="btn btn-edit">編集</button>
+                                            @else
+                                                {{ $attendance['edit_button'] }}
+                                        </td>
+                                @endif
+                                </tr>
+                            @endforeach
                             @endif
                         </tbody>
                     </table>

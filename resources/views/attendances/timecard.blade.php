@@ -40,7 +40,10 @@
                     <p>タイムカード</p>
                 </div>
                 <div class="timecard-selectors">
-                    <p>2023年11月</p>
+                    <form action="{{ '/attendances/timecard/submit-month' }}" method="post" id="monthForm">
+                        @csrf
+                        <input type="month" name="month" value="{{ date('Y-m') }}" id="monthInput">
+                    </form>
                 </div>
                 <div class="record-list mt-5">
                     <table class="table table-striped">
@@ -58,18 +61,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- @if ($attendancesArray)
-                            @foreach ($attendancesArray as $attendance)
-                                <tr>
-                                    <td>{{ $attendance['type'] }}</td>
-                                    <td>{{ $attendance['dateTime'] }}</td>
-                                    <td>{{ $attendance['body_temp'] }}</td>
-                                    <td>{{ $attendance['work_description'] }}</td>
-                                    <td>{{ $attendance['work_comment'] }}</td>
-                                    <td>{{ $attendance['edit_button'] }}</td>
-                                </tr>
-                            @endforeach
-                        @endif --}}
+                            @if ($monthlyAttendanceData)
+                                @foreach ($monthlyAttendanceData as $date)
+                                    <tr>
+                                        <td>{{ $date['date'] }}</td>
+                                        <td>{{ $date['scheduleType'] }}</td>
+                                        <td>{{ $date['bodyTemp'] }}</td>
+                                        <td>{{ $date['checkin'] }}</td>
+                                        <td>{{ $date['checkout'] }}</td>
+                                        <td> {!! $date['rest'] !!} </td>
+                                        <td>{{ $date['overtime'] }}</td>
+                                        <td>{{ $date['workDescription'] }}</td>
+                                        <td>{{ $date['workComment'] }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
 
@@ -105,4 +111,14 @@
         updateClock(); // 初期時刻を設定
         setInterval(updateClock, 1000); // 1秒ごとに時刻を更新
     </script>
+
+
+
 @endsection
+
+<script>
+    // ここにJavaScriptコードを配置
+    document.getElementById('monthInput').addEventListener('change', function() {
+        document.getElementById('monthForm').submit();
+    });
+</script>

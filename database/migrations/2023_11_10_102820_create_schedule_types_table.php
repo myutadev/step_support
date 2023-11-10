@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Grammars\RenameColumn;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('counselors', function (Blueprint $table) {
-            $table->RenameColumn('contact_mail','contact_email');
+        Schema::create('schedule_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
@@ -22,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('counselors', function (Blueprint $table) {
-            $table->RenameColumn('contact_email','contact_mail');
-        });
+        Schema::dropIfExists('schedule_types');
     }
 };

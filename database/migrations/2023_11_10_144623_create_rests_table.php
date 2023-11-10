@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('counselors', function (Blueprint $table) {
+        Schema::create('rests', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('contact_phone')->nullable();
-            $table->string('contact_email')->nullable();
+            $table->foreignId('attendance_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->time('start_time');
+            $table->time('end_time')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('counselors');
+        Schema::disableForeignKeyConstraints();
+        Schema::dropIfExists('rests');
+        Schema::enableForeignKeyConstraints();
     }
 };
