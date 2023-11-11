@@ -18,4 +18,17 @@ class UserDetail extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function disabilityCategory()
+    {
+        return $this->belongsTo(DisabilityCategory::class);
+    }
+    public function residence()
+    {
+        return $this->belongsTo(Residence::class);
+    }
+    public function counselor()
+    {
+        return $this->belongsTo(Counselor::class);
+    }
 }

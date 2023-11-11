@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AdminAttendanceController;
 use App\Models\Attendance;
 
 /*
@@ -80,7 +81,23 @@ Route::group(['prefix' => 'admin'], function () {
         // ダッシュボード
         Route::get('dashboard', fn () => view('admin.dashboard'))
             ->name('admin.dashboard');
+
+        Route::get('timecard', [AdminAttendanceController::class, 'showTimecard'])->name('admin.timecard');
+        Route::get('daily', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
+
+        Route::get('users', [AdminAttendanceController::class, 'showUsers'])->name('admin.users');
+        Route::get('users/create', [AdminAttendanceController::class, 'createUser'])->name('admin.users.create');
+        Route::post('users/store', [AdminAttendanceController::class, 'storeUser'])->name('admin.users.store');
+        Route::get('admins', [AdminAttendanceController::class, 'showAdmins'])->name('admin.admins');
+        Route::get('admins/create', [AdminAttendanceController::class, 'createAdmin'])->name('admin.admins.create');
+        Route::post('admins/store', [AdminAttendanceController::class, 'storeAdmin'])->name('admin.admins.store');
     });
 });
+
+// admin用ルート
+Route::post('attendances/timecard/submit-month', [AdminAttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
+
+
+
 
 require __DIR__ . '/auth.php';

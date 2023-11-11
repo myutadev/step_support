@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Counselor extends Model
 {
     use HasFactory;
+
+    public function userDetails()
+    {
+        return $this->hasMany(UserDetail::class);
+    }
 }

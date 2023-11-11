@@ -210,3 +210,18 @@
     font-weight: 700 !important;
     line-height: normal !important;
 }
+
+.btn-create {
+    border-radius: 4px !important;
+    background: #D0A307 !important;
+    color: white !important;
+
+}
+
+.btn-store {
+
+    border-radius: 4px !important;
+    background: #10649A !important;
+    color: white !important;
+
+}
