@@ -85,32 +85,6 @@
     </div>
 
 
-    <script>
-        function updateClock() {
-            const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            let day = now.getDate();
-            let month = now.getMonth() + 1; // 月は0から始まるため1を足す
-            let year = now.getFullYear();
-            let dayOfWeek = now.toLocaleString('ja-JP', {
-                weekday: 'short'
-            });
-
-            hours = hours < 10 ? '0' + hours : hours;
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            month = month < 10 ? '0' + month : month;
-            day = day < 10 ? '0' + day : day;
-
-            const timeString = `${hours}:${minutes}`;
-            const dateString = `${year}.${month}.${day} (${dayOfWeek})`;
-
-            document.getElementById('digital-clock').textContent = timeString;
-            document.querySelector('.date-display').textContent = dateString;
-        }
-        updateClock(); // 初期時刻を設定
-        setInterval(updateClock, 1000); // 1秒ごとに時刻を更新
-    </script>
 
 
 

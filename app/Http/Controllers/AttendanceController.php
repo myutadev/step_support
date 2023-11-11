@@ -296,20 +296,23 @@ class AttendanceController extends Controller
                 $restTimeString = implode("<br>", $restTimes);
 
                 $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
+                // dd($curAttendance);
+
+                // dd($curAttendance);
                 $curAttendObj = [
                     'date' => $WorkSchedule->date,
                     'scheduleType' => $curScheduleType->name,
                     'bodyTemp' => $curAttendance->body_temp,
                     'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
-                    'checkout' => Carbon::parse($curAttendance->check_out_time)->format('H:i'),
+                    'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
                     'rest' => $restTimeString,
-                    'overtime' => Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+                    'overtime' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
                     'workDescription' => $curAttendance->work_description,
                     'workComment' => $curAttendance->work_comment,
                 ];
 
+
                 array_push($monthlyAttendanceData, $curAttendObj);
-                // dd($monthlyAttendanceData);
             }
         }
 
@@ -388,7 +391,6 @@ class AttendanceController extends Controller
      */
     public function show(Attendance $attendance)
     {
-        
     }
 
     /**
