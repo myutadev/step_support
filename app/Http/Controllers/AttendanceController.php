@@ -8,8 +8,9 @@ use App\Models\Rest;
 use App\Models\ScheduleType;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\UserDetail;
 use App\Models\WorkSchedule;
+
+use App\Models\UserDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
@@ -406,7 +407,10 @@ class AttendanceController extends Controller
      */
     public function update(Request $request, Attendance $attendance)
     {
-        //
+        $attendance->work_description = $request->work_description;
+        $attendance->work_comment = $request->work_comment;
+        $attendance->update();
+        return $this->index();
     }
 
     /**

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\UserDetail;
 use App\Models\WorkSchedule;
 use App\Models\Admin;
+use App\Models\AdminComment;
 use App\Models\AdminDetail;
 use App\Models\Counselor;
 use App\Models\DisabilityCategory;
@@ -92,6 +93,70 @@ class AdminAttendanceController extends Controller
 
         return $this->showUsers();
     }
+
+
+
+    public function showDaily()
+    {
+
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $today = Carbon::today();
+        $todayWorkSchedId = WorkSchedule::where('date', $today)->first()->id;
+
+        //本日の勤怠レコード一覧を取得
+        $attendanceRecords = Attendance::where('company_id', $companyId)->get()->where('work_schedule_id', $todayWorkSchedId);
+
+        $dailyAttendanceData = [];
+
+        foreach ($attendanceRecords as $curAttendance) {
+
+            $curUserId = $curAttendance->user_id;
+            $curUser = User::where('id', $curUserId)->first();
+            $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
+            $restTimes = [];
+
+            foreach ($curRests as $rest) {
+                $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
+            }
+            $restTimeString = implode("<br>", $restTimes);
+
+            $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
+
+            $curAdminComment = AdminComment::where('attendance_id', $curAttendance->id)->first();
+
+            $curAttendanceRecord = [
+                'attendance_id' => $curAttendance->id,
+                'beneficialy_number' => UserDetail::where('user_id', $curUserId)->first()->beneficiary_number,
+                'name' => $curUser->last_name . " " . $curUser->first_name,
+                'body_temp' => $curAttendance->body_temp,
+                'check_in_time' => $curAttendance->check_in_time,
+                'check_out_time' => $curAttendance->check_out_time,
+                'rest' => $restTimeString,
+                'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+                'work_description' => $curAttendance->work_description,
+                'work_comment' => $curAttendance->work_comment,
+                'admin_description' => $curAdminComment->admin_description,
+                'admin_comment' => $curAdminComment->admin_comment,
+            ];
+
+            array_push($dailyAttendanceData, $curAttendanceRecord);
+        }
+
+        return view('admin.attendances.daily', compact('dailyAttendanceData'));
+    }
+
+    public function updateAdminComment(Request $request, Attendance $attendance)
+    {
+        $adminComment = AdminComment::where('attendance_id', $attendance->id)->first();
+        $adminComment->admin_description = $request->admin_description;
+        $adminComment->admin_comment = $request->admin_comment;
+        $adminComment->update();
+
+        return $this->showDaily();
+    }
+
     public function showAdmins()
     {
     }

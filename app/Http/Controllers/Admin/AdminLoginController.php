@@ -22,7 +22,7 @@ class AdminLoginController extends Controller
         $credentials = $request->only(['email', 'password']);
 
         if (Auth::guard('admin')->attempt($credentials)) {
-            return redirect()->route('admin.timecard')->with([
+            return redirect()->route('admin.daily')->with([
                 'login_msg' => 'ログインしました。',
             ]);
         }

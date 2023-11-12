@@ -13,7 +13,7 @@
                             <p class="mb-0 ms-2">タイムカード</p>
                         </div>
                     </a>
-                    <a href="{{ '' }}" class="side-menu-link">
+                    <a href="{{ '/admin/daily' }}" class="side-menu-link">
                         <div class="menu-text-light ms-3 my-4 d-flex
                         align-items-center">
                             <i class="bi bi-calendar2-check"></i>

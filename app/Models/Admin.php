@@ -73,4 +73,9 @@ class Admin extends Authenticatable
     {
         return $this->hasOne(AdminDetail::class);
     }
+
+    public function adminComments()
+    {
+        return $this->hasMany(AdminComment::class);
+    }
 }

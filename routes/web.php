@@ -84,13 +84,13 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('timecard', [AdminAttendanceController::class, 'showTimecard'])->name('admin.timecard');
         Route::get('daily', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
-
         Route::get('users', [AdminAttendanceController::class, 'showUsers'])->name('admin.users');
         Route::get('users/create', [AdminAttendanceController::class, 'createUser'])->name('admin.users.create');
         Route::post('users/store', [AdminAttendanceController::class, 'storeUser'])->name('admin.users.store');
         Route::get('admins', [AdminAttendanceController::class, 'showAdmins'])->name('admin.admins');
         Route::get('admins/create', [AdminAttendanceController::class, 'createAdmin'])->name('admin.admins.create');
         Route::post('admins/store', [AdminAttendanceController::class, 'storeAdmin'])->name('admin.admins.store');
+        Route::patch('daily/{attendance}', [AdminAttendanceController::class, 'updateAdminComment'])->name('admin.daily.update');
     });
 });
 

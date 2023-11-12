@@ -1,10 +1,6 @@
 @extends('layouts.main')
 @section('content')
     <div class="container-fluid">
-        <div class="dashboard-header">
-            <!-- ヘッダーコンテンツ -->
-            @include('layouts.navigation');
-        </div>
 
         <div class="row">
             <!-- サイドバーのカラム -->
@@ -33,7 +29,10 @@
             </div>
 
             <!-- メインコンテンツのカラム -->
-            <div class="col-md-9 pt-5">
+            <div class="col-md-10">
+                {{-- ヘッダー --}}
+                @include('components.header')
+
                 <div class="d-flex flex-column align-items-center pt-5">
                     <div class="dashboard-buttons">
                         <!-- デジタル時計と日付表示 -->
@@ -334,7 +333,10 @@
                                         <td>{{ $attendance['work_comment'] }}</td>
                                         <td>
                                             @if ($attendance['edit_button'] == 1)
-                                                <button type="submit" class="btn btn-edit">編集</button>
+                                                {{-- <button type="submit" class="btn btn-edit"
+                                                    onclick="location.href='{{ route('attendances.edit', $attendance['attendance_id']) }}'">編集</button> --}}
+                                                <button type="submit" class="btn btn-edit" data-bs-toggle="modal"
+                                                    data-bs-target="#editModal">編集</button>
                                             @else
                                                 {{ $attendance['edit_button'] }}
                                         </td>
@@ -344,8 +346,53 @@
                             @endif
                         </tbody>
                     </table>
-
                 </div>
+
+
+                <!--コメント編集用モーダル -->
+                <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header modal-header-no-border">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h5 class="modal-title modal-title-centered mb-3" id="editModalLabel">
+                                    作業内容&コメント修正<br>
+                                </h5>
+
+                                {{-- form in modal --}}
+                                @foreach ($attendancesArray as $attendance)
+                                    @if ($attendance['type'] == '退勤')
+                                        <form id="edit-form"
+                                            action="{{ route('attendances.update', $attendance['attendance_id']) }}"
+                                            method="post">
+                                            @csrf
+                                            @method('PATCH')
+                                            <div class="mb-3">
+                                                <label for="work_description" class="modal-label">作業内容</label>
+                                                <textarea class="form-control" id="work_description" name="work_description" required>{{ $attendance['work_description'] }}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="work_comment" class="modal-label">作業コメント</label>
+                                                <textarea class="form-control" id="work_comment" name="work_comment" required>{{ $attendance['work_comment'] }}</textarea>
+                                            </div>
+                                    @endif
+                                @endforeach
+                                <div class="modal-footer modal-footer-no-border d-flex justify-content-center">
+                                    <button type="submit" class="btn btn-secondary">保存</button>
+                                </div>
+                                </form>
+                                {{-- form in modal --}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- コメント編集用モーダル  ここまで-->
+
+
             </div>
         </div>
 

@@ -1,18 +1,15 @@
 @extends('layouts.main')
 @section('content')
     <div class="container-fluid">
-        <div class="dashboard-header">
-            <!-- ヘッダーコンテンツ -->
-            @include('layouts.navigation');
-        </div>
-
         <div class="row">
             <!-- サイドバーのカラム -->
             @include('components.admin-side-menu')
         </div>
 
         <!-- メインコンテンツのカラム -->
-        <div class="col-md-9 pt-5">
+        <div class="col-md-10">
+            {{-- ヘッダー --}}
+            @include('components.header')
 
             <!-- テーブルのグループ -->
             <div class="timecard-title">

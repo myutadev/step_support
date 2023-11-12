@@ -225,3 +225,23 @@
     color: white !important;
 
 }
+
+.login-title {
+    color: #5B5B5B !important;
+    text-align: center !important;
+    font-family: Inter !important;
+    font-size: 20px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+}
+/* 
+.app-title {
+    color: #06283B !important;
+    font-family: Montserrat !important;
+    font-size: 84px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+    letter-spacing: 2.52px !important;
+} */

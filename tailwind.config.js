@@ -19,3 +19,17 @@ export default {
 
     plugins: [forms],
 };
+
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        'custom-gray': '#5B5B5B',
+      },
+      fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+      },
+    },
+  },
+}

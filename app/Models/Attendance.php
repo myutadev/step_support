@@ -9,6 +9,16 @@ class Attendance extends Model
 {
     use HasFactory;
 
+    // attendanceインスタンス作成後、admin_commentsインスタンス作成
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($attendance) {
+            $attendance->adminComments()->create([]);
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -36,5 +46,10 @@ class Attendance extends Model
     public function work_schedule()
     {
         return $this->belongsTo(WorkSchedule::class);
+    }
+
+    public function adminComments()
+    {
+        return $this->hasMany(AdminComment::class);
     }
 }
