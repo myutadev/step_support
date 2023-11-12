@@ -71,52 +71,55 @@
                                         <td>{{ $attendance['admin_description'] }}</td>
                                         <td>{{ $attendance['admin_comment'] }}</td>
                                         <td>
-                                            <button type="submit" class="btn btn-edit" data-bs-toggle="modal"
-                                                data-bs-target="#editModal">編集</button>
+                                            <button type="button" class="btn btn-edit" data-bs-toggle="modal"
+                                                data-bs-target="#editModal{{ $attendance['attendance_id'] }}"
+                                                data-id="{{ $attendance['attendance_id'] }}"
+                                                data-description="{{ $attendance['admin_description'] }}"
+                                                data-comment="{{ $attendance['admin_comment'] }}">
+                                                編集
+                                            </button>
                                         </td>
-                                        <!--コメント編集用モーダル -->
-                                        <div class="modal fade" id="editModal" tabindex="-1"
-                                            aria-labelledby="editModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header modal-header-no-border">
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <h5 class="modal-title modal-title-centered mb-3"
-                                                            id="editModalLabel">
-                                                            作業内容&コメント修正<br>
-                                                        </h5>
-
-                                                        {{-- form in modal --}}
-                                                        <form id="edit-form"
-                                                            action="{{ route('admin.daily.update', $attendance['attendance_id']), $attendance['attendance_id'] }}"
-                                                            method="post">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <div class="mb-3">
-                                                                <label for="work_description"
-                                                                    class="modal-label">作業内容</label>
-                                                                <textarea class="form-control" id="work_description" name="work_description" required>{{ $attendance['admin_description'] }}</textarea>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="work_comment" class="modal-label">作業コメント</label>
-                                                                <textarea class="form-control" id="work_comment" name="work_comment" required>{{ $attendance['admin_comment'] }}</textarea>
-                                                            </div>
-                                                            <div
-                                                                class="modal-footer modal-footer-no-border d-flex justify-content-center">
-                                                                <button type="submit" class="btn btn-secondary">保存</button>
-                                                            </div>
-                                                        </form>
-                                                        {{-- form in modal --}}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- コメント編集用モーダル  ここまで-->
                                     @endif
                                 </tr>
+
+
+                                <div class="modal fade" id="editModal{{ $attendance['attendance_id'] }}" tabindex="-1"
+                                    aria-labelledby="editModalLabel{{ $attendance['attendance_id'] }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header modal-header-no-border">
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h5 class="modal-title modal-title-centered mb-3" id="editModalLabel">
+                                                    作業内容&コメント修正<br>
+                                                </h5>
+
+
+                                                <!-- モーダルの中身 -->
+                                                <form id="edit-form-{{ $attendance['attendance_id'] }}"
+                                                    action="{{ route('admin.daily.update', $attendance['attendance_id']), $attendance['attendance_id'] }}"
+                                                    method="post">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <!-- フォームの内容 -->
+                                                    <div class="mb-3">
+                                                        <label for="admin_description" class="modal-label">作業内容</label>
+                                                        <textarea class="form-control" id="admin_description" name="admin_description" required>{{ $attendance['admin_description'] }}</textarea>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="admin_comment" class="modal-label">作業コメント</label>
+                                                        <textarea class="form-control" id="admin_comment" name="admin_comment" required>{{ $attendance['admin_comment'] }}</textarea>
+                                                    </div>
+                                                    <div
+                                                        class="modal-footer modal-footer-no-border d-flex justify-content-center">
+                                                        <button type="submit" class="btn btn-secondary">保存</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                             @endforeach
                         @endif
                     </tbody>
@@ -125,15 +128,37 @@
         </div>
     </div>
     </div>
-
-
+    @php
+        $baseUrl = url('admin/daily');
+    @endphp
 
 
 @endsection
 
 <script>
-    // ここにJavaScriptコードを配置
-    document.getElementById('monthInput').addEventListener('change', function() {
-        document.getElementById('monthForm').submit();
-    });
+    <
+    script >
+        document.addEventListener('DOMContentLoaded', function() {
+            const baseUrl = "{{ $baseUrl }}";
+
+            document.querySelectorAll('.btn-edit').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const description = this.getAttribute('data-description');
+                    const comment = this.getAttribute('data-comment');
+
+                    const form = document.querySelector(`#edit-form-${id}`);
+                    if (form) {
+                        form.action = baseUrl + '/' + id;
+                        form.querySelector('.admin_description').value = description;
+                        form.querySelector('.admin_comment').value = comment;
+                    } else {
+                        console.error('Form not found for id:', id);
+                    }
+                });
+            });
+        });
+    // document.getElementById('monthInput').addEventListener('change', function() {
+    // document.getElementById('monthForm').submit();
+    // });
 </script>
