@@ -111,7 +111,9 @@ class AdminAttendanceController extends Controller
         $dailyAttendanceData = [];
 
         foreach ($attendanceRecords as $curAttendance) {
-
+            $admin_id = Auth::id();
+            $admin = Admin::where('id', $admin_id)->first();
+            $admin_name = $admin->last_name . ' ' . $admin->first_name;
             $curUserId = $curAttendance->user_id;
             $curUser = User::where('id', $curUserId)->first();
             $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
@@ -139,6 +141,8 @@ class AdminAttendanceController extends Controller
                 'work_comment' => $curAttendance->work_comment,
                 'admin_description' => $curAdminComment->admin_description,
                 'admin_comment' => $curAdminComment->admin_comment,
+                'admin_name' => $admin_name,
+                'admin_id' => $admin_id,
             ];
 
             array_push($dailyAttendanceData, $curAttendanceRecord);
@@ -149,9 +153,11 @@ class AdminAttendanceController extends Controller
 
     public function updateAdminComment(Request $request, Attendance $attendance)
     {
+        $admin_id = Auth::id();
         $adminComment = AdminComment::where('attendance_id', $attendance->id)->first();
         $adminComment->admin_description = $request->admin_description;
         $adminComment->admin_comment = $request->admin_comment;
+        $adminComment->admin_id = $admin_id;
         $adminComment->update();
 
         return $this->showDaily();

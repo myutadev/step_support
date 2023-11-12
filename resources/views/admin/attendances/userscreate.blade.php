@@ -24,33 +24,29 @@
                 <div class="row mb-3">
                     <label for="beneficiary_number" class="col-sm-2 col-form-label">受給者番号</label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control" id="beneficiary_number" name="beneficiary_number"
-                            value='7737737737'>
+                        <input type="number" class="form-control" id="beneficiary_number" name="beneficiary_number">
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="fullname" class="col-sm-2 col-form-label">名前</label>
                     <div class="col">
-                        <input type="text" class="form-control" id='last_name' name='last_name' placeholder="姓"
-                            value="七海">
+                        <input type="text" class="form-control" id='last_name' name='last_name' placeholder="姓">
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id='first_name' name='first_name' placeholder="名"
-                            value="健人">
+                        <input type="text" class="form-control" id='first_name' name='first_name' placeholder="名">
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <label for="inputEmail3" class="col-sm-2 col-form-label">メールアドレス</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" name='email'
-                            value='kento.nanami@test.co.jp'>
+                        <input type="email" class="form-control" id="email" name='email'>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="inputPassword3" class="col-sm-2 col-form-label">パスワード</label>
                     <div class="col-sm-10">
-                        <input type="password" class="form-control" id="password" name='password' value='12345678@'>
+                        <input type="password" class="form-control" id="password" name='password'>
                     </div>
                 </div>
                 <div class="row mb-3">
