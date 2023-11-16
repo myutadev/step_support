@@ -38,6 +38,8 @@
                             <th>管理者作業</th>
                             <th>管理者コメント</th>
                             <th>管理者名</th>
+                            <th></th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -65,12 +67,15 @@
                                             <td>
                                                 <textarea name="admin_comment" class="admin_comment" id="admin_comment"></textarea>
                                             </td>
+                                            <td>
+                                            </td>
                                             <td> <button type="submit" class="btn btn-secondary btn-sm">保存</button>
                                             </td>
                                         </form>
                                     @else
                                         <td>{{ $attendance['admin_description'] }}</td>
                                         <td>{{ $attendance['admin_comment'] }}</td>
+                                        <td>{{ $attendance['admin_name'] }}</td>
                                         <td>
                                             <button type="button" class="btn btn-edit" data-bs-toggle="modal"
                                                 data-bs-target="#editModal{{ $attendance['attendance_id'] }}"

@@ -7,13 +7,13 @@ use App\Models\Overtime;
 use App\Models\Rest;
 use App\Models\ScheduleType;
 use App\Models\User;
-use App\Models\UserDetail;
 use App\Models\WorkSchedule;
 use App\Models\Admin;
 use App\Models\AdminComment;
 use App\Models\AdminDetail;
 use App\Models\Counselor;
 use App\Models\DisabilityCategory;
+use App\Models\Role;
 use App\Models\Residence;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -37,21 +37,21 @@ class AdminAttendanceController extends Controller
         $admin = Auth::user();
         $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
         $companyId = $adminDetail->company_id;
-        $userDetails = UserDetail::where('company_id', $companyId)->get();
+        $adminDetails = adminDetail::where('company_id', $companyId)->get();
         $userInfoArray = [];
-        foreach ($userDetails as $userDetail) {
-            $curUser = User::where('id', $userDetail->user_id)->first();
+        foreach ($adminDetails as $adminDetail) {
+            $curUser = User::where('id', $adminDetail->user_id)->first();
 
             $curUserInfo = [
-                'beneficiary_number' => $userDetail->beneficiary_number,
+                'beneficiary_number' => $adminDetail->beneficiary_number,
                 'name' => $curUser->last_name . ' ' . $curUser->first_name,
                 'email' => $curUser->email,
-                'is_on_welfare' => $userDetail->is_on_welfare == 1 ? "有" : "無",
-                'admission_date' => $userDetail->admission_date,
-                'discharge_date' => $userDetail->discharge_date,
-                'disability_category_id' => DisabilityCategory::where('id', $userDetail->disability_category_id)->first()->name,
-                'residence_id' => Residence::where('id', $userDetail->residence_id)->first()->name,
-                'counselor_id' => Counselor::where('id', $userDetail->counselor_id)->first()->name,
+                'is_on_welfare' => $adminDetail->is_on_welfare == 1 ? "有" : "無",
+                'admission_date' => $adminDetail->admission_date,
+                'discharge_date' => $adminDetail->discharge_date,
+                'disability_category_id' => DisabilityCategory::where('id', $adminDetail->disability_category_id)->first()->name,
+                'residence_id' => Residence::where('id', $adminDetail->residence_id)->first()->name,
+                'counselor_id' => Counselor::where('id', $adminDetail->counselor_id)->first()->name,
             ];
             array_push($userInfoArray, $curUserInfo);
         }
@@ -79,17 +79,17 @@ class AdminAttendanceController extends Controller
         $user->password = $request->password;
         $user->save();
 
-        $userDetail = UserDetail::where('user_id', $user->id)->first();
-        $userDetail->beneficiary_number = $request->beneficiary_number;
-        $userDetail->disability_category_id = $request->disability_category_id;
+        $adminDetail = adminDetail::where('user_id', $user->id)->first();
+        $adminDetail->beneficiary_number = $request->beneficiary_number;
+        $adminDetail->disability_category_id = $request->disability_category_id;
         //is_on_welfareの有無をチェック
-        $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
+        $adminDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
 
-        $userDetail->residence_id = $request->residence_id;
-        $userDetail->counselor_id = $request->counselor_id;
-        $userDetail->admission_date = $request->admission_date;
-        $userDetail->company_id = $companyId;
-        $userDetail->update();
+        $adminDetail->residence_id = $request->residence_id;
+        $adminDetail->counselor_id = $request->counselor_id;
+        $adminDetail->admission_date = $request->admission_date;
+        $adminDetail->company_id = $companyId;
+        $adminDetail->update();
 
         return $this->showUsers();
     }
@@ -130,7 +130,7 @@ class AdminAttendanceController extends Controller
 
             $curAttendanceRecord = [
                 'attendance_id' => $curAttendance->id,
-                'beneficialy_number' => UserDetail::where('user_id', $curUserId)->first()->beneficiary_number,
+                'beneficialy_number' => adminDetail::where('user_id', $curUserId)->first()->beneficiary_number,
                 'name' => $curUser->last_name . " " . $curUser->first_name,
                 'body_temp' => $curAttendance->body_temp,
                 'check_in_time' => $curAttendance->check_in_time,
@@ -142,7 +142,6 @@ class AdminAttendanceController extends Controller
                 'admin_description' => $curAdminComment->admin_description,
                 'admin_comment' => $curAdminComment->admin_comment,
                 'admin_name' => $admin_name,
-                'admin_id' => $admin_id,
             ];
 
             array_push($dailyAttendanceData, $curAttendanceRecord);
@@ -165,6 +164,27 @@ class AdminAttendanceController extends Controller
 
     public function showAdmins()
     {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $adminDetails = AdminDetail::where('company_id', $companyId)->get();
+        $adminInfoArray = [];
+        foreach ($adminDetails as $adminDetail) {
+            $curAdmin = Admin::where('id', $adminDetail->admin_id)->first();
+
+            $curAdminInfo = [
+                'emp_number' => $adminDetail->emp_number,
+                'name' => $curAdmin->last_name . ' ' . $curAdmin->first_name,
+                'email' => $curAdmin->email,
+                'role' => Role::Firstwhere('id', $adminDetail->role_id)->name,
+                'hire_date' => $adminDetail->hire_date,
+                'termination_date' => $adminDetail->termination_date,
+            ];
+            array_push($adminInfoArray, $curAdminInfo);
+        }
+
+
+        return view('admin.attendances.admins', compact('adminInfoArray'));
     }
     public function createAdmin()
     {

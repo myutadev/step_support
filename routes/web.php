@@ -99,5 +99,4 @@ Route::post('attendances/timecard/submit-month', [AdminAttendanceController::cla
 
 
 
-
 require __DIR__ . '/auth.php';

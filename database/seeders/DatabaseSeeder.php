@@ -25,5 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ResidenceSeeder::class);
         $this->call(ScheduleTypeSeeder::class);
         $this->call(WorkScheduleSeeder::class);
+        $this->call(RoleSeeder::class);
     }
 }
