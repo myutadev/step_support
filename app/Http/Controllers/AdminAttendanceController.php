@@ -15,6 +15,7 @@ use App\Models\Counselor;
 use App\Models\DisabilityCategory;
 use App\Models\Role;
 use App\Models\Residence;
+use App\Models\UserDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
@@ -37,21 +38,21 @@ class AdminAttendanceController extends Controller
         $admin = Auth::user();
         $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
         $companyId = $adminDetail->company_id;
-        $adminDetails = adminDetail::where('company_id', $companyId)->get();
+        $userDetails = UserDetail::where('company_id', $companyId)->get();
         $userInfoArray = [];
-        foreach ($adminDetails as $adminDetail) {
-            $curUser = User::where('id', $adminDetail->user_id)->first();
+        foreach ($userDetails as $userDetail) {
+            $curUser = User::where('id', $userDetail->user_id)->first();
 
             $curUserInfo = [
-                'beneficiary_number' => $adminDetail->beneficiary_number,
+                'beneficiary_number' => $userDetail->beneficiary_number,
                 'name' => $curUser->last_name . ' ' . $curUser->first_name,
                 'email' => $curUser->email,
-                'is_on_welfare' => $adminDetail->is_on_welfare == 1 ? "有" : "無",
-                'admission_date' => $adminDetail->admission_date,
-                'discharge_date' => $adminDetail->discharge_date,
-                'disability_category_id' => DisabilityCategory::where('id', $adminDetail->disability_category_id)->first()->name,
-                'residence_id' => Residence::where('id', $adminDetail->residence_id)->first()->name,
-                'counselor_id' => Counselor::where('id', $adminDetail->counselor_id)->first()->name,
+                'is_on_welfare' => $userDetail->is_on_welfare == 1 ? "有" : "無",
+                'admission_date' => $userDetail->admission_date,
+                'discharge_date' => $userDetail->discharge_date,
+                'disability_category_id' => DisabilityCategory::where('id', $userDetail->disability_category_id)->first()->name,
+                'residence_id' => Residence::where('id', $userDetail->residence_id)->first()->name,
+                'counselor_id' => Counselor::where('id', $userDetail->counselor_id)->first()->name,
             ];
             array_push($userInfoArray, $curUserInfo);
         }
