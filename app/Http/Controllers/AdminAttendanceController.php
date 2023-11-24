@@ -67,6 +67,7 @@ class AdminAttendanceController extends Controller
         $couselors = Counselor::get();
         return view('admin.attendances.userscreate', compact('disability_categories', 'residences', 'couselors'));
     }
+
     public function storeUser(Request $request)
     {
         $admin = Auth::user();
@@ -80,17 +81,17 @@ class AdminAttendanceController extends Controller
         $user->password = $request->password;
         $user->save();
 
-        $adminDetail = adminDetail::where('user_id', $user->id)->first();
-        $adminDetail->beneficiary_number = $request->beneficiary_number;
-        $adminDetail->disability_category_id = $request->disability_category_id;
+        $userDetail = UserDetail::where('user_id', $user->id)->first();
+        $userDetail->beneficiary_number = $request->beneficiary_number;
+        $userDetail->disability_category_id = $request->disability_category_id;
         //is_on_welfareの有無をチェック
-        $adminDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
+        $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
 
-        $adminDetail->residence_id = $request->residence_id;
-        $adminDetail->counselor_id = $request->counselor_id;
-        $adminDetail->admission_date = $request->admission_date;
-        $adminDetail->company_id = $companyId;
-        $adminDetail->update();
+        $userDetail->residence_id = $request->residence_id;
+        $userDetail->counselor_id = $request->counselor_id;
+        $userDetail->admission_date = $request->admission_date;
+        $userDetail->company_id = $companyId;
+        $userDetail->update();
 
         return $this->showUsers();
     }
@@ -131,7 +132,7 @@ class AdminAttendanceController extends Controller
 
             $curAttendanceRecord = [
                 'attendance_id' => $curAttendance->id,
-                'beneficialy_number' => adminDetail::where('user_id', $curUserId)->first()->beneficiary_number,
+                'beneficialy_number' => userDetail::where('user_id', $curUserId)->first()->beneficiary_number,
                 'name' => $curUser->last_name . " " . $curUser->first_name,
                 'body_temp' => $curAttendance->body_temp,
                 'check_in_time' => $curAttendance->check_in_time,
@@ -189,8 +190,30 @@ class AdminAttendanceController extends Controller
     }
     public function createAdmin()
     {
+        $roles = Role::get();
+        return view('admin.attendances.adminscreate', compact('roles'));
     }
-    public function storeAdmins()
+    public function storeAdmin(Request $request)
     {
+
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+
+        $admin = new Admin();
+        $admin->last_name = $request->last_name;
+        $admin->first_name = $request->first_name;
+        $admin->email = $request->email;
+        $admin->password = $request->password;
+        $admin->save();
+
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $adminDetail->hire_date = $request->hire_date;
+        $adminDetail->emp_number = $request->emp_number;
+        $adminDetail->role_id = $request->role_id;
+        $adminDetail->company_id = $companyId;
+        $adminDetail->update();
+
+        return $this->createAdmin();
     }
 }

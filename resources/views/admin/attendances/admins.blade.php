@@ -13,7 +13,7 @@
 
             <!-- テーブルのグループ -->
             <div class="timecard-title">
-                <h3>利用者アカウント管理</h3>
+                <h3>管理者アカウント管理</h3>
             </div>
             <button type="button" onclick="location.href='{{ route('admin.admins.create') }}'"
                 class="btn btn-create mt-3">新規管理者登録</button>
