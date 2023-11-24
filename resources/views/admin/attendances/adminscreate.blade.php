@@ -17,29 +17,43 @@
             <div class="timecard-title">
                 <h3>新規管理者追加</h3>
             </div>
-
+            @if ($errors->any())
+                <div class="error">
+                    <p>
+                        <b>{{ count($errors) }}件のエラーがあります。</b>
+                    </p>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <form class='mt-5' action="{{ route('admin.admins.store') }}" method="post">
                 @csrf
                 <div class="row mb-3">
                     <label for="fullname" class="col-sm-2 col-form-label">名前</label>
                     <div class="col">
-                        <input type="text" class="form-control" id='last_name' name='last_name' placeholder="姓">
+                        <input type="text" class="form-control" id='last_name' name='last_name' placeholder="姓"
+                            value={{ old('last_name') }}>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id='first_name' name='first_name' placeholder="名">
+                        <input type="text" class="form-control" id='first_name' name='first_name' placeholder="名"
+                            value={{ old('first_name') }}>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="emp_number" class="col-sm-2 col-form-label">社員番号</label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control" id="emp_number" name="emp_number">
+                        <input type="number" class="form-control" id="emp_number" name="emp_number"
+                            value={{ old('emp_number') }}>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="inputEmail3" class="col-sm-2 col-form-label">メールアドレス</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" name='email'>
+                        <input type="email" class="form-control" id="email" name='email' value={{ old('email') }}>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -56,7 +70,9 @@
                             <div class="dropdown">
                                 <select class="btn btn-light" name="role_id" id="role_id">
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}">{{ $role->name }}
+                                        <option value="{{ $role->id }}"
+                                            {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                                            {{ $role->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -69,7 +85,8 @@
                 <div class="row mb-3">
                     <label for="hire_date" class="col-sm-2 col-form-label">入社日</label>
                     <div class="col-sm-10">
-                        <input type="date" class="form-control" id="hire_date" name="hire_date">
+                        <input type="date" class="form-control" id="hire_date" name="hire_date"
+                            value={{ old('hire_date') }}>
                     </div>
                 </div>
 

@@ -235,6 +235,12 @@
     font-weight: 700 !important;
     line-height: normal !important;
 }
+
+.error {
+
+    color: red;
+}
+
 /* 
 .app-title {
     color: #06283B !important;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminRequest;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Rest;
@@ -193,7 +194,7 @@ class AdminAttendanceController extends Controller
         $roles = Role::get();
         return view('admin.attendances.adminscreate', compact('roles'));
     }
-    public function storeAdmin(Request $request)
+    public function storeAdmin(AdminRequest $request)
     {
 
         $admin = Auth::user();
