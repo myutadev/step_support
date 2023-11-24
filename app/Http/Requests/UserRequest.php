@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AdminRequest extends FormRequest
+class UserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,9 +26,11 @@ class AdminRequest extends FormRequest
             'last_name' => 'required|string|max:50|regex:/^[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]+$/u', // 漢字、ひらがな、カタカナであることのバリデーション
             'email' => 'required|email',
             'password' => 'required | min:4',
-            'emp_number' => 'required|integer',
-            'role_id' => 'required|integer',
-            'hire_date' => 'required',
+            'beneficiary_number' => 'required|integer|regex:/^\d{10}$/',
+            'disability_category_id' => 'required',
+            'residence_id' => 'required',
+            'counselor_id' => 'required',
+            'admission_date' => 'required',
         ];
     }
 }

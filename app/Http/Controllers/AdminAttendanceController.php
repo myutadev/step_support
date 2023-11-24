@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminRequest;
+use App\Http\Requests\UserRequest;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Rest;
@@ -65,11 +66,11 @@ class AdminAttendanceController extends Controller
     {
         $disability_categories = DisabilityCategory::get();
         $residences = Residence::get();
-        $couselors = Counselor::get();
-        return view('admin.attendances.userscreate', compact('disability_categories', 'residences', 'couselors'));
+        $counselors = Counselor::get();
+        return view('admin.attendances.userscreate', compact('disability_categories', 'residences', 'counselors'));
     }
 
-    public function storeUser(Request $request)
+    public function storeUser(UserRequest $request)
     {
         $admin = Auth::user();
         $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();

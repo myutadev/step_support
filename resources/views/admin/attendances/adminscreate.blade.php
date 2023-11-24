@@ -17,6 +17,8 @@
             <div class="timecard-title">
                 <h3>新規管理者追加</h3>
             </div>
+
+            <!-- フォームのエラーメッセージ -->
             @if ($errors->any())
                 <div class="error">
                     <p>

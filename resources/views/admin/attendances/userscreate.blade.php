@@ -17,6 +17,19 @@
             <div class="timecard-title">
                 <h3>新規利用者追加</h3>
             </div>
+            <!-- フォームのエラーメッセージ -->
+            @if ($errors->any())
+                <div class="error">
+                    <p>
+                        <b>{{ count($errors) }}件のエラーがあります。</b>
+                    </p>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
 
             <form class='mt-5' action="{{ route('admin.users.store') }}" method="post">
@@ -30,17 +43,19 @@
                 <div class="row mb-3">
                     <label for="fullname" class="col-sm-2 col-form-label">名前</label>
                     <div class="col">
-                        <input type="text" class="form-control" id='last_name' name='last_name' placeholder="姓">
+                        <input type="text" class="form-control" id='last_name' name='last_name' placeholder="姓"
+                            value={{ old('last_name') }}>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id='first_name' name='first_name' placeholder="名">
+                        <input type="text" class="form-control" id='first_name' name='first_name' placeholder="名"
+                            value={{ old('first_name') }}>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <label for="inputEmail3" class="col-sm-2 col-form-label">メールアドレス</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" name='email'>
+                        <input type="email" class="form-control" id="email" name='email' value={{ old('email') }}>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -57,7 +72,9 @@
                             <div class="dropdown">
                                 <select class="btn btn-light" name="disability_category_id" id="disability_category_id">
                                     @foreach ($disability_categories as $disability_category)
-                                        <option value="{{ $disability_category->id }}">{{ $disability_category->name }}
+                                        <option value="{{ $disability_category->id }}"
+                                            {{ old('disability_category_id') == $disability_category->id ? 'selected' : '' }}>
+                                            {{ $disability_category->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -72,7 +89,7 @@
                         <div class="col-sm-10">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="is_on_welfare" value="1"
-                                    id="is_on_welfare">
+                                    id="is_on_welfare" {{ old('is_on_welfare') == '1' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_on_welfare">
                                     生活保護を受給している場合はチェック </label>
                             </div>
@@ -83,12 +100,14 @@
                     <div class="row mb-3">
                         <label for="residence_id" class="col-sm-2 col-form-label">住居</label>
                         <div class="col-sm-10">
-                            {{-- ドロップダウンここから --}}
+                            {{-- ドロップダウンここから --}}s
 
                             <div class="dropdown">
                                 <select class="btn btn-light" name="residence_id" id="residence_id">
                                     @foreach ($residences as $residence)
-                                        <option value="{{ $residence->id }}">{{ $residence->name }}
+                                        <option value="{{ $residence->id }}"
+                                            {{ old('residence_id') == $residence->id ? 'selected' : '' }}>
+                                            {{ $residence->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -105,8 +124,10 @@
                             {{-- ドロップダウンここから --}}
                             <div class="dropdown">
                                 <select class="btn btn-light" name="counselor_id" id="counselor_id">
-                                    @foreach ($couselors as $couselor)
-                                        <option value="{{ $couselor->id }}">{{ $couselor->name }}
+                                    @foreach ($counselors as $counselor)
+                                        <option value="{{ $counselor->id }}"
+                                            {{ old('counselor_id') == $counselor->id ? 'selected' : '' }}>
+                                            {{ $counselor->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -118,7 +139,8 @@
                 <div class="row mb-3">
                     <label for="admission_date" class="col-sm-2 col-form-label">入所日</label>
                     <div class="col-sm-10">
-                        <input type="date" class="form-control" id="admission_date" name="admission_date">
+                        <input type="date" class="form-control" id="admission_date" name="admission_date"
+                            value={{ old('admission_date') }}>
                     </div>
                 </div>
 

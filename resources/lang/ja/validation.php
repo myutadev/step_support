@@ -216,7 +216,10 @@ return [
         'emp_number'               => '従業員番号',
         'role_number'              => '役割',
         'hire_date'                => '入社日',
-        'today'                => '本日',
+        'today'                    => '本日',
+        'beneficiary_number'       => '受給者番号',
+        'is_on_welfare'            => '生活保護受給の有無チェック',
+        'admission_date'           => '入所日',
 
     ],
 ];
