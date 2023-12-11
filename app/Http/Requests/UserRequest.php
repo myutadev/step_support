@@ -26,7 +26,7 @@ class UserRequest extends FormRequest
             'last_name' => 'required|string|max:50|regex:/^[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]+$/u', // 漢字、ひらがな、カタカナであることのバリデーション
             'email' => 'required|email',
             'password' => 'required | min:4',
-            'beneficiary_number' => 'required|integer|regex:/^\d{10}$/',
+            'beneficiary_number' => 'required|string|regex:/^\d{10}$/',
             'disability_category_id' => 'required',
             'residence_id' => 'required',
             'counselor_id' => 'required',

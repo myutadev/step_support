@@ -55,6 +55,7 @@ class AdminAttendanceController extends Controller
                 'disability_category_id' => DisabilityCategory::where('id', $userDetail->disability_category_id)->first()->name,
                 'residence_id' => Residence::where('id', $userDetail->residence_id)->first()->name,
                 'counselor_id' => Counselor::where('id', $userDetail->counselor_id)->first()->name,
+                'user_id' => $curUser->id,
             ];
             array_push($userInfoArray, $curUserInfo);
         }
@@ -62,6 +63,7 @@ class AdminAttendanceController extends Controller
 
         return view('admin.attendances.users', compact('userInfoArray'));
     }
+
     public function createUser()
     {
         $disability_categories = DisabilityCategory::get();
@@ -92,6 +94,44 @@ class AdminAttendanceController extends Controller
         $userDetail->residence_id = $request->residence_id;
         $userDetail->counselor_id = $request->counselor_id;
         $userDetail->admission_date = $request->admission_date;
+        $userDetail->company_id = $companyId;
+        $userDetail->update();
+
+        return $this->showUsers();
+    }
+    public function editUser($id)
+    {
+        $user = User::firstWhere('id', $id);
+        $userDetail = UserDetail::firstWhere('user_id', $id);
+        $disability_categories = DisabilityCategory::get();
+        $residences = Residence::get();
+        $counselors = Counselor::get();
+
+        return view('admin.attendances.usersedit', compact('disability_categories', 'residences', 'counselors', 'user', 'userDetail'));
+    }
+
+    public function updateUser(UserRequest $request, $id)
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+
+        $user = User::firstWhere('id', $id);
+        $user->last_name = $request->last_name;
+        $user->first_name = $request->first_name;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->update();
+
+        $userDetail = UserDetail::firstWhere('user_id', $id);
+        $userDetail->beneficiary_number = $request->beneficiary_number;
+        $userDetail->disability_category_id = $request->disability_category_id;
+        //is_on_welfareの有無をチェック
+        $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
+        $userDetail->residence_id = $request->residence_id;
+        $userDetail->counselor_id = $request->counselor_id;
+        $userDetail->admission_date = $request->admission_date;
+        $userDetail->discharge_date = $request->discharge_date;
         $userDetail->company_id = $companyId;
         $userDetail->update();
 
