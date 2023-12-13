@@ -223,6 +223,7 @@ class AdminAttendanceController extends Controller
                 'role' => Role::Firstwhere('id', $adminDetail->role_id)->name,
                 'hire_date' => $adminDetail->hire_date,
                 'termination_date' => $adminDetail->termination_date,
+                'admin_id' => $curAdmin->id,
             ];
             array_push($adminInfoArray, $curAdminInfo);
         }
@@ -257,5 +258,34 @@ class AdminAttendanceController extends Controller
         $adminDetail->update();
 
         return $this->createAdmin();
+    }
+    public function editAdmin($id)
+    {
+        $admin = Admin::firstWhere('id', $id);
+        $adminDetail = AdminDetail::firstWhere('admin_id', $id);
+        $roles = Role::get();
+        $roleId = $adminDetail->role_id;
+        $role = Role::firstWhere('id', $roleId);
+
+        return view('admin.attendances.adminsedit', compact('admin', 'adminDetail', 'role', 'roles'));
+    }
+
+    public function updateAdmin(AdminRequest $request, $id)
+    {
+        $admin = Admin::firstWhere('id', $id);
+        $admin->last_name = $request->last_name;
+        $admin->first_name = $request->first_name;
+        $admin->email = $request->email;
+        $admin->password = $request->password;
+        $admin->update();
+
+        $adminDetail = AdminDetail::firstWhere('admin_id', $admin->id);
+        $adminDetail->hire_date = $request->hire_date;
+        $adminDetail->termination_date = $request->termination_date;
+        $adminDetail->emp_number = $request->emp_number;
+        $adminDetail->role_id = $request->role_id;
+        $adminDetail->update();
+
+        return $this->showAdmins();
     }
 }

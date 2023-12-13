@@ -27,6 +27,7 @@
                             <th scope="col">役割</th>
                             <th scope="col">入社日</th>
                             <th scope="col">退社日</th>
+                            <th scope="col">編集</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,6 +39,14 @@
                                 <td>{{ $adminInfo['role'] }}</td>
                                 <td>{{ $adminInfo['hire_date'] }}</td>
                                 <td>{{ $adminInfo['termination_date'] }}</td>
+                                <td>
+                                    <button
+                                        onclick="location.href='{{ route('admin.admins.edit', $adminInfo['admin_id']) }}'"
+                                        class="btn btn-edit">
+                                        編集
+                                    </button>
+                                </td>
+
                             </tr>
                         @endforeach
                     </tbody>

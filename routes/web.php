@@ -92,6 +92,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('admins', [AdminAttendanceController::class, 'showAdmins'])->name('admin.admins');
         Route::get('admins/create', [AdminAttendanceController::class, 'createAdmin'])->name('admin.admins.create');
         Route::post('admins/store', [AdminAttendanceController::class, 'storeAdmin'])->name('admin.admins.store');
+        Route::get('admins/{id}/edit', [AdminAttendanceController::class, 'editAdmin'])->name('admin.admins.edit');
+        Route::patch('admins/{id}/update', [AdminAttendanceController::class, 'updateAdmin'])->name('admin.admins.update');
         Route::patch('daily/{attendance}', [AdminAttendanceController::class, 'updateAdminComment'])->name('admin.daily.update');
     });
 });
