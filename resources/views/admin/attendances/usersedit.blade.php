@@ -15,8 +15,9 @@
 
             <!-- テーブルのグループ -->
             <div class="timecard-title">
-                <h3>新規利用者追加</h3>
+                <h3>利用者情報編集追加</h3>
             </div>
+
             <!-- フォームのエラーメッセージ -->
             @if ($errors->any())
                 <div class="error">
@@ -31,37 +32,40 @@
                 </div>
             @endif
 
-
-            <form class='mt-5' action="{{ route('admin.users.store') }}" method="post">
+            <form class='mt-5' action="{{ route('admin.users.update', $user->id) }}" method="post">
                 @csrf
+                @method('PATCH')
                 <div class="row mb-3">
                     <label for="beneficiary_number" class="col-sm-2 col-form-label">受給者番号</label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control" id="beneficiary_number" name="beneficiary_number">
+                        <input type="number" class="form-control" id="beneficiary_number" name="beneficiary_number"
+                            value={{ $userDetail->beneficiary_number }}>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="fullname" class="col-sm-2 col-form-label">名前</label>
                     <div class="col">
                         <input type="text" class="form-control" id='last_name' name='last_name' placeholder="姓"
-                            value={{ old('last_name') }}>
+                            value={{ old('last_name', $user->last_name) }}>
                     </div>
                     <div class="col">
                         <input type="text" class="form-control" id='first_name' name='first_name' placeholder="名"
-                            value={{ old('first_name') }}>
+                            value={{ old('first_name', $user->first_name) }}>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <label for="inputEmail3" class="col-sm-2 col-form-label">メールアドレス</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" name='email' value={{ old('email') }}>
+                        <input type="email" class="form-control" id="email" name='email'
+                            value={{ old('email', $user->email) }}>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="inputPassword3" class="col-sm-2 col-form-label">パスワード</label>
                     <div class="col-sm-10">
-                        <input type="password" class="form-control" id="password" name='password'>
+                        <input type="password" class="form-control" id="password" name='password'
+                            value='{{ $user->password }}'>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -73,7 +77,7 @@
                                 <select class="btn btn-light" name="disability_category_id" id="disability_category_id">
                                     @foreach ($disability_categories as $disability_category)
                                         <option value="{{ $disability_category->id }}"
-                                            {{ old('disability_category_id') == $disability_category->id ? 'selected' : '' }}>
+                                            {{ old('disability_category_id', $userDetail->disability_category_id) == $disability_category->id ? 'selected' : '' }}>
                                             {{ $disability_category->name }}
                                         </option>
                                     @endforeach
@@ -89,7 +93,8 @@
                         <div class="col-sm-10">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="is_on_welfare" value="1"
-                                    id="is_on_welfare" {{ old('is_on_welfare') == '1' ? 'checked' : '' }}>
+                                    id="is_on_welfare"
+                                    {{ old('is_on_welfare', $userDetail->is_on_welfare) == '1' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_on_welfare">
                                     生活保護を受給している場合はチェック </label>
                             </div>
@@ -106,7 +111,7 @@
                                 <select class="btn btn-light" name="residence_id" id="residence_id">
                                     @foreach ($residences as $residence)
                                         <option value="{{ $residence->id }}"
-                                            {{ old('residence_id') == $residence->id ? 'selected' : '' }}>
+                                            {{ old('residence_id', $userDetail->residence_id) == $residence->id ? 'selected' : '' }}>
                                             {{ $residence->name }}
                                         </option>
                                     @endforeach
@@ -126,7 +131,7 @@
                                 <select class="btn btn-light" name="counselor_id" id="counselor_id">
                                     @foreach ($counselors as $counselor)
                                         <option value="{{ $counselor->id }}"
-                                            {{ old('counselor_id') == $counselor->id ? 'selected' : '' }}>
+                                            {{ old('counselor_id', $userDetail->counselor_id) == $counselor->id ? 'selected' : '' }}>
                                             {{ $counselor->name }}
                                         </option>
                                     @endforeach
@@ -140,19 +145,25 @@
                     <label for="admission_date" class="col-sm-2 col-form-label">入所日</label>
                     <div class="col-sm-10">
                         <input type="date" class="form-control" id="admission_date" name="admission_date"
-                            value={{ old('admission_date') }}>
+                            value={{ old('admission_date', $userDetail->admission_date) }}>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="discharge_date" class="col-sm-2 col-form-label">退所日</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" id="discharge_date" name="discharge_date"
+                            value={{ old('discharge_date', $userDetail->discharge_date) }}>
                     </div>
                 </div>
 
-
-                <!-- 新規登録ボタン -->
-                <button type="button" class="btn btn-store" id="store-button" data-bs-toggle="modal"
-                    data-bs-target="#storeUserModal">
-                    新規登録
+                <!-- 情報編集ボタン -->
+                <button type="button" class="btn btn-store" id="update-button" data-bs-toggle="modal"
+                    data-bs-target="#updateUserModal">
+                    情報編集
                 </button>
 
                 <!-- 新規登録モーダル -->
-                <div class="modal fade" id="storeUserModal" tabindex="-1" aria-labelledby="storeUserModalLabel"
+                <div class="modal fade" id="updateUserModal" tabindex="-1" aria-labelledby="updateUserModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -217,7 +228,7 @@
 
     // モーダルにフォームの内容を表示させるためのDOM操作
     document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelector("#store-button").addEventListener('click', function() {
+        document.querySelector("#update-button").addEventListener('click', function() {
             const beneficiaryNumber = document.getElementById('beneficiary_number').value;
             const lastName = document.getElementById('last_name').value;
             const firstName = document.getElementById('first_name').value;
@@ -234,6 +245,8 @@
             const counselor_name = counselor_select.options[counselor_select.selectedIndex].text;
 
             const admission_date = document.getElementById('admission_date').value;
+            const discharge_date = document.getElementById('discharge_date').value;
+
 
             const isOnWelfareCheckbox = document.getElementById('is_on_welfare');
             const isOnWelfareChecked = isOnWelfareCheckbox.checked;
@@ -257,8 +270,7 @@
                 <h4 class="mb-3">住居: ${residence_name}</h4>
                 <h4 class="mb-3">相談員: ${counselor_name}</h4>
                 <h4 class="mb-3">入所日: ${admission_date}</h4>
-
-
+                <h4 class="mb-3">退所日: ${discharge_date}</h4>
             `
             // <h4>生活保護受給:${is_on_welfare}</h4>
 

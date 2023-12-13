@@ -30,6 +30,7 @@
                             <th scope="col">相談員</th>
                             <th scope="col">入所日</th>
                             <th scope="col">退所日</th>
+                            <th scope="col">編集</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,6 +45,13 @@
                                 <td>{{ $userInfo['counselor_id'] }}</td>
                                 <td>{{ $userInfo['admission_date'] }}</td>
                                 <td>{{ $userInfo['discharge_date'] }}</td>
+                                <td>
+                                    <button onclick="location.href='{{ route('admin.users.edit', $userInfo['user_id']) }}'"
+                                        class="btn btn-edit">
+                                        編集
+                                    </button>
+                                </td>
+
                             </tr>
                         @endforeach
                     </tbody>

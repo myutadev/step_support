@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminRequest;
+use App\Http\Requests\UserRequest;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Rest;
 use App\Models\ScheduleType;
 use App\Models\User;
-use App\Models\UserDetail;
 use App\Models\WorkSchedule;
 use App\Models\Admin;
 use App\Models\AdminComment;
 use App\Models\AdminDetail;
 use App\Models\Counselor;
 use App\Models\DisabilityCategory;
+use App\Models\Role;
 use App\Models\Residence;
+use App\Models\UserDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
@@ -52,6 +55,7 @@ class AdminAttendanceController extends Controller
                 'disability_category_id' => DisabilityCategory::where('id', $userDetail->disability_category_id)->first()->name,
                 'residence_id' => Residence::where('id', $userDetail->residence_id)->first()->name,
                 'counselor_id' => Counselor::where('id', $userDetail->counselor_id)->first()->name,
+                'user_id' => $curUser->id,
             ];
             array_push($userInfoArray, $curUserInfo);
         }
@@ -59,14 +63,16 @@ class AdminAttendanceController extends Controller
 
         return view('admin.attendances.users', compact('userInfoArray'));
     }
+
     public function createUser()
     {
         $disability_categories = DisabilityCategory::get();
         $residences = Residence::get();
-        $couselors = Counselor::get();
-        return view('admin.attendances.userscreate', compact('disability_categories', 'residences', 'couselors'));
+        $counselors = Counselor::get();
+        return view('admin.attendances.userscreate', compact('disability_categories', 'residences', 'counselors'));
     }
-    public function storeUser(Request $request)
+
+    public function storeUser(UserRequest $request)
     {
         $admin = Auth::user();
         $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
@@ -88,6 +94,44 @@ class AdminAttendanceController extends Controller
         $userDetail->residence_id = $request->residence_id;
         $userDetail->counselor_id = $request->counselor_id;
         $userDetail->admission_date = $request->admission_date;
+        $userDetail->company_id = $companyId;
+        $userDetail->update();
+
+        return $this->showUsers();
+    }
+    public function editUser($id)
+    {
+        $user = User::firstWhere('id', $id);
+        $userDetail = UserDetail::firstWhere('user_id', $id);
+        $disability_categories = DisabilityCategory::get();
+        $residences = Residence::get();
+        $counselors = Counselor::get();
+
+        return view('admin.attendances.usersedit', compact('disability_categories', 'residences', 'counselors', 'user', 'userDetail'));
+    }
+
+    public function updateUser(UserRequest $request, $id)
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+
+        $user = User::firstWhere('id', $id);
+        $user->last_name = $request->last_name;
+        $user->first_name = $request->first_name;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->update();
+
+        $userDetail = UserDetail::firstWhere('user_id', $id);
+        $userDetail->beneficiary_number = $request->beneficiary_number;
+        $userDetail->disability_category_id = $request->disability_category_id;
+        //is_on_welfareの有無をチェック
+        $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
+        $userDetail->residence_id = $request->residence_id;
+        $userDetail->counselor_id = $request->counselor_id;
+        $userDetail->admission_date = $request->admission_date;
+        $userDetail->discharge_date = $request->discharge_date;
         $userDetail->company_id = $companyId;
         $userDetail->update();
 
@@ -130,7 +174,7 @@ class AdminAttendanceController extends Controller
 
             $curAttendanceRecord = [
                 'attendance_id' => $curAttendance->id,
-                'beneficialy_number' => UserDetail::where('user_id', $curUserId)->first()->beneficiary_number,
+                'beneficialy_number' => userDetail::where('user_id', $curUserId)->first()->beneficiary_number,
                 'name' => $curUser->last_name . " " . $curUser->first_name,
                 'body_temp' => $curAttendance->body_temp,
                 'check_in_time' => $curAttendance->check_in_time,
@@ -142,7 +186,6 @@ class AdminAttendanceController extends Controller
                 'admin_description' => $curAdminComment->admin_description,
                 'admin_comment' => $curAdminComment->admin_comment,
                 'admin_name' => $admin_name,
-                'admin_id' => $admin_id,
             ];
 
             array_push($dailyAttendanceData, $curAttendanceRecord);
@@ -165,11 +208,84 @@ class AdminAttendanceController extends Controller
 
     public function showAdmins()
     {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $adminDetails = AdminDetail::where('company_id', $companyId)->get();
+        $adminInfoArray = [];
+        foreach ($adminDetails as $adminDetail) {
+            $curAdmin = Admin::where('id', $adminDetail->admin_id)->first();
+
+            $curAdminInfo = [
+                'emp_number' => $adminDetail->emp_number,
+                'name' => $curAdmin->last_name . ' ' . $curAdmin->first_name,
+                'email' => $curAdmin->email,
+                'role' => Role::Firstwhere('id', $adminDetail->role_id)->name,
+                'hire_date' => $adminDetail->hire_date,
+                'termination_date' => $adminDetail->termination_date,
+                'admin_id' => $curAdmin->id,
+            ];
+            array_push($adminInfoArray, $curAdminInfo);
+        }
+
+
+        return view('admin.attendances.admins', compact('adminInfoArray'));
     }
     public function createAdmin()
     {
+        $roles = Role::get();
+        return view('admin.attendances.adminscreate', compact('roles'));
     }
-    public function storeAdmins()
+    public function storeAdmin(AdminRequest $request)
     {
+
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+
+        $admin = new Admin();
+        $admin->last_name = $request->last_name;
+        $admin->first_name = $request->first_name;
+        $admin->email = $request->email;
+        $admin->password = $request->password;
+        $admin->save();
+
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $adminDetail->hire_date = $request->hire_date;
+        $adminDetail->emp_number = $request->emp_number;
+        $adminDetail->role_id = $request->role_id;
+        $adminDetail->company_id = $companyId;
+        $adminDetail->update();
+
+        return $this->createAdmin();
+    }
+    public function editAdmin($id)
+    {
+        $admin = Admin::firstWhere('id', $id);
+        $adminDetail = AdminDetail::firstWhere('admin_id', $id);
+        $roles = Role::get();
+        $roleId = $adminDetail->role_id;
+        $role = Role::firstWhere('id', $roleId);
+
+        return view('admin.attendances.adminsedit', compact('admin', 'adminDetail', 'role', 'roles'));
+    }
+
+    public function updateAdmin(AdminRequest $request, $id)
+    {
+        $admin = Admin::firstWhere('id', $id);
+        $admin->last_name = $request->last_name;
+        $admin->first_name = $request->first_name;
+        $admin->email = $request->email;
+        $admin->password = $request->password;
+        $admin->update();
+
+        $adminDetail = AdminDetail::firstWhere('admin_id', $admin->id);
+        $adminDetail->hire_date = $request->hire_date;
+        $adminDetail->termination_date = $request->termination_date;
+        $adminDetail->emp_number = $request->emp_number;
+        $adminDetail->role_id = $request->role_id;
+        $adminDetail->update();
+
+        return $this->showAdmins();
     }
 }

@@ -87,16 +87,19 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('users', [AdminAttendanceController::class, 'showUsers'])->name('admin.users');
         Route::get('users/create', [AdminAttendanceController::class, 'createUser'])->name('admin.users.create');
         Route::post('users/store', [AdminAttendanceController::class, 'storeUser'])->name('admin.users.store');
+        Route::get('users/{id}/edit', [AdminAttendanceController::class, 'editUser'])->name('admin.users.edit');
+        Route::patch('users/{id}/update', [AdminAttendanceController::class, 'updateUser'])->name('admin.users.update');
         Route::get('admins', [AdminAttendanceController::class, 'showAdmins'])->name('admin.admins');
         Route::get('admins/create', [AdminAttendanceController::class, 'createAdmin'])->name('admin.admins.create');
         Route::post('admins/store', [AdminAttendanceController::class, 'storeAdmin'])->name('admin.admins.store');
+        Route::get('admins/{id}/edit', [AdminAttendanceController::class, 'editAdmin'])->name('admin.admins.edit');
+        Route::patch('admins/{id}/update', [AdminAttendanceController::class, 'updateAdmin'])->name('admin.admins.update');
         Route::patch('daily/{attendance}', [AdminAttendanceController::class, 'updateAdminComment'])->name('admin.daily.update');
     });
 });
 
 // admin用ルート
 Route::post('attendances/timecard/submit-month', [AdminAttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
-
 
 
 
