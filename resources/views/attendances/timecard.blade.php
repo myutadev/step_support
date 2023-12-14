@@ -29,7 +29,7 @@
             </div>
 
             <!-- メインコンテンツのカラム -->
-            <div class="col-md-10" >
+            <div class="col-md-10">
                 {{-- ヘッダー --}}
                 @include('components.header')
 
@@ -38,9 +38,10 @@
                     <p>タイムカード</p>
                 </div>
                 <div class="timecard-selectors">
-                    <form action="{{ '/attendances/timecard/submit-month' }}" method="post" id="monthForm">
+                    <form action="{{ '/attendances/timecard/' }}" method="post" id="monthForm">
                         @csrf
-                        <input type="month" name="month" value="{{ date('Y-m') }}" id="monthInput">
+                        <input type="month" name="month" value="{{ $year }}-{{ $month }}"
+                            id="monthInput">
                     </form>
                 </div>
                 <div class="record-list mt-5">
@@ -83,14 +84,6 @@
     </div>
 
 
-
-
+    <script src="{{ asset('js/calendar/monthChangeHandler.js') }}"></script>
 
 @endsection
-
-<script>
-    // ここにJavaScriptコードを配置
-    document.getElementById('monthInput').addEventListener('change', function() {
-        document.getElementById('monthForm').submit();
-    });
-</script>

@@ -33,9 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// 利用者さん用出退勤route
-Route::get('attendances/timecard', [AttendanceController::class, 'timecard'])->name('attendances.timecard')->middleware('auth');
-Route::post('attendances/timecard/submit-month', [AttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
+// 利用者さん用表示ルート
+Route::get('attendances/timecard/{yearmonth?}', [AttendanceController::class, 'timecard'])->name('attendances.timecard')->middleware('auth');
 
 
 Route::resource('attendances', AttendanceController::class)
@@ -47,16 +46,14 @@ Route::resource('attendances', AttendanceController::class)
 // 利用者さん用出退勤route
 
 Route::post('attendances/checkin', [AttendanceController::class, 'checkin'])->name('attendances.checkin')->middleware('auth');
-
 Route::post('attendances/rest-start', [AttendanceController::class, 'restStart'])->name('attendances.rest.start')->middleware('auth');
-
 Route::post('attendances/rest-end', [AttendanceController::class, 'restEnd'])->name('attendances.rest.end')->middleware('auth');
-
 Route::post('attendances/overtime-start', [AttendanceController::class, 'overtimeStart'])->name('attendances.overtime.start')->middleware('auth');
-
 Route::post('attendances/overtime-end', [AttendanceController::class, 'overtimeEnd'])->name('attendances.overtime.end')->middleware('auth');
-
 Route::post('attendances/checkout', [AttendanceController::class, 'checkout'])->name('attendances.checkout')->middleware('auth');
+
+
+
 
 /*
 |--------------------------------------------------------------------------

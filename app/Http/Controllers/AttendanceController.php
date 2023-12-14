@@ -255,12 +255,21 @@ class AttendanceController extends Controller
         return redirect()->route('attendances.index')->with('requested', "残業終了しました");
     }
 
-    public function timecard()
+    public function timecard($yearmonth = null)
     {
         $user = Auth::user();
-        $today = Carbon::today();
-        $year = $today->year;
-        $month = $today->month;
+
+        if (is_null($yearmonth)) {
+            $today = Carbon::today();
+            $year = $today->year;
+            $month = $today->month;
+        } else {
+            $yearMonthArr = explode("-", $yearmonth);
+            $year = $yearMonthArr[0];
+            $month = $yearMonthArr[1];
+        }
+
+
         $monthlyAttendanceData = [];
 
         $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)
@@ -316,74 +325,8 @@ class AttendanceController extends Controller
                 array_push($monthlyAttendanceData, $curAttendObj);
             }
         }
-
-        return view('attendances.timecard', compact('monthlyAttendanceData'));
+        return view('attendances.timecard', compact('monthlyAttendanceData', 'year', 'month'));
     }
-
-    public function submitMonth(Request $request)
-    {
-        $user = Auth::user();
-        $today = Carbon::today();
-        $year = $today->year;
-        $month = $today->month;
-        $monthlyAttendanceData = [];
-
-        $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->orderBy('date', 'asc')
-            ->get();
-
-        foreach ($thisMonthWorkSchedules as $WorkSchedule) {
-            $curScheduleType = ScheduleType::where('id', $WorkSchedule->schedule_type_id)->first();
-            $curAttendance = Attendance::where('user_id', $user->id)->where('work_schedule_id', $WorkSchedule->id)->first();
-            //curAttenddanceがNull→まだ出勤されてない場合
-            if (!$curAttendance) {
-                $curAttendObj = [
-                    'date' => $WorkSchedule->date,
-                    'scheduleType' => $curScheduleType->name,
-                    'bodyTemp' => "",
-                    'checkin' => "",
-                    'checkout' => "",
-                    'rest' => "",
-                    'overtime' => "",
-                    'workDescription' => "",
-                    'workComment' => "",
-                ];
-                array_push($monthlyAttendanceData, $curAttendObj);
-            } else {
-
-
-                $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
-                //休憩は複数回入る可能性あり。
-                $restTimes = [];
-                foreach ($curRests as $rest) {
-                    $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
-                }
-                $restTimeString = implode("<br>", $restTimes);
-
-                $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
-                $curAttendObj = [
-                    'date' => $WorkSchedule->date,
-                    'scheduleType' => $curScheduleType->name,
-                    'bodyTemp' => $curAttendance->body_temp,
-                    'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
-                    'checkout' => Carbon::parse($curAttendance->check_out_time)->format('H:i'),
-                    'rest' => $restTimeString,
-                    'overtime' => Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
-                    'workDescription' => $curAttendance->work_description,
-                    'workComment' => $curAttendance->work_comment,
-                ];
-
-                array_push($monthlyAttendanceData, $curAttendObj);
-                // dd($monthlyAttendanceData);
-            }
-        }
-
-        return view('attendances.timecard', compact('monthlyAttendanceData'));
-    }
-
-
-
 
 
 
