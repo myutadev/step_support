@@ -15,8 +15,8 @@ class WorkScheduleSeeder extends Seeder
      */
     public function run(): void
     {
-        $startDate = Carbon::create(2023, 10, 1);
-        $endDate = Carbon::create(2023, 12, 31);
+        $startDate = Carbon::create(2024, 1, 1);
+        $endDate = Carbon::create(2030, 12, 31);
 
         while ($startDate->lte($endDate)) {
             DB::table('work_schedules')->insert([
