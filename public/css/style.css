@@ -236,6 +236,11 @@
     line-height: normal !important;
 }
 
+.link-for-admin {
+    text-align: right !important;
+}
+
+
 .error {
 
     color: red;
