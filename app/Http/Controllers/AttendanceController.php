@@ -12,6 +12,8 @@ use App\Models\WorkSchedule;
 
 use App\Models\UserDetail;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
+use DateInterval;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
 
@@ -290,6 +292,7 @@ class AttendanceController extends Controller
                     'checkout' => "",
                     'rest' => "",
                     'overtime' => "",
+                    'duration' => "",
                     'workDescription' => "",
                     'workComment' => "",
                 ];
@@ -306,9 +309,57 @@ class AttendanceController extends Controller
                 $restTimeString = implode("<br>", $restTimes);
 
                 $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
-                // dd($curAttendance);
 
-                // dd($curAttendance);
+                //ここから1日の勤務時間の計算 1. 出勤 10時以前→10時、10時以降→15分単位で切り上げ
+                $checkInTimeForCalc = Carbon::parse($curAttendance->check_in_time);
+                $checkOutTimeForCalc = Carbon::parse($curAttendance->check_out_time);
+                $baseTimeForIn = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 10:00:00');
+                $baseTimeForOut = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 15:00:00');
+
+                $isOvertime = $curAttendance->is_overtime;
+
+                //出勤時間の切り上げ
+                if ($checkInTimeForCalc->lt($baseTimeForIn)) {
+                    $checkInTimeForCalc->hour(10)->minute(0)->second(0);
+                } else {
+                    $checkInTimeForCalc->ceilMinute(15);
+                }
+
+
+                //退勤時間の切り下げ 残業なし(isOvertime=0) かつ 15時以降の打刻であれば
+                if ($checkOutTimeForCalc->gt($baseTimeForOut) && $isOvertime == 0) {
+                    $checkOutTimeForCalc->hour(15)->minute(0)->second(0);
+                } else {
+                    $checkOutTimeForCalc->floorminute(15);
+                }
+
+                $totalRestDuration = CarbonInterval::seconds(0); // 0秒で初期化
+
+                foreach ($curRests as $rest) {
+                    $restStart = Carbon::parse($rest->start_time);
+                    $restEnd = Carbon::parse($rest->end_time);
+                    $restDuration = $restStart->floorminute(15)->diff($restEnd->ceilminute(15));
+
+                    $totalRestDuration = $totalRestDuration->add($restDuration);
+                }
+                //残業代:なければ 0のcarboninterval,あれば計算する。
+
+                if ($curOvertime == null) {
+                    $overtimeDuration = CarbonInterval::seconds(0);
+                } else {
+                    $overtimeStart = Carbon::parse($curOvertime->start_time)->ceilMinute(15);
+                    $overtimeEnd = Carbon::parse($curOvertime->end_time)->floorMinute(15);
+                    $overtimeDuration = $overtimeStart->diff($overtimeEnd);
+                }
+
+                // duration - 休憩の合計 + 残業の時間
+                $workDuration = $checkInTimeForCalc->diff($checkOutTimeForCalc);
+                $workDurationInterval = CarbonInterval::instance($workDuration);
+                $overTimeInterval = CarbonInterval::instance($overtimeDuration);
+                $restInterval = CarbonInterval::instance($totalRestDuration);
+                $workDurationInterval = $workDurationInterval->add($overTimeInterval)->sub($restInterval);
+                // dd($workDurationInterval);
+
                 $curAttendObj = [
                     'date' => $WorkSchedule->date,
                     'scheduleType' => $curScheduleType->name,
@@ -317,6 +368,7 @@ class AttendanceController extends Controller
                     'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
                     'rest' => $restTimeString,
                     'overtime' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+                    'duration' => $workDurationInterval->format('%H:%I:%S'),
                     'workDescription' => $curAttendance->work_description,
                     'workComment' => $curAttendance->work_comment,
                 ];

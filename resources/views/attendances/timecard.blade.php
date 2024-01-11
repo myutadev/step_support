@@ -55,6 +55,7 @@
                                 <th scope="col">退勤時間</th>
                                 <th scope="col">休憩</th>
                                 <th scope="col">残業</th>
+                                <th scope="col">勤務時間</th>
                                 <th scope="col">作業内容</th>
                                 <th scope="col">作業コメント</th>
                             </tr>
@@ -70,6 +71,7 @@
                                         <td>{{ $date['checkout'] }}</td>
                                         <td> {!! $date['rest'] !!} </td>
                                         <td>{{ $date['overtime'] }}</td>
+                                        <td>{{ $date['duration'] }}</td>
                                         <td>{{ $date['workDescription'] }}</td>
                                         <td>{{ $date['workComment'] }}</td>
                                     </tr>
