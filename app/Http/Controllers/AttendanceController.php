@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Rest;
@@ -16,6 +17,7 @@ use Carbon\CarbonInterval;
 use DateInterval;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
+
 
 class AttendanceController extends Controller
 {
@@ -188,7 +190,60 @@ class AttendanceController extends Controller
         $attendance->check_out_time = Carbon::now()->toTimeString();
         $attendance->work_description = $request->work_description;
         $attendance->work_comment = $request->work_comment;
+        $attendance_id = $attendance->id;
         $attendance->update();
+
+        // 退勤時間が12時15分を超えている場合は自動で休憩時間をつける
+        // 休憩開始時間のロジック a. 12時前出勤 = 12時から休憩  or  b.12~13時出勤 or c.13時以降出勤 
+        // 休憩終了時間のロジック a. 12~13時までに退勤 = 退勤時間そのまま記録 b. 13時以降に退勤 = 13時に
+        // 通常:12時前に出勤→ 13時以降退勤 :一律:12:00~13:00休憩
+        // イレギュラー: 12時~13時に出勤: 1. 退勤13時以降 → 出勤時間 15分切り上げた時間~13時まで休憩 2. 退勤13時までに退勤
+        //
+
+        $carbonChecnkInTime = Carbon::parse($attendance->check_in_time);
+        $carbonCheckOutTime = Carbon::parse($attendance->check_out_time);
+
+
+        if ($carbonChecnkInTime->hour < 12) {
+            //13:00以降であれば 現在時刻の15分切り下げ から - 13:00
+            if ($carbonCheckOutTime->hour >= 13) {
+                //休憩開始 = 12:00 , 休憩終了 = 13:00
+                $message1 = 'this is before 12 in then after 13 out';
+                $rest = new Rest;
+                $rest->attendance_id = $attendance_id;
+                $rest->start_time = "12:00:00";
+                $rest->end_time = "13:00:00";
+                $rest->save();
+            } elseif ($carbonCheckOutTime->hour >= 12) {
+                // 休憩開始 = 12:00 , 休憩終了 = 退勤終了時間
+                $message1 = 'this is before 12 in then after 12 out';
+                $rest = new Rest;
+                $rest->attendance_id = $attendance_id;
+                $rest->start_time = "12:00:00";
+                $rest->end_time = Carbon::now()->toTimeString();
+                $rest->save();
+            } else {
+                //休憩なし
+            }
+        } elseif ($carbonChecnkInTime->hour === 12) {
+            // 12時代 else  
+            $rest = new Rest;
+            $rest->attendance_id = $attendance_id;
+            $rest->start_time = $attendance->check_in_time;
+            if ($carbonCheckOutTime->hour === 12) {
+                // 12時台 rest_start = check in time  休憩終了=チェックアウトタイム
+                $rest->end_time = Carbon::now()->toTimeString();
+                $rest->save();
+            } else {
+                // after 13 out rest_start = check in time rest_end= 13:00  
+                $rest->end_time = "13:00:00";
+                $rest->save();
+            }
+        } else {
+            //休憩なし
+        }
+
+
 
         return redirect()->route('attendances.index')->with(
             'requested',
