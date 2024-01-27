@@ -15,7 +15,7 @@ class WorkScheduleSeeder extends Seeder
      */
     public function run(): void
     {
-        $startDate = Carbon::create(2024, 1, 1);
+        $startDate = Carbon::create(2023, 1, 1);
         $endDate = Carbon::create(2030, 12, 31);
 
         while ($startDate->lte($endDate)) {
