@@ -42,7 +42,7 @@
                         <!-- ボタンのグループ -->
                         <div class="col d-flex justify-content-between pt-2">
                             <!-- 出勤ボタン -->
-                            <button type="button" class="btn btn-attend me-3" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-attend me-3" id="attendanceButton" data-bs-toggle="modal"
                                 data-bs-target="#temperatureModal">
                                 出勤
                             </button>
@@ -84,11 +84,6 @@
                             <button type="button" class="btn btn-leave" id="leaveButton">
                                 退勤
                             </button>
-                            {{-- <button type="button" class="btn btn-leave" data-bs-toggle="modal" data-bs-target="#leaveModal"
-                                id="leaveButton">
-                                退勤
-                            </button>
- --}}
 
 
                             <!-- 退勤モーダル -->
@@ -163,7 +158,7 @@
 
                             <!-- 休憩開始ボタン -->
                             <button type="button" class="btn btn-break" data-bs-toggle="modal"
-                                data-bs-target="#startRestModal">
+                                data-bs-target="#startRestModal" id="restStartButton">
                                 休憩開始
                             </button>
 
@@ -197,7 +192,7 @@
                             </div>
                             <!-- 休憩終了ボタン -->
                             <button type="button" class="btn btn-break" data-bs-toggle="modal"
-                                data-bs-target="#endRestModal">
+                                data-bs-target="#endRestModal" id="restEndButton" disabled>
                                 休憩終了
                             </button>
 
@@ -232,7 +227,7 @@
 
                             <!-- 残業開始ボタン -->
                             <button type="button" class="btn btn-overtime" data-bs-toggle="modal"
-                                data-bs-target="#startOvertimeModal">
+                                data-bs-target="#startOvertimeModal" id="overtimeStartButton">
                                 残業開始
                             </button>
 
@@ -270,7 +265,7 @@
 
                             <!-- 残業終了ボタン -->
                             <button type="button" class="btn btn-overtime" data-bs-toggle="modal"
-                                data-bs-target="#endOvertimeModal">
+                                data-bs-target="#endOvertimeModal" id="overtimeEndButton" disabled>
                                 残業終了
                             </button>
 
@@ -358,7 +353,7 @@
                             @if ($attendancesArray)
                                 @foreach ($attendancesArray as $attendance)
                                     <tr>
-                                        <td>{{ $attendance['type'] }}</td>
+                                        <td class="attendance-type">{{ $attendance['type'] }}</td>
                                         <td>{{ $attendance['dateTime'] }}</td>
                                         <td>{{ $attendance['is_overtime'] }}</td>
                                         <td>{{ $attendance['body_temp'] }}</td>
@@ -490,5 +485,116 @@
                     leaveModal.show();
                 });
             });
+
+            // ボタン制御JS→出退勤
+            document.addEventListener('DOMContentLoaded', function() {
+                const attendanceButton = document.getElementById('attendanceButton')
+                const leaveButton = document.getElementById('leaveButton')
+                let isAttendRecordPresent = false;
+                let isLeaveRecordPresent = false;
+                //1. attendrecord = false , 2
+                const attendanceTypeElements = document.querySelectorAll('.attendance-type');
+                attendanceTypeElements.forEach(element => {
+                    if (element.innerHTML.trim() === '出勤') {
+                        isAttendRecordPresent = true;
+                    } else if (element.innerHTML.trim() === '退勤') {
+                        isLeaveRecordPresent = true;
+                    }
+                });
+
+                if (!isAttendRecordPresent) {
+                    console.log("if")
+                    leaveButton.disabled = true;
+                } else if (isAttendRecordPresent && isLeaveRecordPresent) {
+                    console.log("elif")
+                    leaveButton.disabled = true;
+                    attendanceButton.disabled = true;
+                } else {
+                    console.log("else")
+
+                    leaveButton.disabled = false;
+                    attendanceButton.disabled = true;
+                }
+            })
+
+            // ボタン制御JS→休憩
+            document.addEventListener('DOMContentLoaded', function() {
+                const restStartButton = document.getElementById('restStartButton')
+                const restEndButton = document.getElementById('restEndButton')
+                let isRestStartRecordPresent = false;
+                let isRestEndRecordPresent = false;
+                let counter = 0;
+                //1. attendrecord = false , 2
+                const attendanceTypeElements = document.querySelectorAll('.attendance-type');
+                attendanceTypeElements.forEach(element => {
+                    if (counter % 2 == 0) {
+                        isRestStartRecordPresent = false;
+                        isRestEndRecordPresent = false;
+                    }
+
+                    if (element.innerHTML.trim() === '休憩開始') {
+                        isRestStartRecordPresent = true;
+                        counter++
+                    } else if (element.innerHTML.trim() === '休憩終了') {
+                        isRestEndRecordPresent = true;
+                        counter++
+                    }
+
+                });
+
+                if (!isRestStartRecordPresent) {
+                    console.log("if")
+                    restStartButton.disabled = false;
+                } else if (isRestStartRecordPresent && isRestEndRecordPresent) {
+                    console.log("elif")
+                    restStartButton.disabled = false;
+                    restEndButton.disabled = true;
+                } else {
+                    console.log("else")
+                    restStartButton.disabled = true;
+                    restEndButton.disabled = false;
+
+                }
+            })
+
+
+            // ボタン制御JS→残業
+            document.addEventListener('DOMContentLoaded', function() {
+                const overtimeStartButton = document.getElementById('overtimeStartButton')
+                const overtimeEndButton = document.getElementById('overtimeEndButton')
+                let isOvertimeStartRecordPresent = false;
+                let isOvertimeEndRecordPresent = false;
+                let counter = 0;
+                //1. attendrecord = false , 2
+                const attendanceTypeElements = document.querySelectorAll('.attendance-type');
+                attendanceTypeElements.forEach(element => {
+                    if (counter % 2 == 0) {
+                        isOvertimeStartRecordPresent = false;
+                        isOvertimeEndRecordPresent = false;
+                    }
+
+                    if (element.innerHTML.trim() === '残業開始') {
+                        isOvertimeStartRecordPresent = true;
+                        counter++
+                    } else if (element.innerHTML.trim() === '残業終了') {
+                        isOvertimeEndRecordPresent = true;
+                        counter++
+                    }
+
+                });
+
+                if (!isOvertimeStartRecordPresent) {
+                    console.log("if")
+                    overtimeStartButton.disabled = false;
+                } else if (isOvertimeStartRecordPresent && isOvertimeEndRecordPresent) {
+                    console.log("elif")
+                    overtimeStartButton.disabled = false;
+                    overtimeEndButton.disabled = true;
+                } else {
+                    console.log("else")
+                    overtimeStartButton.disabled = true;
+                    overtimeEndButton.disabled = false;
+                }
+            })
         </script>
     @endsection
