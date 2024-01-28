@@ -465,7 +465,7 @@
                 leaveButton.addEventListener('click', function() {
                     const now = new Date();
                     console.log(now)
-                    if ((now.getHours() >= 12 && now.getMinutes() >= 30) || now.getHours() >= 12) {
+                    if ((now.getHours() >= 15 && now.getMinutes() >= 30) || now.getHours() >= 16) {
                         // 現在時刻が15:30以降の場合、残業確認モーダルを表示
                         overtimeModal.show();
                         console.log('overtime log')
