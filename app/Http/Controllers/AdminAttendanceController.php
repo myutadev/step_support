@@ -52,6 +52,7 @@ class AdminAttendanceController extends Controller
                 'is_on_welfare' => $userDetail->is_on_welfare == 1 ? "有" : "無",
                 'admission_date' => $userDetail->admission_date,
                 'discharge_date' => $userDetail->discharge_date,
+                'birthdate' => $userDetail->birthdate,
                 'disability_category_id' => DisabilityCategory::where('id', $userDetail->disability_category_id)->first()->name,
                 'residence_id' => Residence::where('id', $userDetail->residence_id)->first()->name,
                 'counselor_id' => Counselor::where('id', $userDetail->counselor_id)->first()->name,
@@ -86,6 +87,7 @@ class AdminAttendanceController extends Controller
         $user->save();
 
         $userDetail = UserDetail::where('user_id', $user->id)->first();
+        $userDetail->birthdate = $request->birthdate;
         $userDetail->beneficiary_number = $request->beneficiary_number;
         $userDetail->disability_category_id = $request->disability_category_id;
         //is_on_welfareの有無をチェック
@@ -126,6 +128,7 @@ class AdminAttendanceController extends Controller
         $userDetail = UserDetail::firstWhere('user_id', $id);
         $userDetail->beneficiary_number = $request->beneficiary_number;
         $userDetail->disability_category_id = $request->disability_category_id;
+        $userDetail->birthdate = $request->birthdate;
         //is_on_welfareの有無をチェック
         $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
         $userDetail->residence_id = $request->residence_id;

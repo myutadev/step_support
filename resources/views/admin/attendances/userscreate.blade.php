@@ -51,7 +51,13 @@
                             value={{ old('first_name') }}>
                     </div>
                 </div>
-
+                <div class="row mb-3">
+                    <label for="birthdate" class="col-sm-2 col-form-label">生年月日</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" id="birthdate" name="birthdate"
+                            value={{ old('birthdate') }}>
+                    </div>
+                </div>
                 <div class="row mb-3">
                     <label for="inputEmail3" class="col-sm-2 col-form-label">メールアドレス</label>
                     <div class="col-sm-10">
@@ -221,6 +227,7 @@
             const beneficiaryNumber = document.getElementById('beneficiary_number').value;
             const lastName = document.getElementById('last_name').value;
             const firstName = document.getElementById('first_name').value;
+            const birthdate = document.getElementById('birthdate').value;
             const email = document.getElementById('email').value;
             // const is_on_welfare = document.getElementById('is_on_welfare').value;
             const disability_category_select = document.getElementById('disability_category_id');
@@ -251,6 +258,7 @@
                 `
                 <h4 class="mb-3">受給者番号: ${beneficiaryNumber}</h4>
                 <h4 class="mb-3">名前: ${name}</h4>
+                <h4 class="mb-3">生年月日: ${birthdate}</h4>
                 <h4 class="mb-3">メールアドレス: ${email}</h4>
                 <h4 class="mb-3">障害区分: ${disability_category_name}</h4>
                 <h4 class="mb-3">生活保護受給: ${is_on_welfare}</h4>
