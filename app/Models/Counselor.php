@@ -13,4 +13,8 @@ class Counselor extends Model
     {
         return $this->hasMany(UserDetail::class);
     }
+    public function Company()
+    {
+        return $this->belongsTo(UserDetail::class);
+    }
 }

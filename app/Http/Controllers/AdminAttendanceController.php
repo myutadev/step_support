@@ -291,4 +291,32 @@ class AdminAttendanceController extends Controller
 
         return $this->showAdmins();
     }
+
+    public function showCounselors()
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $counselors = Counselor::where('company_id', $companyId)->get();
+
+        return view('admin.attendances.counselors', compact('counselors'));
+    }
+    public function editCounselor($id)
+    {
+        $counselor = Counselor::where('id', $id)->first();
+        return view('admin.attendances.counselorsedit', compact('counselor'));
+    }
+    public function updateCounselor(Request $request, $id)
+    {
+        $counselor = Counselor::where('id', $id)->first();
+        $counselor->name = $request->name;
+        $counselor->contact_phone = $request->contact_phone;
+        $counselor->contact_email = $request->contact_email;
+        $counselor->update();
+
+        return $this->showCounselors();
+    }
+    public function showResidences()
+    {
+    }
 }

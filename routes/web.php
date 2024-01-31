@@ -92,6 +92,17 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('admins/{id}/edit', [AdminAttendanceController::class, 'editAdmin'])->name('admin.admins.edit');
         Route::patch('admins/{id}/update', [AdminAttendanceController::class, 'updateAdmin'])->name('admin.admins.update');
         Route::patch('daily/{attendance}', [AdminAttendanceController::class, 'updateAdminComment'])->name('admin.daily.update');
+        //settings
+        Route::get('settings/counselors', [AdminAttendanceController::class, 'showCounselors'])->name('admin.counselors');
+        Route::get('settings/counselors/create', [AdminAttendanceController::class, 'createCounselor'])->name('admin.counselors.create');
+        Route::post('settings/counselors/store', [AdminAttendanceController::class, 'storeCounselor'])->name('admin.counselors.store');
+        Route::get('settings/counselors/{id}/edit', [AdminAttendanceController::class, 'editCounselor'])->name('admin.counselors.edit');
+        Route::patch('settings/counselors/{id}/update', [AdminAttendanceController::class, 'updateCounselor'])->name('admin.counselors.update');
+        Route::get('settings/residences', [AdminAttendanceController::class, 'showResidences'])->name('admin.residences');
+        Route::get('settings/residences/create', [AdminAttendanceController::class, 'createResidence'])->name('admin.residences.create');
+        Route::post('settings/residences/store', [AdminAttendanceController::class, 'storeResidences'])->name('admin.residences.store');
+        Route::get('settings/residences/{id}/edit', [AdminAttendanceController::class, 'editResidences'])->name('admin.residences.edit');
+        Route::patch('settings/residences/{id}/update', [AdminAttendanceController::class, 'updateResidences'])->name('admin.residences.update');
     });
 });
 
