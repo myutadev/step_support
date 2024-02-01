@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\CounselorRequest;
+use App\Http\Requests\ResidenceRequest;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Rest;
@@ -295,18 +297,35 @@ class AdminAttendanceController extends Controller
     public function showCounselors()
     {
         $admin = Auth::user();
-        $adminDetail = AdminDetail::where('id', $admin->id)->first();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
         $companyId = $adminDetail->company_id;
         $counselors = Counselor::where('company_id', $companyId)->get();
 
         return view('admin.attendances.counselors', compact('counselors'));
+    }
+    public function createCounselor()
+    {
+        return view('admin.attendances.counselorcreate');
+    }
+    public function storeCounselor(CounselorRequest $request)
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $counselor = new Counselor();
+        $counselor->name = $request->name;
+        $counselor->contact_phone = $request->contact_phone;
+        $counselor->contact_email = $request->contact_email;
+        $counselor->company_id = $companyId;
+        $counselor->save();
+        return $this->showCounselors();
     }
     public function editCounselor($id)
     {
         $counselor = Counselor::where('id', $id)->first();
         return view('admin.attendances.counselorsedit', compact('counselor'));
     }
-    public function updateCounselor(Request $request, $id)
+    public function updateCounselor(CounselorRequest $request, $id)
     {
         $counselor = Counselor::where('id', $id)->first();
         $counselor->name = $request->name;
@@ -316,7 +335,59 @@ class AdminAttendanceController extends Controller
 
         return $this->showCounselors();
     }
+    public function deleteCounselor($id)
+    {
+        $counselor = Counselor::where('id', $id)->first();
+        $counselor->delete();
+        return $this->showCounselors();
+    }
     public function showResidences()
     {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $residences = Residence::where('company_id', $companyId)->get();
+
+        return view('admin.attendances.residences', compact('residences'));
+    }
+    public function createResidence()
+    {
+        return view('admin.attendances.residencecreate');
+    }
+    public function storeResidences(ResidenceRequest $request)
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $residence = new Residence();
+        $residence->name = $request->name;
+        $residence->contact_name = $request->contact_name;
+        $residence->contact_phone = $request->contact_phone;
+        $residence->contact_email = $request->contact_email;
+        $residence->company_id = $companyId;
+        $residence->save();
+        return $this->showResidences();
+    }
+    public function editResidences($id)
+    {
+        $residence = Residence::where('id', $id)->first();
+        return view('admin.attendances.residencesedit', compact('residence'));
+    }
+    public function updateResidences(ResidenceRequest $request, $id)
+    {
+        $residnece = Residence::where('id', $id)->first();
+        $residnece->name = $request->name;
+        $residnece->contact_name = $request->contact_name;
+        $residnece->contact_phone = $request->contact_phone;
+        $residnece->contact_email = $request->contact_email;
+        $residnece->update();
+
+        return $this->showResidences();
+    }
+    public function deleteResidences($id)
+    {
+        $residence = Residence::where('id', $id)->first();
+        $residence->delete();
+        return $this->showResidences();
     }
 }
