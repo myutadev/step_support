@@ -109,7 +109,7 @@ Route::group(['prefix' => 'admin'], function () {
 });
 
 // admin用ルート
-Route::post('attendances/timecard/submit-month', [AdminAttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
+Route::post('attendances/timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
 
 
 

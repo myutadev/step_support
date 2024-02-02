@@ -19,7 +19,15 @@
             <div class="timecard-selectors">
                 <form action="{{ '/attendances/timecard/submit-month' }}" method="post" id="monthForm">
                     @csrf
-                    <input type="month" name="month" value="{{ date('Y-m') }}" id="monthInput">
+                    <input type="month" name="month" value="{{ $year }}-{{ $month }}" id="monthInput">
+                    <div class="form-group">
+                        <label for="userselect">利用者名</label>
+                        <select class="form-control" id="userselect" name="user">
+                            @foreach ($users as $user)
+                                <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </form>
             </div>
             <div class="record-list mt-5">
@@ -31,8 +39,10 @@
                             <th scope="col">体温</th>
                             <th scope="col">出勤時間</th>
                             <th scope="col">退勤時間</th>
+                            <th scope="col">残業有無</th>
                             <th scope="col">休憩</th>
                             <th scope="col">残業</th>
+                            <th scope="col">勤務時間</th>
                             <th scope="col">作業内容</th>
                             <th scope="col">作業コメント</th>
                         </tr>
@@ -46,8 +56,10 @@
                                     <td>{{ $date['bodyTemp'] }}</td>
                                     <td>{{ $date['checkin'] }}</td>
                                     <td>{{ $date['checkout'] }}</td>
+                                    <td>{{ $date['is_overtime'] }}</td>
                                     <td> {!! $date['rest'] !!} </td>
                                     <td>{{ $date['overtime'] }}</td>
+                                    <td>{{ $date['duration'] }}</td>
                                     <td>{{ $date['workDescription'] }}</td>
                                     <td>{{ $date['workComment'] }}</td>
                                 </tr>

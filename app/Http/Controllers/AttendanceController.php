@@ -333,11 +333,11 @@ class AttendanceController extends Controller
         if (is_null($yearmonth)) {
             $today = Carbon::today();
             $year = $today->year;
-            $month = $today->month;
+            $month = sprintf("%02d", $today->month);
         } else {
             $yearMonthArr = explode("-", $yearmonth);
             $year = $yearMonthArr[0];
-            $month = $yearMonthArr[1];
+            $month = sprintf("%02d", $yearMonthArr[1]);
         }
 
 

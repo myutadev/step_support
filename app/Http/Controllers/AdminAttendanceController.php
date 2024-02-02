@@ -21,19 +21,152 @@ use App\Models\Role;
 use App\Models\Residence;
 use App\Models\UserDetail;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
+
 
 use Illuminate\Http\Request;
 
 class AdminAttendanceController extends Controller
 {
 
-    public function showTimecard()
+    public function showTimecard($yearmonth = null, $user_id = null)
     {
-        $monthlyAttendanceData = [];
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $userDetails = UserDetail::with('user')->where('company_id', $companyId)->get();
+        $users = $userDetails->map(function ($userDetail) {
+            return [
+                'id' => $userDetail->user_id,
+                'name' => $userDetail->user->last_name . $userDetail->user->first_name,
+            ];
+        });
+        // dd($users);
 
-        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData'));
+        if ($yearmonth == null) {
+            $today = Carbon::today();
+            $year = $today->year;
+            $month = sprintf("%02d", $today->month);
+        } else {
+            $yearMonthArr = explode("-", $yearmonth);
+            $year = $yearmonth[0];
+            $month = sprintf("%02d", $yearmonth[1]);
+        }
+
+        if ($user_id == null) {
+            $userDetail = UserDetail::where('company_id', $companyId)->first();
+            $user_id = $userDetail->user_id;
+        }
+        $monthlyAttendanceData = [];
+        // dd($month);
+
+        $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
+        foreach ($thisMonthWorkSchedules as $workSchedule) {
+            $curScheduleType = ScheduleType::where('id', $workSchedule->schedule_type_id)->first();
+            $curAttendance = Attendance::where('user_id', $user_id)->where('work_schedule_id', $workSchedule->id)->first();
+
+            if (!$curAttendance) {
+                $curAttendanceObj = [
+                    'date' => $workSchedule->date,
+                    'scheduleType' => $curScheduleType->name,
+                    'bodyTemp' => "",
+                    'checkin' => "",
+                    'checkout' => "",
+                    'is_overtime' => "",
+                    'rest' => "",
+                    'overtime' => "",
+                    'duration' => "",
+                    'workDescription' => "",
+                    'workComment' => "",
+                ];
+                array_push($monthlyAttendanceData, $curAttendanceObj);
+            } else {
+                $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
+                //休憩は複数回入る可能性あり。
+                $restTimes = [];
+                foreach ($curRests as $rest) {
+                    $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
+                }
+                $restTimeString = implode("<br>", $restTimes);
+
+                $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
+
+                //ここから1日の勤務時間の計算 1. 出勤 10時以前→10時、10時以降→15分単位で切り上げ
+                $checkInTimeForCalc = Carbon::parse($curAttendance->check_in_time);
+                $checkOutTimeForCalc = Carbon::parse($curAttendance->check_out_time);
+                $baseTimeForIn = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 10:00:00');
+                $baseTimeForOut = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 15:00:00');
+
+                $isOvertime = $curAttendance->is_overtime;
+
+                //出勤時間の切り上げ
+                if ($checkInTimeForCalc->lt($baseTimeForIn)) {
+                    $checkInTimeForCalc->hour(10)->minute(0)->second(0);
+                } else {
+                    $checkInTimeForCalc->ceilMinute(15);
+                }
+
+
+                //退勤時間の切り下げ 残業なし(isOvertime=0) かつ 15時以降の打刻であれば
+                if ($checkOutTimeForCalc->gt($baseTimeForOut) && $isOvertime == 0) {
+                    $checkOutTimeForCalc->hour(15)->minute(0)->second(0);
+                } else {
+                    $checkOutTimeForCalc->floorminute(15);
+                }
+
+                $totalRestDuration = CarbonInterval::seconds(0); // 0秒で初期化
+
+                foreach ($curRests as $rest) {
+                    $restStart = Carbon::parse($rest->start_time);
+                    $restEnd = Carbon::parse($rest->end_time);
+                    $restDuration = $restStart->floorminute(15)->diff($restEnd->ceilminute(15));
+
+                    $totalRestDuration = $totalRestDuration->add($restDuration);
+                }
+                //残業代:なければ 0のcarboninterval,あれば計算する。
+
+                if ($curOvertime == null) {
+                    $overtimeDuration = CarbonInterval::seconds(0);
+                } else {
+                    $overtimeStart = Carbon::parse($curOvertime->start_time)->ceilMinute(15);
+                    $overtimeEnd = Carbon::parse($curOvertime->end_time)->floorMinute(15);
+                    $overtimeDuration = $overtimeStart->diff($overtimeEnd);
+                }
+
+                // duration - 休憩の合計 + 残業の時間
+                $workDuration = $checkInTimeForCalc->diff($checkOutTimeForCalc);
+                $workDurationInterval = CarbonInterval::instance($workDuration);
+                $overTimeInterval = CarbonInterval::instance($overtimeDuration);
+                $restInterval = CarbonInterval::instance($totalRestDuration);
+                $workDurationInterval = $workDurationInterval->add($overTimeInterval)->sub($restInterval);
+                // dd($workDurationInterval);
+                if ($curAttendance->is_overtime === 1) {
+                    $is_overtime_str = "有";
+                } else {
+                    $is_overtime_str = "無";
+                }
+
+                $curAttendanceObj = [
+                    'date' => $workSchedule->date,
+                    'scheduleType' => $curScheduleType->name,
+                    'bodyTemp' => $curAttendance->body_temp,
+                    'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
+                    'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
+                    'is_overtime' => $is_overtime_str,
+                    'rest' => $restTimeString,
+                    'overtime' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+                    'duration' => $workDurationInterval->format('%H:%I:%S'),
+                    'workDescription' => $curAttendance->work_description,
+                    'workComment' => $curAttendance->work_comment,
+                ];
+                array_push($monthlyAttendanceData, $curAttendanceObj);
+            }
+        }
+
+        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users'));
     }
 
     public function showUsers()

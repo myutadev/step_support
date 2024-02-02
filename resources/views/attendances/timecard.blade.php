@@ -53,7 +53,7 @@
                                 <th scope="col">体温</th>
                                 <th scope="col">出勤時間</th>
                                 <th scope="col">退勤時間</th>
-                                <th scope="col">残業</th>
+                                <th scope="col">残業有無</th>
                                 <th scope="col">休憩</th>
                                 <th scope="col">残業</th>
                                 <th scope="col">勤務時間</th>
