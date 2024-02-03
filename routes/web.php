@@ -79,7 +79,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('dashboard', fn () => view('admin.dashboard'))
             ->name('admin.dashboard');
 
-        Route::get('timecard', [AdminAttendanceController::class, 'showTimecard'])->name('admin.timecard');
+        Route::get('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'showTimecard'])->name('admin.timecard');
+        // Route::post('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('admin.timecard.submit.month')->middleware('auth');
         Route::get('daily', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
         Route::get('users', [AdminAttendanceController::class, 'showUsers'])->name('admin.users');
         Route::get('users/create', [AdminAttendanceController::class, 'createUser'])->name('admin.users.create');
@@ -109,7 +110,6 @@ Route::group(['prefix' => 'admin'], function () {
 });
 
 // admin用ルート
-Route::post('attendances/timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
 
 
 

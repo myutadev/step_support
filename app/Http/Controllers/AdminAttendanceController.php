@@ -52,17 +52,18 @@ class AdminAttendanceController extends Controller
             $month = sprintf("%02d", $today->month);
         } else {
             $yearMonthArr = explode("-", $yearmonth);
-            $year = $yearmonth[0];
-            $month = sprintf("%02d", $yearmonth[1]);
+            $year = $yearMonthArr[0];
+            $month = sprintf("%02d", $yearMonthArr[1]);
         }
+
 
         if ($user_id == null) {
             $userDetail = UserDetail::where('company_id', $companyId)->first();
             $user_id = $userDetail->user_id;
         }
+        // dd($user_name);
+        // 表示データの作成
         $monthlyAttendanceData = [];
-        // dd($month);
-
         $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
         foreach ($thisMonthWorkSchedules as $workSchedule) {
             $curScheduleType = ScheduleType::where('id', $workSchedule->schedule_type_id)->first();
@@ -166,7 +167,7 @@ class AdminAttendanceController extends Controller
             }
         }
 
-        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users'));
+        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users', 'user_id'));
     }
 
     public function showUsers()

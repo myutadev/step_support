@@ -13,20 +13,28 @@
 
 
             <!-- テーブルのグループ -->
-            <div class="timecard-title">
-                <p>タイムカード</p>
-            </div>
             <div class="timecard-selectors">
-                <form action="{{ '/attendances/timecard/submit-month' }}" method="post" id="monthForm">
+                <form action="{{ '/attendances/timecard/submit-month' }}" method="post" id="monthUserForm" class="form-inline">
                     @csrf
-                    <input type="month" name="month" value="{{ $year }}-{{ $month }}" id="monthInput">
-                    <div class="form-group">
-                        <label for="userselect">利用者名</label>
-                        <select class="form-control" id="userselect" name="user">
-                            @foreach ($users as $user)
-                                <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
-                            @endforeach
-                        </select>
+                    <div class="row">
+                        <!-- 月選択 -->
+                        <div class="col-sm-2">
+                            <p>タイムカード</p>
+                            <input type="month" name="month" value="{{ $year }}-{{ $month }}"
+                                id="monthInput" class="form-control mb-2 mr-sm-2">
+                        </div>
+                        <!-- 利用者名選択 -->
+                        <div class="col-sm-2">
+                            <div class="form-group mb-2 mr-sm-2">
+                                <p class="mb-4">利用者名</p>
+                                <select class="form-control" id="userInput" name="user">
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user['id'] }}" {{ $user['id'] == $user_id ? 'selected' : '' }}>
+                                            {{ $user['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -73,41 +81,5 @@
     </div>
     </div>
 
-
-    <script>
-        function updateClock() {
-            const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            let day = now.getDate();
-            let month = now.getMonth() + 1; // 月は0から始まるため1を足す
-            let year = now.getFullYear();
-            let dayOfWeek = now.toLocaleString('ja-JP', {
-                weekday: 'short'
-            });
-
-            hours = hours < 10 ? '0' + hours : hours;
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            month = month < 10 ? '0' + month : month;
-            day = day < 10 ? '0' + day : day;
-
-            const timeString = `${hours}:${minutes}`;
-            const dateString = `${year}.${month}.${day} (${dayOfWeek})`;
-
-            document.getElementById('digital-clock').textContent = timeString;
-            document.querySelector('.date-display').textContent = dateString;
-        }
-        updateClock(); // 初期時刻を設定
-        setInterval(updateClock, 1000); // 1秒ごとに時刻を更新
-    </script>
-
-
-
+    <script src="{{ asset('js/calendar/monthUserChangeHandler.js') }}"></script>
 @endsection
-
-<script>
-    // ここにJavaScriptコードを配置
-    document.getElementById('monthInput').addEventListener('change', function() {
-        document.getElementById('monthForm').submit();
-    });
-</script>
