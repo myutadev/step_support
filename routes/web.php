@@ -81,7 +81,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'showTimecard'])->name('admin.timecard');
         // Route::post('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('admin.timecard.submit.month')->middleware('auth');
-        Route::get('daily', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
+        Route::get('daily/{date?}', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
         Route::get('users', [AdminAttendanceController::class, 'showUsers'])->name('admin.users');
         Route::get('users/create', [AdminAttendanceController::class, 'createUser'])->name('admin.users.create');
         Route::post('users/store', [AdminAttendanceController::class, 'storeUser'])->name('admin.users.store');

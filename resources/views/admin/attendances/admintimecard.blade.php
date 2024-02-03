@@ -14,29 +14,26 @@
 
             <!-- テーブルのグループ -->
             <div class="timecard-selectors">
-                <form action="{{ '/attendances/timecard/submit-month' }}" method="post" id="monthUserForm" class="form-inline">
-                    @csrf
-                    <div class="row">
-                        <!-- 月選択 -->
-                        <div class="col-sm-2">
-                            <p>タイムカード</p>
-                            <input type="month" name="month" value="{{ $year }}-{{ $month }}"
-                                id="monthInput" class="form-control mb-2 mr-sm-2">
-                        </div>
-                        <!-- 利用者名選択 -->
-                        <div class="col-sm-2">
-                            <div class="form-group mb-2 mr-sm-2">
-                                <p class="mb-4">利用者名</p>
-                                <select class="form-control" id="userInput" name="user">
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user['id'] }}" {{ $user['id'] == $user_id ? 'selected' : '' }}>
-                                            {{ $user['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                <div class="row">
+                    <!-- 月選択 -->
+                    <div class="col-sm-2">
+                        <p>タイムカード</p>
+                        <input type="month" name="month" value="{{ $year }}-{{ $month }}" id="monthInput"
+                            class="form-control mb-2 mr-sm-2">
+                    </div>
+                    <!-- 利用者名選択 -->
+                    <div class="col-sm-2">
+                        <div class="form-group mb-2 mr-sm-2">
+                            <p class="mb-4">利用者名</p>
+                            <select class="form-control" id="userInput" name="user">
+                                @foreach ($users as $user)
+                                    <option value="{{ $user['id'] }}" {{ $user['id'] == $user_id ? 'selected' : '' }}>
+                                        {{ $user['name'] }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
             <div class="record-list mt-5">
                 <table class="table table-striped">

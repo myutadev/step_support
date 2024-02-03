@@ -279,17 +279,22 @@ class AdminAttendanceController extends Controller
 
 
 
-    public function showDaily()
+    public function showDaily($date = null)
     {
+
+        if ($date == null) {
+            $selectedDate = Carbon::today();
+        } else {
+            $selectedDate = $date;
+        }
 
         $admin = Auth::user();
         $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
         $companyId = $adminDetail->company_id;
-        $today = Carbon::today();
-        $todayWorkSchedId = WorkSchedule::where('date', $today)->first()->id;
+        $selectedWorkSchedId = WorkSchedule::where('date', $selectedDate)->first()->id;
 
         //本日の勤怠レコード一覧を取得
-        $attendanceRecords = Attendance::where('company_id', $companyId)->get()->where('work_schedule_id', $todayWorkSchedId);
+        $attendanceRecords = Attendance::where('company_id', $companyId)->get()->where('work_schedule_id', $selectedWorkSchedId);
 
         $dailyAttendanceData = [];
 
@@ -330,7 +335,7 @@ class AdminAttendanceController extends Controller
             array_push($dailyAttendanceData, $curAttendanceRecord);
         }
 
-        return view('admin.attendances.daily', compact('dailyAttendanceData'));
+        return view('admin.attendances.daily', compact('dailyAttendanceData', 'selectedDate'));
     }
 
     public function updateAdminComment(Request $request, Attendance $attendance)
@@ -342,7 +347,9 @@ class AdminAttendanceController extends Controller
         $adminComment->admin_id = $admin_id;
         $adminComment->update();
 
-        return $this->showDaily();
+        $workSchedule = WorkSchedule::where('id', $attendance->work_schedule_id)->first();
+        $date = $workSchedule->date;
+        return redirect()->route('admin.daily', compact('date'));
     }
 
     public function showAdmins()
