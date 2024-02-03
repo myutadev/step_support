@@ -26,5 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ScheduleTypeSeeder::class);
         $this->call(WorkScheduleSeeder::class);
         $this->call(RoleSeeder::class);
+        $this->call(AdminSeeder::class);
+        $this->call(AdminDetailSeeder::class);
     }
 }

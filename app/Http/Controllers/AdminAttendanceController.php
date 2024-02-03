@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\CounselorRequest;
+use App\Http\Requests\ResidenceRequest;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Rest;
@@ -19,19 +21,153 @@ use App\Models\Role;
 use App\Models\Residence;
 use App\Models\UserDetail;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
+
 
 use Illuminate\Http\Request;
 
 class AdminAttendanceController extends Controller
 {
 
-    public function showTimecard()
+    public function showTimecard($yearmonth = null, $user_id = null)
     {
-        $monthlyAttendanceData = [];
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $userDetails = UserDetail::with('user')->where('company_id', $companyId)->get();
+        $users = $userDetails->map(function ($userDetail) {
+            return [
+                'id' => $userDetail->user_id,
+                'name' => $userDetail->user->last_name . $userDetail->user->first_name,
+            ];
+        });
+        // dd($users);
 
-        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData'));
+        if ($yearmonth == null) {
+            $today = Carbon::today();
+            $year = $today->year;
+            $month = sprintf("%02d", $today->month);
+        } else {
+            $yearMonthArr = explode("-", $yearmonth);
+            $year = $yearMonthArr[0];
+            $month = sprintf("%02d", $yearMonthArr[1]);
+        }
+
+
+        if ($user_id == null) {
+            $userDetail = UserDetail::where('company_id', $companyId)->first();
+            $user_id = $userDetail->user_id;
+        }
+        // dd($user_name);
+        // 表示データの作成
+        $monthlyAttendanceData = [];
+        $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
+        foreach ($thisMonthWorkSchedules as $workSchedule) {
+            $curScheduleType = ScheduleType::where('id', $workSchedule->schedule_type_id)->first();
+            $curAttendance = Attendance::where('user_id', $user_id)->where('work_schedule_id', $workSchedule->id)->first();
+
+            if (!$curAttendance) {
+                $curAttendanceObj = [
+                    'date' => $workSchedule->date,
+                    'scheduleType' => $curScheduleType->name,
+                    'bodyTemp' => "",
+                    'checkin' => "",
+                    'checkout' => "",
+                    'is_overtime' => "",
+                    'rest' => "",
+                    'overtime' => "",
+                    'duration' => "",
+                    'workDescription' => "",
+                    'workComment' => "",
+                ];
+                array_push($monthlyAttendanceData, $curAttendanceObj);
+            } else {
+                $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
+                //休憩は複数回入る可能性あり。
+                $restTimes = [];
+                foreach ($curRests as $rest) {
+                    $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
+                }
+                $restTimeString = implode("<br>", $restTimes);
+
+                $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
+
+                //ここから1日の勤務時間の計算 1. 出勤 10時以前→10時、10時以降→15分単位で切り上げ
+                $checkInTimeForCalc = Carbon::parse($curAttendance->check_in_time);
+                $checkOutTimeForCalc = Carbon::parse($curAttendance->check_out_time);
+                $baseTimeForIn = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 10:00:00');
+                $baseTimeForOut = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 15:00:00');
+
+                $isOvertime = $curAttendance->is_overtime;
+
+                //出勤時間の切り上げ
+                if ($checkInTimeForCalc->lt($baseTimeForIn)) {
+                    $checkInTimeForCalc->hour(10)->minute(0)->second(0);
+                } else {
+                    $checkInTimeForCalc->ceilMinute(15);
+                }
+
+
+                //退勤時間の切り下げ 残業なし(isOvertime=0) かつ 15時以降の打刻であれば
+                if ($checkOutTimeForCalc->gt($baseTimeForOut) && $isOvertime == 0) {
+                    $checkOutTimeForCalc->hour(15)->minute(0)->second(0);
+                } else {
+                    $checkOutTimeForCalc->floorminute(15);
+                }
+
+                $totalRestDuration = CarbonInterval::seconds(0); // 0秒で初期化
+
+                foreach ($curRests as $rest) {
+                    $restStart = Carbon::parse($rest->start_time);
+                    $restEnd = Carbon::parse($rest->end_time);
+                    $restDuration = $restStart->floorminute(15)->diff($restEnd->ceilminute(15));
+
+                    $totalRestDuration = $totalRestDuration->add($restDuration);
+                }
+                //残業代:なければ 0のcarboninterval,あれば計算する。
+
+                if ($curOvertime == null) {
+                    $overtimeDuration = CarbonInterval::seconds(0);
+                } else {
+                    $overtimeStart = Carbon::parse($curOvertime->start_time)->ceilMinute(15);
+                    $overtimeEnd = Carbon::parse($curOvertime->end_time)->floorMinute(15);
+                    $overtimeDuration = $overtimeStart->diff($overtimeEnd);
+                }
+
+                // duration - 休憩の合計 + 残業の時間
+                $workDuration = $checkInTimeForCalc->diff($checkOutTimeForCalc);
+                $workDurationInterval = CarbonInterval::instance($workDuration);
+                $overTimeInterval = CarbonInterval::instance($overtimeDuration);
+                $restInterval = CarbonInterval::instance($totalRestDuration);
+                $workDurationInterval = $workDurationInterval->add($overTimeInterval)->sub($restInterval);
+                // dd($workDurationInterval);
+                if ($curAttendance->is_overtime === 1) {
+                    $is_overtime_str = "有";
+                } else {
+                    $is_overtime_str = "無";
+                }
+
+                $curAttendanceObj = [
+                    'date' => $workSchedule->date,
+                    'scheduleType' => $curScheduleType->name,
+                    'bodyTemp' => $curAttendance->body_temp,
+                    'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
+                    'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
+                    'is_overtime' => $is_overtime_str,
+                    'rest' => $restTimeString,
+                    'overtime' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+                    'duration' => $workDurationInterval->format('%H:%I:%S'),
+                    'workDescription' => $curAttendance->work_description,
+                    'workComment' => $curAttendance->work_comment,
+                ];
+                array_push($monthlyAttendanceData, $curAttendanceObj);
+            }
+        }
+
+        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users', 'user_id'));
     }
 
     public function showUsers()
@@ -52,6 +188,7 @@ class AdminAttendanceController extends Controller
                 'is_on_welfare' => $userDetail->is_on_welfare == 1 ? "有" : "無",
                 'admission_date' => $userDetail->admission_date,
                 'discharge_date' => $userDetail->discharge_date,
+                'birthdate' => $userDetail->birthdate,
                 'disability_category_id' => DisabilityCategory::where('id', $userDetail->disability_category_id)->first()->name,
                 'residence_id' => Residence::where('id', $userDetail->residence_id)->first()->name,
                 'counselor_id' => Counselor::where('id', $userDetail->counselor_id)->first()->name,
@@ -86,6 +223,7 @@ class AdminAttendanceController extends Controller
         $user->save();
 
         $userDetail = UserDetail::where('user_id', $user->id)->first();
+        $userDetail->birthdate = $request->birthdate;
         $userDetail->beneficiary_number = $request->beneficiary_number;
         $userDetail->disability_category_id = $request->disability_category_id;
         //is_on_welfareの有無をチェック
@@ -126,6 +264,7 @@ class AdminAttendanceController extends Controller
         $userDetail = UserDetail::firstWhere('user_id', $id);
         $userDetail->beneficiary_number = $request->beneficiary_number;
         $userDetail->disability_category_id = $request->disability_category_id;
+        $userDetail->birthdate = $request->birthdate;
         //is_on_welfareの有無をチェック
         $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
         $userDetail->residence_id = $request->residence_id;
@@ -140,17 +279,22 @@ class AdminAttendanceController extends Controller
 
 
 
-    public function showDaily()
+    public function showDaily($date = null)
     {
+
+        if ($date == null) {
+            $selectedDate = Carbon::today();
+        } else {
+            $selectedDate = $date;
+        }
 
         $admin = Auth::user();
         $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
         $companyId = $adminDetail->company_id;
-        $today = Carbon::today();
-        $todayWorkSchedId = WorkSchedule::where('date', $today)->first()->id;
+        $selectedWorkSchedId = WorkSchedule::where('date', $selectedDate)->first()->id;
 
         //本日の勤怠レコード一覧を取得
-        $attendanceRecords = Attendance::where('company_id', $companyId)->get()->where('work_schedule_id', $todayWorkSchedId);
+        $attendanceRecords = Attendance::where('company_id', $companyId)->get()->where('work_schedule_id', $selectedWorkSchedId);
 
         $dailyAttendanceData = [];
 
@@ -191,7 +335,7 @@ class AdminAttendanceController extends Controller
             array_push($dailyAttendanceData, $curAttendanceRecord);
         }
 
-        return view('admin.attendances.daily', compact('dailyAttendanceData'));
+        return view('admin.attendances.daily', compact('dailyAttendanceData', 'selectedDate'));
     }
 
     public function updateAdminComment(Request $request, Attendance $attendance)
@@ -203,7 +347,9 @@ class AdminAttendanceController extends Controller
         $adminComment->admin_id = $admin_id;
         $adminComment->update();
 
-        return $this->showDaily();
+        $workSchedule = WorkSchedule::where('id', $attendance->work_schedule_id)->first();
+        $date = $workSchedule->date;
+        return redirect()->route('admin.daily', compact('date'));
     }
 
     public function showAdmins()
@@ -287,5 +433,102 @@ class AdminAttendanceController extends Controller
         $adminDetail->update();
 
         return $this->showAdmins();
+    }
+
+    public function showCounselors()
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $counselors = Counselor::where('company_id', $companyId)->get();
+
+        return view('admin.attendances.counselors', compact('counselors'));
+    }
+    public function createCounselor()
+    {
+        return view('admin.attendances.counselorcreate');
+    }
+    public function storeCounselor(CounselorRequest $request)
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $counselor = new Counselor();
+        $counselor->name = $request->name;
+        $counselor->contact_phone = $request->contact_phone;
+        $counselor->contact_email = $request->contact_email;
+        $counselor->company_id = $companyId;
+        $counselor->save();
+        return $this->showCounselors();
+    }
+    public function editCounselor($id)
+    {
+        $counselor = Counselor::where('id', $id)->first();
+        return view('admin.attendances.counselorsedit', compact('counselor'));
+    }
+    public function updateCounselor(CounselorRequest $request, $id)
+    {
+        $counselor = Counselor::where('id', $id)->first();
+        $counselor->name = $request->name;
+        $counselor->contact_phone = $request->contact_phone;
+        $counselor->contact_email = $request->contact_email;
+        $counselor->update();
+
+        return $this->showCounselors();
+    }
+    public function deleteCounselor($id)
+    {
+        $counselor = Counselor::where('id', $id)->first();
+        $counselor->delete();
+        return $this->showCounselors();
+    }
+    public function showResidences()
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $residences = Residence::where('company_id', $companyId)->get();
+
+        return view('admin.attendances.residences', compact('residences'));
+    }
+    public function createResidence()
+    {
+        return view('admin.attendances.residencecreate');
+    }
+    public function storeResidences(ResidenceRequest $request)
+    {
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $residence = new Residence();
+        $residence->name = $request->name;
+        $residence->contact_name = $request->contact_name;
+        $residence->contact_phone = $request->contact_phone;
+        $residence->contact_email = $request->contact_email;
+        $residence->company_id = $companyId;
+        $residence->save();
+        return $this->showResidences();
+    }
+    public function editResidences($id)
+    {
+        $residence = Residence::where('id', $id)->first();
+        return view('admin.attendances.residencesedit', compact('residence'));
+    }
+    public function updateResidences(ResidenceRequest $request, $id)
+    {
+        $residnece = Residence::where('id', $id)->first();
+        $residnece->name = $request->name;
+        $residnece->contact_name = $request->contact_name;
+        $residnece->contact_phone = $request->contact_phone;
+        $residnece->contact_email = $request->contact_email;
+        $residnece->update();
+
+        return $this->showResidences();
+    }
+    public function deleteResidences($id)
+    {
+        $residence = Residence::where('id', $id)->first();
+        $residence->delete();
+        return $this->showResidences();
     }
 }

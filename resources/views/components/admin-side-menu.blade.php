@@ -38,17 +38,31 @@
                     <div class="menu-text-dark ms-3">
                         <p>設定</p>
                     </div>
-                    <a href="{{ '/admin/users' }}" class="side-menu-link">
+                    <a href="{{ route('admin.users') }}" class="side-menu-link">
                         <div class="menu-text-light ms-3 my-4 d-flex align-items-center">
                             <i class="bi bi-person-plus"></i>
                             <p class="mb-0 ms-2">利用者アカウント管理</p>
                         </div>
                     </a>
-                    <a href="{{ '/admin/admins' }}" class="side-menu-link">
+                    <a href="{{ route('admin.admins') }}" class="side-menu-link">
                         <div class="menu-text-light ms-3 my-4 d-flex
                         align-items-center">
                             <i class="bi bi-person-plus-fill"></i>
                             <p class="mb-0 ms-2">管理者アカウント管理</p>
+                        </div>
+                    </a>
+                    <a href="{{ route('admin.counselors') }}" class="side-menu-link">
+                        <div class="menu-text-light ms-3 my-4 d-flex
+                        align-items-center">
+                            <i class="bi bi-file-earmark-person-fill"></i>
+                            <p class="mb-0 ms-2">相談員情報管理</p>
+                        </div>
+                    </a>
+                    <a href="{{ route('admin.residences') }}" class="side-menu-link">
+                        <div class="menu-text-light ms-3 my-4 d-flex
+                        align-items-center">
+                            <i class="bi bi-house"></i>
+                            <p class="mb-0 ms-2">住居情報管理</p>
                         </div>
                     </a>
                 </div>

@@ -29,7 +29,7 @@
             </div>
 
             <!-- メインコンテンツのカラム -->
-            <div class="col-md-10" >
+            <div class="col-md-10">
                 {{-- ヘッダー --}}
                 @include('components.header')
 
@@ -38,9 +38,10 @@
                     <p>タイムカード</p>
                 </div>
                 <div class="timecard-selectors">
-                    <form action="{{ '/attendances/timecard/submit-month' }}" method="post" id="monthForm">
+                    <form action="{{ '/attendances/timecard/' }}" method="post" id="monthForm">
                         @csrf
-                        <input type="month" name="month" value="{{ date('Y-m') }}" id="monthInput">
+                        <input type="month" name="month" value="{{ $year }}-{{ $month }}"
+                            id="monthInput">
                     </form>
                 </div>
                 <div class="record-list mt-5">
@@ -52,8 +53,10 @@
                                 <th scope="col">体温</th>
                                 <th scope="col">出勤時間</th>
                                 <th scope="col">退勤時間</th>
+                                <th scope="col">残業有無</th>
                                 <th scope="col">休憩</th>
                                 <th scope="col">残業</th>
+                                <th scope="col">勤務時間</th>
                                 <th scope="col">作業内容</th>
                                 <th scope="col">作業コメント</th>
                             </tr>
@@ -67,8 +70,10 @@
                                         <td>{{ $date['bodyTemp'] }}</td>
                                         <td>{{ $date['checkin'] }}</td>
                                         <td>{{ $date['checkout'] }}</td>
+                                        <td>{{ $date['is_overtime'] }}</td>
                                         <td> {!! $date['rest'] !!} </td>
                                         <td>{{ $date['overtime'] }}</td>
+                                        <td>{{ $date['duration'] }}</td>
                                         <td>{{ $date['workDescription'] }}</td>
                                         <td>{{ $date['workComment'] }}</td>
                                     </tr>
@@ -83,14 +88,6 @@
     </div>
 
 
-
-
+    <script src="{{ asset('js/calendar/monthChangeHandler.js') }}"></script>
 
 @endsection
-
-<script>
-    // ここにJavaScriptコードを配置
-    document.getElementById('monthInput').addEventListener('change', function() {
-        document.getElementById('monthForm').submit();
-    });
-</script>

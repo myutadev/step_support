@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Rest;
@@ -12,8 +13,11 @@ use App\Models\WorkSchedule;
 
 use App\Models\UserDetail;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
+use DateInterval;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
+
 
 class AttendanceController extends Controller
 {
@@ -41,6 +45,7 @@ class AttendanceController extends Controller
                 'attendance_id' => $attendance->id,
                 'type' => '出勤',
                 'dateTime' => $workSchedule->date . ' ' .  Carbon::parse($attendance->check_in_time)->format('H:i'),
+                'is_overtime' => "",
                 'body_temp' => $attendance->body_temp,
                 'work_description' => "",
                 'work_comment' => "",
@@ -54,6 +59,7 @@ class AttendanceController extends Controller
                         'attendance_id' => $attendance->id,
                         'type' => '休憩開始',
                         'dateTime' => $workSchedule->date . ' ' .  Carbon::parse($rest->start_time)->format('H:i'),
+                        'is_overtime' => "",
                         'body_temp' => "",
                         'work_description' => "",
                         'work_comment' => "",
@@ -67,6 +73,7 @@ class AttendanceController extends Controller
                             'attendance_id' => $attendance->id,
                             'type' => '休憩終了',
                             'dateTime' => $workSchedule->date . ' ' .  Carbon::parse($rest->end_time)->format('H:i'),
+                            'is_overtime' => "",
                             'body_temp' => "",
                             'work_description' => "",
                             'work_comment' => "",
@@ -79,15 +86,22 @@ class AttendanceController extends Controller
 
 
             if (!$attendance->check_out_time == "") {
+
+                if ($attendance->is_overtime === 1) {
+                    $is_overtime_str = "有";
+                } else {
+                    $is_overtime_str = "無";
+                }
+
                 $checkOut = [
                     'attendance_id' => $attendance->id,
                     'type' => '退勤',
                     'dateTime' => $workSchedule->date . ' ' .  Carbon::parse($attendance->check_out_time)->format('H:i'),
+                    'is_overtime' => $is_overtime_str,
                     'body_temp' => "",
                     'work_description' => $attendance->work_description,
                     'work_comment' => $attendance->work_comment,
                     "edit_button" => 1,
-
                 ];
                 array_unshift($attendancesArray, $checkOut);
             }
@@ -98,6 +112,7 @@ class AttendanceController extends Controller
                         'attendance_id' => $attendance->id,
                         'type' => '残業開始',
                         'dateTime' => $workSchedule->date . ' ' .  Carbon::parse($overtime->start_time)->format('H:i'),
+                        'is_overtime' => "",
                         'body_temp' => "",
                         'work_description' => "",
                         'work_comment' => "",
@@ -111,6 +126,7 @@ class AttendanceController extends Controller
                             'attendance_id' => $attendance->id,
                             'type' => '残業終了',
                             'dateTime' => $workSchedule->date . ' ' .  Carbon::parse($overtime->end_time)->format('H:i'),
+                            'is_overtime' => "",
                             'body_temp' => "",
                             'work_description' => "",
                             'work_comment' => "",
@@ -186,7 +202,61 @@ class AttendanceController extends Controller
         $attendance->check_out_time = Carbon::now()->toTimeString();
         $attendance->work_description = $request->work_description;
         $attendance->work_comment = $request->work_comment;
+        $attendance->is_overtime = $request->is_overtime;
+        $attendance_id = $attendance->id;
         $attendance->update();
+
+        // 退勤時間が12時15分を超えている場合は自動で休憩時間をつける
+        // 休憩開始時間のロジック a. 12時前出勤 = 12時から休憩  or  b.12~13時出勤 or c.13時以降出勤 
+        // 休憩終了時間のロジック a. 12~13時までに退勤 = 退勤時間そのまま記録 b. 13時以降に退勤 = 13時に
+        // 通常:12時前に出勤→ 13時以降退勤 :一律:12:00~13:00休憩
+        // イレギュラー: 12時~13時に出勤: 1. 退勤13時以降 → 出勤時間 15分切り上げた時間~13時まで休憩 2. 退勤13時までに退勤
+        //
+
+        $carbonChecnkInTime = Carbon::parse($attendance->check_in_time);
+        $carbonCheckOutTime = Carbon::parse($attendance->check_out_time);
+
+
+        if ($carbonChecnkInTime->hour < 12) {
+            //13:00以降であれば 現在時刻の15分切り下げ から - 13:00
+            if ($carbonCheckOutTime->hour >= 13) {
+                //休憩開始 = 12:00 , 休憩終了 = 13:00
+                $message1 = 'this is before 12 in then after 13 out';
+                $rest = new Rest;
+                $rest->attendance_id = $attendance_id;
+                $rest->start_time = "12:00:00";
+                $rest->end_time = "13:00:00";
+                $rest->save();
+            } elseif ($carbonCheckOutTime->hour >= 12) {
+                // 休憩開始 = 12:00 , 休憩終了 = 退勤終了時間
+                $message1 = 'this is before 12 in then after 12 out';
+                $rest = new Rest;
+                $rest->attendance_id = $attendance_id;
+                $rest->start_time = "12:00:00";
+                $rest->end_time = Carbon::now()->toTimeString();
+                $rest->save();
+            } else {
+                //休憩なし
+            }
+        } elseif ($carbonChecnkInTime->hour === 12) {
+            // 12時代 else  
+            $rest = new Rest;
+            $rest->attendance_id = $attendance_id;
+            $rest->start_time = $attendance->check_in_time;
+            if ($carbonCheckOutTime->hour === 12) {
+                // 12時台 rest_start = check in time  休憩終了=チェックアウトタイム
+                $rest->end_time = Carbon::now()->toTimeString();
+                $rest->save();
+            } else {
+                // after 13 out rest_start = check in time rest_end= 13:00  
+                $rest->end_time = "13:00:00";
+                $rest->save();
+            }
+        } else {
+            //休憩なし
+        }
+
+
 
         return redirect()->route('attendances.index')->with(
             'requested',
@@ -255,12 +325,22 @@ class AttendanceController extends Controller
         return redirect()->route('attendances.index')->with('requested', "残業終了しました");
     }
 
-    public function timecard()
+
+    public function timecard($yearmonth = null)
     {
         $user = Auth::user();
-        $today = Carbon::today();
-        $year = $today->year;
-        $month = $today->month;
+
+        if (is_null($yearmonth)) {
+            $today = Carbon::today();
+            $year = $today->year;
+            $month = sprintf("%02d", $today->month);
+        } else {
+            $yearMonthArr = explode("-", $yearmonth);
+            $year = $yearMonthArr[0];
+            $month = sprintf("%02d", $yearMonthArr[1]);
+        }
+
+
         $monthlyAttendanceData = [];
 
         $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)
@@ -279,8 +359,10 @@ class AttendanceController extends Controller
                     'bodyTemp' => "",
                     'checkin' => "",
                     'checkout' => "",
+                    'is_overtime' => "",
                     'rest' => "",
                     'overtime' => "",
+                    'duration' => "",
                     'workDescription' => "",
                     'workComment' => "",
                 ];
@@ -297,17 +379,72 @@ class AttendanceController extends Controller
                 $restTimeString = implode("<br>", $restTimes);
 
                 $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
-                // dd($curAttendance);
 
-                // dd($curAttendance);
+                //ここから1日の勤務時間の計算 1. 出勤 10時以前→10時、10時以降→15分単位で切り上げ
+                $checkInTimeForCalc = Carbon::parse($curAttendance->check_in_time);
+                $checkOutTimeForCalc = Carbon::parse($curAttendance->check_out_time);
+                $baseTimeForIn = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 10:00:00');
+                $baseTimeForOut = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 15:00:00');
+
+                $isOvertime = $curAttendance->is_overtime;
+
+                //出勤時間の切り上げ
+                if ($checkInTimeForCalc->lt($baseTimeForIn)) {
+                    $checkInTimeForCalc->hour(10)->minute(0)->second(0);
+                } else {
+                    $checkInTimeForCalc->ceilMinute(15);
+                }
+
+
+                //退勤時間の切り下げ 残業なし(isOvertime=0) かつ 15時以降の打刻であれば
+                if ($checkOutTimeForCalc->gt($baseTimeForOut) && $isOvertime == 0) {
+                    $checkOutTimeForCalc->hour(15)->minute(0)->second(0);
+                } else {
+                    $checkOutTimeForCalc->floorminute(15);
+                }
+
+                $totalRestDuration = CarbonInterval::seconds(0); // 0秒で初期化
+
+                foreach ($curRests as $rest) {
+                    $restStart = Carbon::parse($rest->start_time);
+                    $restEnd = Carbon::parse($rest->end_time);
+                    $restDuration = $restStart->floorminute(15)->diff($restEnd->ceilminute(15));
+
+                    $totalRestDuration = $totalRestDuration->add($restDuration);
+                }
+                //残業代:なければ 0のcarboninterval,あれば計算する。
+
+                if ($curOvertime == null) {
+                    $overtimeDuration = CarbonInterval::seconds(0);
+                } else {
+                    $overtimeStart = Carbon::parse($curOvertime->start_time)->ceilMinute(15);
+                    $overtimeEnd = Carbon::parse($curOvertime->end_time)->floorMinute(15);
+                    $overtimeDuration = $overtimeStart->diff($overtimeEnd);
+                }
+
+                // duration - 休憩の合計 + 残業の時間
+                $workDuration = $checkInTimeForCalc->diff($checkOutTimeForCalc);
+                $workDurationInterval = CarbonInterval::instance($workDuration);
+                $overTimeInterval = CarbonInterval::instance($overtimeDuration);
+                $restInterval = CarbonInterval::instance($totalRestDuration);
+                $workDurationInterval = $workDurationInterval->add($overTimeInterval)->sub($restInterval);
+                // dd($workDurationInterval);
+                if ($curAttendance->is_overtime === 1) {
+                    $is_overtime_str = "有";
+                } else {
+                    $is_overtime_str = "無";
+                }
+
                 $curAttendObj = [
                     'date' => $WorkSchedule->date,
                     'scheduleType' => $curScheduleType->name,
                     'bodyTemp' => $curAttendance->body_temp,
                     'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
                     'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
+                    'is_overtime' => $is_overtime_str,
                     'rest' => $restTimeString,
                     'overtime' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+                    'duration' => $workDurationInterval->format('%H:%I:%S'),
                     'workDescription' => $curAttendance->work_description,
                     'workComment' => $curAttendance->work_comment,
                 ];
@@ -316,74 +453,8 @@ class AttendanceController extends Controller
                 array_push($monthlyAttendanceData, $curAttendObj);
             }
         }
-
-        return view('attendances.timecard', compact('monthlyAttendanceData'));
+        return view('attendances.timecard', compact('monthlyAttendanceData', 'year', 'month'));
     }
-
-    public function submitMonth(Request $request)
-    {
-        $user = Auth::user();
-        $today = Carbon::today();
-        $year = $today->year;
-        $month = $today->month;
-        $monthlyAttendanceData = [];
-
-        $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->orderBy('date', 'asc')
-            ->get();
-
-        foreach ($thisMonthWorkSchedules as $WorkSchedule) {
-            $curScheduleType = ScheduleType::where('id', $WorkSchedule->schedule_type_id)->first();
-            $curAttendance = Attendance::where('user_id', $user->id)->where('work_schedule_id', $WorkSchedule->id)->first();
-            //curAttenddanceがNull→まだ出勤されてない場合
-            if (!$curAttendance) {
-                $curAttendObj = [
-                    'date' => $WorkSchedule->date,
-                    'scheduleType' => $curScheduleType->name,
-                    'bodyTemp' => "",
-                    'checkin' => "",
-                    'checkout' => "",
-                    'rest' => "",
-                    'overtime' => "",
-                    'workDescription' => "",
-                    'workComment' => "",
-                ];
-                array_push($monthlyAttendanceData, $curAttendObj);
-            } else {
-
-
-                $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
-                //休憩は複数回入る可能性あり。
-                $restTimes = [];
-                foreach ($curRests as $rest) {
-                    $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
-                }
-                $restTimeString = implode("<br>", $restTimes);
-
-                $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
-                $curAttendObj = [
-                    'date' => $WorkSchedule->date,
-                    'scheduleType' => $curScheduleType->name,
-                    'bodyTemp' => $curAttendance->body_temp,
-                    'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
-                    'checkout' => Carbon::parse($curAttendance->check_out_time)->format('H:i'),
-                    'rest' => $restTimeString,
-                    'overtime' => Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
-                    'workDescription' => $curAttendance->work_description,
-                    'workComment' => $curAttendance->work_comment,
-                ];
-
-                array_push($monthlyAttendanceData, $curAttendObj);
-                // dd($monthlyAttendanceData);
-            }
-        }
-
-        return view('attendances.timecard', compact('monthlyAttendanceData'));
-    }
-
-
-
 
 
 

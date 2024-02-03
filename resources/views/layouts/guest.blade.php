@@ -12,6 +12,10 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    {{-- css読み込み
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}"> --}}
+
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -21,15 +25,11 @@
         <div>
             <h1 class="app-title text-lg text-center">Step Support</h1>
             <h1 class="app-title text-lg text-center">継続支援A型事業所用打刻&出退勤管理システム</h1>
-
-            {{-- <a href="/"> --}}
-            {{-- <x-application-logo class="w-20 h-20 fill-current text-gray-500" /> --}}
-            {{-- </a> --}}
         </div>
 
-        <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-            {{ $slot }}
-        </div>
+        {{-- <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg"> --}}
+        {{ $slot }}
+        {{-- </div> --}}
     </div>
 </body>
 

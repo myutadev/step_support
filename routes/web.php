@@ -33,9 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// 利用者さん用出退勤route
-Route::get('attendances/timecard', [AttendanceController::class, 'timecard'])->name('attendances.timecard')->middleware('auth');
-Route::post('attendances/timecard/submit-month', [AttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
+// 利用者さん用表示ルート
+Route::get('attendances/timecard/{yearmonth?}', [AttendanceController::class, 'timecard'])->name('attendances.timecard')->middleware('auth');
 
 
 Route::resource('attendances', AttendanceController::class)
@@ -47,16 +46,14 @@ Route::resource('attendances', AttendanceController::class)
 // 利用者さん用出退勤route
 
 Route::post('attendances/checkin', [AttendanceController::class, 'checkin'])->name('attendances.checkin')->middleware('auth');
-
 Route::post('attendances/rest-start', [AttendanceController::class, 'restStart'])->name('attendances.rest.start')->middleware('auth');
-
 Route::post('attendances/rest-end', [AttendanceController::class, 'restEnd'])->name('attendances.rest.end')->middleware('auth');
-
 Route::post('attendances/overtime-start', [AttendanceController::class, 'overtimeStart'])->name('attendances.overtime.start')->middleware('auth');
-
 Route::post('attendances/overtime-end', [AttendanceController::class, 'overtimeEnd'])->name('attendances.overtime.end')->middleware('auth');
-
 Route::post('attendances/checkout', [AttendanceController::class, 'checkout'])->name('attendances.checkout')->middleware('auth');
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -82,8 +79,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('dashboard', fn () => view('admin.dashboard'))
             ->name('admin.dashboard');
 
-        Route::get('timecard', [AdminAttendanceController::class, 'showTimecard'])->name('admin.timecard');
-        Route::get('daily', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
+        Route::get('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'showTimecard'])->name('admin.timecard');
+        // Route::post('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('admin.timecard.submit.month')->middleware('auth');
+        Route::get('daily/{date?}', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
         Route::get('users', [AdminAttendanceController::class, 'showUsers'])->name('admin.users');
         Route::get('users/create', [AdminAttendanceController::class, 'createUser'])->name('admin.users.create');
         Route::post('users/store', [AdminAttendanceController::class, 'storeUser'])->name('admin.users.store');
@@ -95,11 +93,23 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('admins/{id}/edit', [AdminAttendanceController::class, 'editAdmin'])->name('admin.admins.edit');
         Route::patch('admins/{id}/update', [AdminAttendanceController::class, 'updateAdmin'])->name('admin.admins.update');
         Route::patch('daily/{attendance}', [AdminAttendanceController::class, 'updateAdminComment'])->name('admin.daily.update');
+        //settings
+        Route::get('settings/counselors', [AdminAttendanceController::class, 'showCounselors'])->name('admin.counselors');
+        Route::get('settings/counselors/create', [AdminAttendanceController::class, 'createCounselor'])->name('admin.counselors.create');
+        Route::post('settings/counselors/store', [AdminAttendanceController::class, 'storeCounselor'])->name('admin.counselors.store');
+        Route::get('settings/counselors/{id}/edit', [AdminAttendanceController::class, 'editCounselor'])->name('admin.counselors.edit');
+        Route::patch('settings/counselors/{id}/update', [AdminAttendanceController::class, 'updateCounselor'])->name('admin.counselors.update');
+        Route::delete('settings/counselors/{id}', [AdminAttendanceController::class, 'deleteCounselor'])->name('admin.counselors.destroy');
+        Route::get('settings/residences', [AdminAttendanceController::class, 'showResidences'])->name('admin.residences');
+        Route::get('settings/residences/create', [AdminAttendanceController::class, 'createResidence'])->name('admin.residences.create');
+        Route::post('settings/residences/store', [AdminAttendanceController::class, 'storeResidences'])->name('admin.residences.store');
+        Route::get('settings/residences/{id}/edit', [AdminAttendanceController::class, 'editResidences'])->name('admin.residences.edit');
+        Route::patch('settings/residences/{id}/update', [AdminAttendanceController::class, 'updateResidences'])->name('admin.residences.update');
+        Route::delete('settings/residences/{id}', [AdminAttendanceController::class, 'deleteResidences'])->name('admin.residences.destroy');
     });
 });
 
 // admin用ルート
-Route::post('attendances/timecard/submit-month', [AdminAttendanceController::class, 'submitMonth'])->name('attendances.timecard.submit.month')->middleware('auth');
 
 
 

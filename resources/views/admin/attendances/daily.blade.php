@@ -17,10 +17,7 @@
                 <p>日別出勤状況</p>
             </div>
             <div class="timecard-selectors">
-                <form action="{{ '/attendances/timecard/submit-month' }}" method="post" id="monthForm">
-                    @csrf
-                    <input type="date" name="date" value="{{ date('Y-m-d') }}" id="monthInput">
-                </form>
+                <input type="date" name="date" value="{{ $selectedDate }}" id="dateInput">
             </div>
             <div class="record-list mt-5">
                 <table class="table table-striped">
@@ -138,33 +135,29 @@
         $baseUrl = url('admin/daily');
     @endphp
 
+    <script src="{{ asset('js/calendar/dateChangeHandler.js') }}"></script>
 
 @endsection
 
 <script>
-    <
-    script >
-        document.addEventListener('DOMContentLoaded', function() {
-            const baseUrl = "{{ $baseUrl }}";
+    document.addEventListener('DOMContentLoaded', function() {
+        const baseUrl = "{{ $baseUrl }}";
 
-            document.querySelectorAll('.btn-edit').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    const description = this.getAttribute('data-description');
-                    const comment = this.getAttribute('data-comment');
+        document.querySelectorAll('.btn-edit').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const description = this.getAttribute('data-description');
+                const comment = this.getAttribute('data-comment');
 
-                    const form = document.querySelector(`#edit-form-${id}`);
-                    if (form) {
-                        form.action = baseUrl + '/' + id;
-                        form.querySelector('.admin_description').value = description;
-                        form.querySelector('.admin_comment').value = comment;
-                    } else {
-                        console.error('Form not found for id:', id);
-                    }
-                });
+                const form = document.querySelector(`#edit-form-${id}`);
+                if (form) {
+                    form.action = baseUrl + '/' + id;
+                    form.querySelector('.admin_description').value = description;
+                    form.querySelector('.admin_comment').value = comment;
+                } else {
+                    console.error('Form not found for id:', id);
+                }
             });
         });
-    // document.getElementById('monthInput').addEventListener('change', function() {
-    // document.getElementById('monthForm').submit();
-    // });
+    });
 </script>

@@ -220,6 +220,7 @@ return [
         'beneficiary_number'       => '受給者番号',
         'is_on_welfare'            => '生活保護受給の有無チェック',
         'admission_date'           => '入所日',
-
+        'contact_phone'           => '連絡先電話番号',
+        'contact_email'           => '連絡先メールアドレス',
     ],
 ];

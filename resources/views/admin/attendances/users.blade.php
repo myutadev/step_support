@@ -23,6 +23,7 @@
                         <tr>
                             <th scope="col">受給者番号</th>
                             <th scope="col">利用者名</th>
+                            <th scope="col">生年月日</th>
                             <th scope="col">メールアドレス</th>
                             <th scope="col">障害区分</th>
                             <th scope="col">生活保護受給</th>
@@ -38,6 +39,7 @@
                             <tr>
                                 <td>{{ $userInfo['beneficiary_number'] }}</td>
                                 <td>{{ $userInfo['name'] }}</td>
+                                <td>{{ $userInfo['birthdate'] }}</td>
                                 <td>{{ $userInfo['email'] }}</td>
                                 <td>{{ $userInfo['disability_category_id'] }}</td>
                                 <td>{{ $userInfo['is_on_welfare'] }}</td>
