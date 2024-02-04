@@ -15,6 +15,6 @@ class Counselor extends Model
     }
     public function Company()
     {
-        return $this->belongsTo(UserDetail::class);
+        return $this->belongsTo(Company::class);
     }
 }

@@ -106,6 +106,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('settings/residences/{id}/edit', [AdminAttendanceController::class, 'editResidences'])->name('admin.residences.edit');
         Route::patch('settings/residences/{id}/update', [AdminAttendanceController::class, 'updateResidences'])->name('admin.residences.update');
         Route::delete('settings/residences/{id}', [AdminAttendanceController::class, 'deleteResidences'])->name('admin.residences.destroy');
+        Route::get('settings/workschedules/{yearmonth?}', [AdminAttendanceController::class, 'showWorkschedules'])->name('admin.workschedules');
+        Route::patch('settings/workschedules/{id}/update', [AdminAttendanceController::class, 'updateWorkschedules'])->name('admin.workschedules.update');
     });
 });
 

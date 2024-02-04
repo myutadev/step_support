@@ -13,4 +13,8 @@ class ScheduleType extends Model
     {
         return $this->hasMany(WorkSchedule::class);
     }
+    public function specialSchedule()
+    {
+        return $this->hasMany(SpecialSchedule::class);
+    }
 }

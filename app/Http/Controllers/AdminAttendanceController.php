@@ -19,6 +19,7 @@ use App\Models\Counselor;
 use App\Models\DisabilityCategory;
 use App\Models\Role;
 use App\Models\Residence;
+use App\Models\SpecialSchedule;
 use App\Models\UserDetail;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
@@ -530,5 +531,57 @@ class AdminAttendanceController extends Controller
         $residence = Residence::where('id', $id)->first();
         $residence->delete();
         return $this->showResidences();
+    }
+
+    public function showWorkschedules($yearmonth = null)
+    {
+
+        $admin = Auth::user();
+        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $companyId = $adminDetail->company_id;
+        $schedules = SpecialSchedule::where('company_id', $companyId)->get();
+        // dd($schedules);
+        $residences = Residence::where('company_id', $companyId)->get();
+
+        if ($yearmonth == null) {
+            $today = Carbon::today();
+            $year = $today->year;
+            $month = sprintf("%02d", $today->month);
+        } else {
+            $yearMonthArr = explode("-", $yearmonth);
+            $year = $yearMonthArr[0];
+            $month = sprintf("%02d", $yearMonthArr[1]);
+        }
+
+        $monthlyWorkScheduleData = [];
+        $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
+
+        foreach ($thisMonthWorkSchedules as $workSchedule) {
+            $curScheduleType = ScheduleType::where('id', $workSchedule->schedule_type_id)->first();
+            $curSpecialSchedule = SpecialSchedule::where('work_schedule_id', $workSchedule->id)->first();
+            $curCarbonDate = Carbon::parse($workSchedule->date);
+            $curDay = $curCarbonDate->isoFormat('ddd');
+
+            if (!$curSpecialSchedule) {
+                $curScheduleObj = [
+                    'date' => $workSchedule->date,
+                    'day' => $curDay,
+                    'scheduleType' => $curScheduleType->name,
+                    'description' => "",
+                ];
+                array_push($monthlyWorkScheduleData, $curScheduleObj);
+            } else {
+                $overwriteScheduleType = $curSpecialSchedule->schedule_type;
+                // dd($overwriteScheduleType);
+                $curScheduleObj = [
+                    'date' => $workSchedule->date,
+                    'day' => $curDay,
+                    'scheduleType' => $overwriteScheduleType->name,
+                    'description' => $curSpecialSchedule->description,
+                ];
+                array_push($monthlyWorkScheduleData, $curScheduleObj);
+            }
+        }
+        return view('admin.attendances.workschedule', compact('monthlyWorkScheduleData', 'year', 'month'));
     }
 }

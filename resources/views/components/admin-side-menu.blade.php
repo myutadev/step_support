@@ -65,4 +65,11 @@
                             <p class="mb-0 ms-2">住居情報管理</p>
                         </div>
                     </a>
+                    <a href="{{ route('admin.workschedules') }}" class="side-menu-link">
+                        <div class="menu-text-light ms-3 my-4 d-flex
+                        align-items-center">
+                            <i class="bi bi-calendar-date"></i>
+                            <p class="mb-0 ms-2">開所日編集</p>
+                        </div>
+                    </a>
                 </div>

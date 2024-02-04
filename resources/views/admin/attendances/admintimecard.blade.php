@@ -72,10 +72,8 @@
                         @endif
                     </tbody>
                 </table>
-
             </div>
         </div>
-    </div>
     </div>
 
     <script src="{{ asset('js/calendar/monthUserChangeHandler.js') }}"></script>

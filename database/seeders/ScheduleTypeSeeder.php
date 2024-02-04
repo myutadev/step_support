@@ -14,7 +14,7 @@ class ScheduleTypeSeeder extends Seeder
     public function run(): void
     {
         $param = [[
-            'name' => '出勤日',
+            'name' => '開所日',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
 
