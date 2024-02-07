@@ -564,6 +564,8 @@ class AdminAttendanceController extends Controller
 
             if (!$curSpecialSchedule) {
                 $curScheduleObj = [
+                    'id' => $workSchedule->id,
+                    'special_sched_id' => "",
                     'date' => $workSchedule->date,
                     'day' => $curDay,
                     'scheduleType' => $curScheduleType->name,
@@ -574,6 +576,8 @@ class AdminAttendanceController extends Controller
                 $overwriteScheduleType = $curSpecialSchedule->schedule_type;
                 // dd($overwriteScheduleType);
                 $curScheduleObj = [
+                    'id' => $workSchedule->id,
+                    'special_sched_id' => $curSpecialSchedule->id,
                     'date' => $workSchedule->date,
                     'day' => $curDay,
                     'scheduleType' => $overwriteScheduleType->name,
@@ -583,5 +587,46 @@ class AdminAttendanceController extends Controller
             }
         }
         return view('admin.attendances.workschedule', compact('monthlyWorkScheduleData', 'year', 'month'));
+    }
+    public function createWorkschedules(Request $request)
+    {
+        $workSchedule = WorkSchedule::find($request->id);
+        $carbonDate = Carbon::parse($workSchedule->date);
+        $day = $carbonDate->isoFormat('ddd');
+        $targetWorkSchedule = [
+            'id' => $workSchedule->id,
+            'date' => $workSchedule->date,
+            'day' => $day,
+        ];
+
+        $scheduleTypes = ScheduleType::all();
+
+        return view('admin.attendances.workschedulecreate', compact('targetWorkSchedule', 'scheduleTypes'));
+    }
+    public function storeWorkschedules(Request $request)
+    {
+        $admin = Auth::user();
+        $targetWorkSchedule = WorkSchedule::where('id', $request->workSchedule_id)->first();
+        $year = $targetWorkSchedule->year;
+        $month = sprintf("%02d", $targetWorkSchedule->month);
+        $yearmonth = $year . "-" . $month;
+
+        $companyId = $admin->adminDetail->company_id;
+        $workSchedule = new SpecialSchedule();
+        $workSchedule->company_id = $companyId;
+        $workSchedule->work_schedule_id =  $request->workSchedule_id;
+        $workSchedule->schedule_type_id = $request->schedule_type_id;
+        $workSchedule->description = $request->description;
+        $workSchedule->save();
+        return redirect()->route('admin.workschedules', compact('yearmonth'));
+    }
+    public function deleteWorkschedules(Request $request)
+    {
+        $special_sched = SpecialSchedule::find($request->id);
+        $year = $special_sched->work_schedule->year;
+        $month = sprintf("%02d", $special_sched->work_schedule->month);
+        $yearmonth = $year . "-" . $month;
+        $special_sched->delete();
+        return redirect()->route('admin.workschedules', compact('yearmonth'));
     }
 }

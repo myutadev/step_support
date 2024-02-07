@@ -106,7 +106,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('settings/residences/{id}/edit', [AdminAttendanceController::class, 'editResidences'])->name('admin.residences.edit');
         Route::patch('settings/residences/{id}/update', [AdminAttendanceController::class, 'updateResidences'])->name('admin.residences.update');
         Route::delete('settings/residences/{id}', [AdminAttendanceController::class, 'deleteResidences'])->name('admin.residences.destroy');
-        Route::get('settings/workschedules/{yearmonth?}', [AdminAttendanceController::class, 'showWorkschedules'])->name('admin.workschedules');
+        Route::get('settings/workschedules/show/{yearmonth?}', [AdminAttendanceController::class, 'showWorkschedules'])->name('admin.workschedules');
+        Route::get('settings/workschedules/create/{id}', [AdminAttendanceController::class, 'createWorkschedules'])->name('admin.workschedules.create');
+        Route::post('settings/workschedules/store', [AdminAttendanceController::class, 'storeWorkschedules'])->name('admin.workschedules.store');
+        Route::delete('settings/workschedules/destroy/{id}', [AdminAttendanceController::class, 'deleteWorkschedules'])->name('admin.workschedules.destroy');
         Route::patch('settings/workschedules/{id}/update', [AdminAttendanceController::class, 'updateWorkschedules'])->name('admin.workschedules.update');
     });
 });
