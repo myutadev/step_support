@@ -9,11 +9,11 @@ class ScheduleType extends Model
 {
     use HasFactory;
 
-    public function workSchedule()
+    public function workSchedules()
     {
         return $this->hasMany(WorkSchedule::class);
     }
-    public function specialSchedule()
+    public function specialSchedules()
     {
         return $this->hasMany(SpecialSchedule::class);
     }

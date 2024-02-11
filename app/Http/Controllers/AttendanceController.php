@@ -31,11 +31,21 @@ class AttendanceController extends Controller
         // 1.当日のレコードの有無→退勤レコードの有無
         $userId = Auth::id();
         $today = Carbon::today();
-        $workSchedule = WorkSchedule::where('date', $today)->first();
-        $attendance = Attendance::where('user_id', $userId)->where('work_schedule_id', $workSchedule->id)->first();
+        // $workSchedule = WorkSchedule::where('date', $today)->first();
+        $workSchedule = WorkSchedule::with([
+            'attendances' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            },
+            'attendances.rests',
+            'attendances.overtimes',
+        ])->where('date', $today)->first();
+        // dd($workSchedule);
+
+        $attendance = $workSchedule->attendances->first();
+
         if ($attendance) {
-            $rests = Rest::where('attendance_id', $attendance->id)->get();
-            $overtimes = Overtime::where('attendance_id', $attendance->id)->get();
+            $rests = $attendance->rests;
+            $overtimes = $attendance->overtimes;
         }
 
         $attendancesArray = [];
@@ -158,8 +168,6 @@ class AttendanceController extends Controller
     public function store(Request $request)
     {
     }
-
-
     /**
      *   利用者さん出退勤登録用Postメソッド
 
@@ -197,8 +205,12 @@ class AttendanceController extends Controller
     {
         $userId = $request->user()->id;
         $today = Carbon::today();
-        $workSchedule = WorkSchedule::where('date', $today)->first();
-        $attendance = Attendance::where('user_id', $userId)->where('work_schedule_id', $workSchedule->id)->first();
+        $workSchedule = WorkSchedule::with([
+            'attendances' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            }
+        ])->where('date', $today)->first();
+        $attendance = $workSchedule->attendances->first();
         $attendance->check_out_time = Carbon::now()->toTimeString();
         $attendance->work_description = $request->work_description;
         $attendance->work_comment = $request->work_comment;
@@ -270,9 +282,10 @@ class AttendanceController extends Controller
         $rest = new Rest;
         $userId = Auth::id();
         $today = Carbon::today();
-        //work_schedulesからdateidを取得
-        $workSchedule = WorkSchedule::where('date', $today)->first();
-        $attendance = Attendance::where('user_id', $userId)->where('work_schedule_id', $workSchedule->id)->first();
+        $workSchedule = WorkSchedule::with(['attendances' => function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        }])->where('date', $today)->first();
+        $attendance = $workSchedule->attendances->first();
         $attendance_id = $attendance->id;
 
         $rest->attendance_id = $attendance_id;
@@ -286,10 +299,14 @@ class AttendanceController extends Controller
     {
         $userId = Auth::id();
         $today = Carbon::today();
-        $workSchedule = WorkSchedule::where('date', $today)->first();
-        $attendance = Attendance::where('user_id', $userId)->where('work_schedule_id', $workSchedule->id)->first();
-        $attendanceId = $attendance->id;
-        $rest = Rest::where('end_time', null)->where('attendance_id', $attendanceId)->first();
+        $workSchedule = WorkSchedule::with([
+            'attendances' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            },
+            'attendances.rests'
+        ])->where('date', $today)->first();
+        $attendance = $workSchedule->attendances->first();
+        $rest = $attendance->rests->where('end_time', null)->first();
         $rest->end_time = Carbon::now()->toTimeString();
         $rest->update();
 
@@ -301,8 +318,10 @@ class AttendanceController extends Controller
         $overtime = new Overtime();
         $userId = Auth::id();
         $today = Carbon::today();
-        $workSchedule = WorkSchedule::where('date', $today)->first();
-        $attendance = Attendance::where('user_id', $userId)->where('work_schedule_id', $workSchedule->id)->first();
+        $workSchedule = WorkSchedule::with(['attendances' => function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        }])->where('date', $today)->first();
+        $attendance = $workSchedule->attendances->first();
         $attendance_id = $attendance->id;
         $overtime->attendance_id = $attendance_id;
         $overtime->start_time = Carbon::now()->toTimeString();
@@ -315,10 +334,14 @@ class AttendanceController extends Controller
     {
         $userId = Auth::id();
         $today = Carbon::today();
-        $workSchedule = WorkSchedule::where('date', $today)->first();
-        $attendance = Attendance::where('user_id', $userId)->where('work_schedule_id', $workSchedule->id)->first();
-        $attendanceId = $attendance->id;
-        $overtime = Overtime::where('end_time', null)->where('attendance_id', $attendanceId)->first();
+        $workSchedule = WorkSchedule::with([
+            'attendances' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            },
+            'attendances.overtimes'
+        ])->where('date', $today)->first();
+        $attendance = $workSchedule->attendances->first();
+        $overtime = $attendance->overtimes->where('end_time', null)->first();
         $overtime->end_time = Carbon::now()->toTimeString();
         $overtime->update();
 
@@ -340,22 +363,28 @@ class AttendanceController extends Controller
             $month = sprintf("%02d", $yearMonthArr[1]);
         }
 
-
         $monthlyAttendanceData = [];
 
-        $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->orderBy('date', 'asc')
-            ->get();
+        $thisMonthWorkSchedules = WorkSchedule::with([
+            'specialSchedule.schedule_type',
+            'scheduleType',
+            'attendances' => function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            },
+            'attendances.rests',
+            'attendances.overtimes'
+        ])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
 
-        foreach ($thisMonthWorkSchedules as $WorkSchedule) {
-            $curScheduleType = ScheduleType::where('id', $WorkSchedule->schedule_type_id)->first();
-            $curAttendance = Attendance::where('user_id', $user->id)->where('work_schedule_id', $WorkSchedule->id)->first();
+
+        foreach ($thisMonthWorkSchedules as $workSchedule) {
+
+            $curAttendance = $workSchedule->attendances->first();
+
             //curAttenddanceがNull→まだ出勤されてない場合
             if (!$curAttendance) {
                 $curAttendObj = [
-                    'date' => $WorkSchedule->date,
-                    'scheduleType' => $curScheduleType->name,
+                    'date' => $workSchedule->date,
+                    'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => "",
                     'checkin' => "",
                     'checkout' => "",
@@ -368,17 +397,13 @@ class AttendanceController extends Controller
                 ];
                 array_push($monthlyAttendanceData, $curAttendObj);
             } else {
-
-
-                $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
+                $curRests =  $curAttendance->rests;
                 //休憩は複数回入る可能性あり。
                 $restTimes = [];
                 foreach ($curRests as $rest) {
                     $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
                 }
                 $restTimeString = implode("<br>", $restTimes);
-
-                $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
 
                 //ここから1日の勤務時間の計算 1. 出勤 10時以前→10時、10時以降→15分単位で切り上げ
                 $checkInTimeForCalc = Carbon::parse($curAttendance->check_in_time);
@@ -414,6 +439,8 @@ class AttendanceController extends Controller
                 }
                 //残業代:なければ 0のcarboninterval,あれば計算する。
 
+                $curOvertime = $curAttendance->overtimes->first();
+
                 if ($curOvertime == null) {
                     $overtimeDuration = CarbonInterval::seconds(0);
                 } else {
@@ -436,8 +463,8 @@ class AttendanceController extends Controller
                 }
 
                 $curAttendObj = [
-                    'date' => $WorkSchedule->date,
-                    'scheduleType' => $curScheduleType->name,
+                    'date' => $workSchedule->date,
+                    'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => $curAttendance->body_temp,
                     'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
                     'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
@@ -448,7 +475,6 @@ class AttendanceController extends Controller
                     'workDescription' => $curAttendance->work_description,
                     'workComment' => $curAttendance->work_comment,
                 ];
-
 
                 array_push($monthlyAttendanceData, $curAttendObj);
             }

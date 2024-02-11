@@ -65,15 +65,14 @@ class AdminAttendanceController extends Controller
         // dd($user_name);
         // 表示データの作成
         $monthlyAttendanceData = [];
-        $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
+        $thisMonthWorkSchedules = WorkSchedule::with(['specialSchedule.schedule_type', 'scheduleType'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
         foreach ($thisMonthWorkSchedules as $workSchedule) {
-            $curScheduleType = ScheduleType::where('id', $workSchedule->schedule_type_id)->first();
             $curAttendance = Attendance::where('user_id', $user_id)->where('work_schedule_id', $workSchedule->id)->first();
 
             if (!$curAttendance) {
                 $curAttendanceObj = [
                     'date' => $workSchedule->date,
-                    'scheduleType' => $curScheduleType->name,
+                    'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => "",
                     'checkin' => "",
                     'checkout' => "",
@@ -153,7 +152,7 @@ class AdminAttendanceController extends Controller
 
                 $curAttendanceObj = [
                     'date' => $workSchedule->date,
-                    'scheduleType' => $curScheduleType->name,
+                    'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => $curAttendance->body_temp,
                     'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
                     'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),

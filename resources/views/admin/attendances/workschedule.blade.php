@@ -65,9 +65,7 @@
                                                 {{ $date['description'] !== '' ? '' : 'disabled' }}>
                                         </form>
                                     </td>
-
                                     </td>
-
                                 </tr>
                             @endforeach
                         @endif
