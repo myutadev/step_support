@@ -49,7 +49,7 @@
                     <label for="emp_number" class="col-sm-2 col-form-label">社員番号</label>
                     <div class="col-sm-10">
                         <input type="number" class="form-control" id="emp_number" name="emp_number"
-                            value={{ old('emp_number', $adminDetail->emp_number) }}>
+                            value={{ old('emp_number', $admin->adminDetail->emp_number) }}>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -75,7 +75,7 @@
                                 <select class="btn btn-light" name="role_id" id="role_id">
                                     @foreach ($roles as $role)
                                         <option value="{{ $role->id }}"
-                                            {{ old('role_id', $role->id) == $role->id ? 'selected' : '' }}>
+                                            {{ old('role_id', $admin->adminDetail->role->id) == $role->id ? 'selected' : '' }}>
                                             {{ $role->name }}
                                         </option>
                                     @endforeach
@@ -90,7 +90,7 @@
                     <label for="hire_date" class="col-sm-2 col-form-label">入社日</label>
                     <div class="col-sm-10">
                         <input type="date" class="form-control" id="hire_date" name="hire_date"
-                            value={{ old('hire_date', $adminDetail->hire_date) }}>
+                            value={{ old('hire_date', $admin->adminDetail->hire_date) }}>
                     </div>
                 </div>
 
@@ -98,7 +98,7 @@
                     <label for="hire_date" class="col-sm-2 col-form-label">退社日</label>
                     <div class="col-sm-10">
                         <input type="date" class="form-control" id="termination_date" name="termination_date"
-                            value={{ old('termination_date', $adminDetail->termination_date) }}>
+                            value={{ old('termination_date', $admin->adminDetail->termination_date) }}>
                     </div>
                 </div>
 

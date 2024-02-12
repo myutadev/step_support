@@ -39,7 +39,7 @@
                     <label for="beneficiary_number" class="col-sm-2 col-form-label">受給者番号</label>
                     <div class="col-sm-10">
                         <input type="number" class="form-control" id="beneficiary_number" name="beneficiary_number"
-                            value={{ $userDetail->beneficiary_number }}>
+                            value={{ $user->userDetail->beneficiary_number }}>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -58,7 +58,7 @@
                     <label for="birthdate" class="col-sm-2 col-form-label">生年月日</label>
                     <div class="col-sm-10">
                         <input type="date" class="form-control" id="birthdate" name="birthdate"
-                            value={{ old('birthdate', $userDetail->birthdate) }}>
+                            value={{ old('birthdate', $user->userDetail->birthdate) }}>
                     </div>
                 </div>
 
@@ -85,7 +85,7 @@
                                 <select class="btn btn-light" name="disability_category_id" id="disability_category_id">
                                     @foreach ($disability_categories as $disability_category)
                                         <option value="{{ $disability_category->id }}"
-                                            {{ old('disability_category_id', $userDetail->disability_category_id) == $disability_category->id ? 'selected' : '' }}>
+                                            {{ old('disability_category_id', $user->userDetail->disability_category_id) == $disability_category->id ? 'selected' : '' }}>
                                             {{ $disability_category->name }}
                                         </option>
                                     @endforeach
@@ -102,7 +102,7 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="is_on_welfare" value="1"
                                     id="is_on_welfare"
-                                    {{ old('is_on_welfare', $userDetail->is_on_welfare) == '1' ? 'checked' : '' }}>
+                                    {{ old('is_on_welfare', $user->userDetail->is_on_welfare) == '1' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_on_welfare">
                                     生活保護を受給している場合はチェック </label>
                             </div>
@@ -119,7 +119,7 @@
                                 <select class="btn btn-light" name="residence_id" id="residence_id">
                                     @foreach ($residences as $residence)
                                         <option value="{{ $residence->id }}"
-                                            {{ old('residence_id', $userDetail->residence_id) == $residence->id ? 'selected' : '' }}>
+                                            {{ old('residence_id', $user->userDetail->residence_id) == $residence->id ? 'selected' : '' }}>
                                             {{ $residence->name }}
                                         </option>
                                     @endforeach
@@ -139,7 +139,7 @@
                                 <select class="btn btn-light" name="counselor_id" id="counselor_id">
                                     @foreach ($counselors as $counselor)
                                         <option value="{{ $counselor->id }}"
-                                            {{ old('counselor_id', $userDetail->counselor_id) == $counselor->id ? 'selected' : '' }}>
+                                            {{ old('counselor_id', $user->userDetail->counselor_id) == $counselor->id ? 'selected' : '' }}>
                                             {{ $counselor->name }}
                                         </option>
                                     @endforeach
@@ -153,14 +153,14 @@
                     <label for="admission_date" class="col-sm-2 col-form-label">入所日</label>
                     <div class="col-sm-10">
                         <input type="date" class="form-control" id="admission_date" name="admission_date"
-                            value={{ old('admission_date', $userDetail->admission_date) }}>
+                            value={{ old('admission_date', $user->userDetail->admission_date) }}>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="discharge_date" class="col-sm-2 col-form-label">退所日</label>
                     <div class="col-sm-10">
                         <input type="date" class="form-control" id="discharge_date" name="discharge_date"
-                            value={{ old('discharge_date', $userDetail->discharge_date) }}>
+                            value={{ old('discharge_date', $user->userDetail->discharge_date) }}>
                     </div>
                 </div>
 

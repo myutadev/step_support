@@ -18,4 +18,9 @@ class WorkSchedule extends Model
     {
         return $this->hasMany(Attendance::class);
     }
+
+    public function specialSchedule()
+    {
+        return $this->hasOne(SpecialSchedule::class);
+    }
 }

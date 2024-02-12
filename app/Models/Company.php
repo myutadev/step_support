@@ -27,4 +27,8 @@ class Company extends Model
     {
         return $this->hasMany(Counselor::class);
     }
+    public function special_schedules()
+    {
+        return $this->hasMany(SpecialSchedule::class);
+    }
 }

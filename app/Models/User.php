@@ -73,4 +73,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserDetail::class);
     }
+
+    public function getFullNameAttribute()
+    {
+        return $this->last_name . $this->first_name;
+    }
 }
