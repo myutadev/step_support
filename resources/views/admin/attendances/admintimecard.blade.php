@@ -28,7 +28,7 @@
                             <select class="form-control" id="userInput" name="user">
                                 @foreach ($users as $user)
                                     <option value="{{ $user['id'] }}" {{ $user['id'] == $user_id ? 'selected' : '' }}>
-                                        {{ $user['name'] }}</option>
+                                        {{ $user->full_name }}</option>
                                 @endforeach
                             </select>
                         </div>

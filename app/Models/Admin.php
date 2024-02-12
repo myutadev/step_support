@@ -78,4 +78,9 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(AdminComment::class);
     }
+
+    public function getFullNameAttribute()
+    {
+        return $this->last_name . ' ' . $this->first_name;
+    }
 }

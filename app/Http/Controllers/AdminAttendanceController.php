@@ -35,17 +35,12 @@ class AdminAttendanceController extends Controller
 
     public function showTimecard($yearmonth = null, $user_id = null)
     {
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
-        $userDetails = UserDetail::with('user')->where('company_id', $companyId)->get();
-        $users = $userDetails->map(function ($userDetail) {
-            return [
-                'id' => $userDetail->user_id,
-                'name' => $userDetail->user->last_name . $userDetail->user->first_name,
-            ];
-        });
-        // dd($users);
+        $adminId = Auth::id();
+        $admin = Admin::with('adminDetail')->find($adminId);
+        $companyId = $admin->adminDetail->company_id;
+        $users = User::whereHas('userDetail', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId);
+        })->with('userDetail')->get();
 
         if ($yearmonth == null) {
             $today = Carbon::today();
@@ -62,12 +57,15 @@ class AdminAttendanceController extends Controller
             $userDetail = UserDetail::where('company_id', $companyId)->first();
             $user_id = $userDetail->user_id;
         }
-        // dd($user_name);
+
         // 表示データの作成
         $monthlyAttendanceData = [];
-        $thisMonthWorkSchedules = WorkSchedule::with(['specialSchedule.schedule_type', 'scheduleType'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
+        $thisMonthWorkSchedules = WorkSchedule::with(['specialSchedule.schedule_type', 'scheduleType', 'attendances' => function ($query) use ($user_id) {
+            $query->where('user_id', $user_id);
+        }, 'attendances.rests', 'attendances.overtimes'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
+        // dd($thisMonthWorkSchedules);
         foreach ($thisMonthWorkSchedules as $workSchedule) {
-            $curAttendance = Attendance::where('user_id', $user_id)->where('work_schedule_id', $workSchedule->id)->first();
+            $curAttendance = $workSchedule->attendances->first();
 
             if (!$curAttendance) {
                 $curAttendanceObj = [
@@ -85,7 +83,7 @@ class AdminAttendanceController extends Controller
                 ];
                 array_push($monthlyAttendanceData, $curAttendanceObj);
             } else {
-                $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
+                $curRests = $curAttendance->rests;
                 //休憩は複数回入る可能性あり。
                 $restTimes = [];
                 foreach ($curRests as $rest) {
@@ -93,7 +91,7 @@ class AdminAttendanceController extends Controller
                 }
                 $restTimeString = implode("<br>", $restTimes);
 
-                $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
+                $curOvertime = $curAttendance->overtimes->first();
 
                 //ここから1日の勤務時間の計算 1. 出勤 10時以前→10時、10時以降→15分単位で切り上げ
                 $checkInTimeForCalc = Carbon::parse($curAttendance->check_in_time);
@@ -172,31 +170,31 @@ class AdminAttendanceController extends Controller
 
     public function showUsers()
     {
+        $adminId = Auth::id();
+        $admin = Admin::with('adminDetail')->find($adminId);
+        $companyId = $admin->adminDetail->company_id;
+        $users = User::whereHas('userDetail', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId);
+        })->with(['userDetail.disabilityCategory', 'userDetail.residence', 'userDetail.counselor'])->get();
 
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
-        $userDetails = UserDetail::where('company_id', $companyId)->get();
         $userInfoArray = [];
-        foreach ($userDetails as $userDetail) {
-            $curUser = User::where('id', $userDetail->user_id)->first();
+        foreach ($users as $user) {
 
             $curUserInfo = [
-                'beneficiary_number' => $userDetail->beneficiary_number,
-                'name' => $curUser->last_name . ' ' . $curUser->first_name,
-                'email' => $curUser->email,
-                'is_on_welfare' => $userDetail->is_on_welfare == 1 ? "有" : "無",
-                'admission_date' => $userDetail->admission_date,
-                'discharge_date' => $userDetail->discharge_date,
-                'birthdate' => $userDetail->birthdate,
-                'disability_category_id' => DisabilityCategory::where('id', $userDetail->disability_category_id)->first()->name,
-                'residence_id' => Residence::where('id', $userDetail->residence_id)->first()->name,
-                'counselor_id' => Counselor::where('id', $userDetail->counselor_id)->first()->name,
-                'user_id' => $curUser->id,
+                'beneficiary_number' => $user->userDetail->beneficiary_number,
+                'name' => $user->full_name,
+                'email' => $user->email,
+                'is_on_welfare' => $user->userDetail->is_on_welfare == 1 ? "有" : "無",
+                'admission_date' => $user->userDetail->admission_date,
+                'discharge_date' => $user->userDetail->discharge_date,
+                'birthdate' => $user->userDetail->birthdate,
+                'disability_category_id' => $user->userDetail->disabilityCategory->name,
+                'residence_id' => $user->userDetail->residence->name,
+                'counselor_id' => $user->userDetail->counselor->name,
+                'user_id' => $user->id,
             ];
             array_push($userInfoArray, $curUserInfo);
         }
-        // dd($userInfoArray);
 
         return view('admin.attendances.users', compact('userInfoArray'));
     }
@@ -211,8 +209,8 @@ class AdminAttendanceController extends Controller
 
     public function storeUser(UserRequest $request)
     {
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $adminId = Auth::id();
+        $adminDetail = AdminDetail::where('admin_id', $adminId)->first();
         $companyId = $adminDetail->company_id;
 
         $user = new User();
@@ -239,13 +237,13 @@ class AdminAttendanceController extends Controller
     }
     public function editUser($id)
     {
-        $user = User::firstWhere('id', $id);
-        $userDetail = UserDetail::firstWhere('user_id', $id);
         $disability_categories = DisabilityCategory::get();
         $residences = Residence::get();
         $counselors = Counselor::get();
 
-        return view('admin.attendances.usersedit', compact('disability_categories', 'residences', 'counselors', 'user', 'userDetail'));
+        $user = User::with(['userDetail.disabilityCategory', 'userDetail.residence', 'userDetail.counselor'])->firstWhere('id', $id);
+
+        return view('admin.attendances.usersedit', compact('disability_categories', 'residences', 'counselors', 'user'));
     }
 
     public function updateUser(UserRequest $request, $id)
@@ -254,29 +252,27 @@ class AdminAttendanceController extends Controller
         $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
         $companyId = $adminDetail->company_id;
 
-        $user = User::firstWhere('id', $id);
+        $user = User::with('userDetail')->firstWhere('id', $id);
         $user->last_name = $request->last_name;
         $user->first_name = $request->first_name;
         $user->email = $request->email;
         $user->password = $request->password;
         $user->update();
 
-        $userDetail = UserDetail::firstWhere('user_id', $id);
-        $userDetail->beneficiary_number = $request->beneficiary_number;
-        $userDetail->disability_category_id = $request->disability_category_id;
-        $userDetail->birthdate = $request->birthdate;
+        $user->userDetail->beneficiary_number = $request->beneficiary_number;
+        $user->userDetail->disability_category_id = $request->disability_category_id;
+        $user->userDetail->birthdate = $request->birthdate;
         //is_on_welfareの有無をチェック
-        $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
-        $userDetail->residence_id = $request->residence_id;
-        $userDetail->counselor_id = $request->counselor_id;
-        $userDetail->admission_date = $request->admission_date;
-        $userDetail->discharge_date = $request->discharge_date;
-        $userDetail->company_id = $companyId;
-        $userDetail->update();
+        $user->userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
+        $user->userDetail->residence_id = $request->residence_id;
+        $user->userDetail->counselor_id = $request->counselor_id;
+        $user->userDetail->admission_date = $request->admission_date;
+        $user->userDetail->discharge_date = $request->discharge_date;
+        $user->userDetail->company_id = $companyId;
+        $user->userDetail->update();
 
         return $this->showUsers();
     }
-
 
 
     public function showDaily($date = null)
@@ -291,48 +287,47 @@ class AdminAttendanceController extends Controller
         $admin = Auth::user();
         $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
         $companyId = $adminDetail->company_id;
-        $selectedWorkSchedId = WorkSchedule::where('date', $selectedDate)->first()->id;
+
+        $selectedWorkSched = WorkSchedule::whereHas('attendances', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId);
+        })->with(['attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin', 'attendances.user.userDetail'])
+            ->where('date', $selectedDate)->first();
 
         //本日の勤怠レコード一覧を取得
-        $attendanceRecords = Attendance::where('company_id', $companyId)->get()->where('work_schedule_id', $selectedWorkSchedId);
-
+        $selectedAttendances = $selectedWorkSched == null ? $selectedAttendances = null : $selectedWorkSched->attendances;
         $dailyAttendanceData = [];
 
-        foreach ($attendanceRecords as $curAttendance) {
-            $admin_id = Auth::id();
-            $admin = Admin::where('id', $admin_id)->first();
-            $admin_name = $admin->last_name . ' ' . $admin->first_name;
-            $curUserId = $curAttendance->user_id;
-            $curUser = User::where('id', $curUserId)->first();
-            $curRests = Rest::where('attendance_id', $curAttendance->id)->get();
-            $restTimes = [];
+        if ($selectedAttendances !== null) {
+            foreach ($selectedAttendances as $curAttendance) {
+                $curAttendance->rests == null ? $curRests = [] : $curRests = $curAttendance->rests;
+                $restTimes = [];
 
-            foreach ($curRests as $rest) {
-                $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
+                foreach ($curRests as $rest) {
+                    $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
+                }
+                $restTimeString = implode("<br>", $restTimes);
+                $curOvertime = $curAttendance->overtimes->first();
+
+                $curAdminComment = $curAttendance->adminComments->first();
+
+                $curAttendanceRecord = [
+                    'attendance_id' => $curAttendance->id,
+                    'beneficialy_number' => $curAttendance->user->userDetail->beneficiary_number,
+                    'name' => $curAttendance->user->full_name,
+                    'body_temp' => $curAttendance->body_temp,
+                    'check_in_time' => $curAttendance->check_in_time,
+                    'check_out_time' => $curAttendance->check_out_time,
+                    'rest' => $restTimeString,
+                    'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+                    'work_description' => $curAttendance->work_description,
+                    'work_comment' => $curAttendance->work_comment,
+                    'admin_description' => $curAdminComment->admin_description,
+                    'admin_comment' => $curAdminComment->admin_comment,
+                    'admin_name' => $curAdminComment->admin == null ? null : $curAdminComment->admin->full_name,
+                ];
+
+                array_push($dailyAttendanceData, $curAttendanceRecord);
             }
-            $restTimeString = implode("<br>", $restTimes);
-
-            $curOvertime = Overtime::where('attendance_id', $curAttendance->id)->first();
-
-            $curAdminComment = AdminComment::where('attendance_id', $curAttendance->id)->first();
-
-            $curAttendanceRecord = [
-                'attendance_id' => $curAttendance->id,
-                'beneficialy_number' => userDetail::where('user_id', $curUserId)->first()->beneficiary_number,
-                'name' => $curUser->last_name . " " . $curUser->first_name,
-                'body_temp' => $curAttendance->body_temp,
-                'check_in_time' => $curAttendance->check_in_time,
-                'check_out_time' => $curAttendance->check_out_time,
-                'rest' => $restTimeString,
-                'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
-                'work_description' => $curAttendance->work_description,
-                'work_comment' => $curAttendance->work_comment,
-                'admin_description' => $curAdminComment->admin_description,
-                'admin_comment' => $curAdminComment->admin_comment,
-                'admin_name' => $admin_name,
-            ];
-
-            array_push($dailyAttendanceData, $curAttendanceRecord);
         }
 
         return view('admin.attendances.daily', compact('dailyAttendanceData', 'selectedDate'));
@@ -351,29 +346,34 @@ class AdminAttendanceController extends Controller
         $date = $workSchedule->date;
         return redirect()->route('admin.daily', compact('date'));
     }
+    //ここから
 
     public function showAdmins()
     {
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+        $adminId = Auth::id();
+        $adminDetail = AdminDetail::where('admin_id', $adminId)->first();
         $companyId = $adminDetail->company_id;
-        $adminDetails = AdminDetail::where('company_id', $companyId)->get();
+
         $adminInfoArray = [];
-        foreach ($adminDetails as $adminDetail) {
-            $curAdmin = Admin::where('id', $adminDetail->admin_id)->first();
+
+        $admins = Admin::whereHas('adminDetail', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId);
+        })->with(['adminDetail.role'])->get();
+
+
+        foreach ($admins as $admin) {
 
             $curAdminInfo = [
-                'emp_number' => $adminDetail->emp_number,
-                'name' => $curAdmin->last_name . ' ' . $curAdmin->first_name,
-                'email' => $curAdmin->email,
-                'role' => Role::Firstwhere('id', $adminDetail->role_id)->name,
-                'hire_date' => $adminDetail->hire_date,
-                'termination_date' => $adminDetail->termination_date,
-                'admin_id' => $curAdmin->id,
+                'emp_number' => $admin->adminDetail->emp_number,
+                'name' => $admin->full_name,
+                'email' => $admin->email,
+                'role' => $admin->adminDetail->name,
+                'hire_date' => $admin->adminDetail->hire_date,
+                'termination_date' => $admin->adminDetail->termination_date,
+                'admin_id' => $admin->id,
             ];
             array_push($adminInfoArray, $curAdminInfo);
         }
-
 
         return view('admin.attendances.admins', compact('adminInfoArray'));
     }
@@ -385,9 +385,8 @@ class AdminAttendanceController extends Controller
     public function storeAdmin(AdminRequest $request)
     {
 
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
+        $adminId = Auth::id();
+        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
 
         $admin = new Admin();
         $admin->last_name = $request->last_name;
@@ -403,43 +402,38 @@ class AdminAttendanceController extends Controller
         $adminDetail->company_id = $companyId;
         $adminDetail->update();
 
-        return $this->createAdmin();
+        return redirect()->route('admin.admins');
     }
     public function editAdmin($id)
     {
-        $admin = Admin::firstWhere('id', $id);
-        $adminDetail = AdminDetail::firstWhere('admin_id', $id);
         $roles = Role::get();
-        $roleId = $adminDetail->role_id;
-        $role = Role::firstWhere('id', $roleId);
+        $admin = Admin::with('adminDetail.role')->where('id', $id)->first();
 
-        return view('admin.attendances.adminsedit', compact('admin', 'adminDetail', 'role', 'roles'));
+        return view('admin.attendances.adminsedit', compact('admin', 'roles'));
     }
 
     public function updateAdmin(AdminRequest $request, $id)
     {
-        $admin = Admin::firstWhere('id', $id);
+        $admin = Admin::with('adminDetail')->firstWhere('id', $id);
         $admin->last_name = $request->last_name;
         $admin->first_name = $request->first_name;
         $admin->email = $request->email;
         $admin->password = $request->password;
         $admin->update();
 
-        $adminDetail = AdminDetail::firstWhere('admin_id', $admin->id);
-        $adminDetail->hire_date = $request->hire_date;
-        $adminDetail->termination_date = $request->termination_date;
-        $adminDetail->emp_number = $request->emp_number;
-        $adminDetail->role_id = $request->role_id;
-        $adminDetail->update();
+        $admin->adminDetail->hire_date = $request->hire_date;
+        $admin->adminDetail->termination_date = $request->termination_date;
+        $admin->adminDetail->emp_number = $request->emp_number;
+        $admin->adminDetail->role_id = $request->role_id;
+        $admin->adminDetail->update();
 
         return $this->showAdmins();
     }
 
     public function showCounselors()
     {
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
+        $adminId = Auth::id();
+        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
         $counselors = Counselor::where('company_id', $companyId)->get();
 
         return view('admin.attendances.counselors', compact('counselors'));
@@ -450,9 +444,8 @@ class AdminAttendanceController extends Controller
     }
     public function storeCounselor(CounselorRequest $request)
     {
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
+        $adminId = Auth::id();
+        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
         $counselor = new Counselor();
         $counselor->name = $request->name;
         $counselor->contact_phone = $request->contact_phone;
@@ -461,11 +454,13 @@ class AdminAttendanceController extends Controller
         $counselor->save();
         return $this->showCounselors();
     }
+
     public function editCounselor($id)
     {
         $counselor = Counselor::where('id', $id)->first();
         return view('admin.attendances.counselorsedit', compact('counselor'));
     }
+
     public function updateCounselor(CounselorRequest $request, $id)
     {
         $counselor = Counselor::where('id', $id)->first();
@@ -482,11 +477,11 @@ class AdminAttendanceController extends Controller
         $counselor->delete();
         return $this->showCounselors();
     }
+
     public function showResidences()
     {
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
+        $adminId = Auth::id();
+        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
         $residences = Residence::where('company_id', $companyId)->get();
 
         return view('admin.attendances.residences', compact('residences'));
@@ -497,9 +492,8 @@ class AdminAttendanceController extends Controller
     }
     public function storeResidences(ResidenceRequest $request)
     {
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
+        $adminId = Auth::id();
+        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
         $residence = new Residence();
         $residence->name = $request->name;
         $residence->contact_name = $request->contact_name;
@@ -509,6 +503,7 @@ class AdminAttendanceController extends Controller
         $residence->save();
         return $this->showResidences();
     }
+
     public function editResidences($id)
     {
         $residence = Residence::where('id', $id)->first();
@@ -535,12 +530,8 @@ class AdminAttendanceController extends Controller
     public function showWorkschedules($yearmonth = null)
     {
 
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
-        $schedules = SpecialSchedule::where('company_id', $companyId)->get();
-        // dd($schedules);
-        $residences = Residence::where('company_id', $companyId)->get();
+        $adminId = Auth::id();
+        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
 
         if ($yearmonth == null) {
             $today = Carbon::today();
@@ -553,11 +544,13 @@ class AdminAttendanceController extends Controller
         }
 
         $monthlyWorkScheduleData = [];
-        $thisMonthWorkSchedules = WorkSchedule::whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
+
+        // need  workSchedule.specialSchedule / workSchedule.scheduleType
+        $thisMonthWorkSchedules = WorkSchedule::with(['scheduleType', 'specialSchedule'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
 
         foreach ($thisMonthWorkSchedules as $workSchedule) {
-            $curScheduleType = ScheduleType::where('id', $workSchedule->schedule_type_id)->first();
-            $curSpecialSchedule = SpecialSchedule::where('work_schedule_id', $workSchedule->id)->first();
+            $curScheduleType = $workSchedule->scheduleType;
+            $curSpecialSchedule = $workSchedule->specialSchedule;
             $curCarbonDate = Carbon::parse($workSchedule->date);
             $curDay = $curCarbonDate->isoFormat('ddd');
 
@@ -587,6 +580,7 @@ class AdminAttendanceController extends Controller
         }
         return view('admin.attendances.workschedule', compact('monthlyWorkScheduleData', 'year', 'month'));
     }
+
     public function createWorkschedules(Request $request)
     {
         $workSchedule = WorkSchedule::find($request->id);

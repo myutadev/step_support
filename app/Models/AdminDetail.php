@@ -13,4 +13,9 @@ class AdminDetail extends Model
     {
         return $this->belongsTo(Admin::class);
     }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
 }
