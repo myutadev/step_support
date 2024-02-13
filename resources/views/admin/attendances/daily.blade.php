@@ -19,6 +19,15 @@
             <div class="timecard-selectors">
                 <input type="date" name="date" value="{{ $selectedDate }}" id="dateInput">
             </div>
+            @if ($errors->any())
+                <div class="alert alert-danger mt-2">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <div class="record-list mt-5">
                 <table class="table table-striped">
                     <thead>
@@ -73,15 +82,19 @@
                                         <td>{{ $attendance['admin_description'] }}</td>
                                         <td>{{ $attendance['admin_comment'] }}</td>
                                         <td>{{ $attendance['admin_name'] }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-edit" data-bs-toggle="modal"
-                                                data-bs-target="#editModal{{ $attendance['attendance_id'] }}"
-                                                data-id="{{ $attendance['attendance_id'] }}"
-                                                data-description="{{ $attendance['admin_description'] }}"
-                                                data-comment="{{ $attendance['admin_comment'] }}">
-                                                編集
-                                            </button>
-                                        </td>
+                                        @if ($attendance['admin_id'] === Auth::user()->id)
+                                            <td>
+                                                <button type="button" class="btn btn-edit" data-bs-toggle="modal"
+                                                    data-bs-target="#editModal{{ $attendance['attendance_id'] }}"
+                                                    data-id="{{ $attendance['attendance_id'] }}"
+                                                    data-description="{{ $attendance['admin_description'] }}"
+                                                    data-comment="{{ $attendance['admin_comment'] }}">
+                                                    編集
+                                                </button>
+                                            </td>
+                                        @else
+                                            <td></td>
+                                        @endif
                                     @endif
                                 </tr>
 

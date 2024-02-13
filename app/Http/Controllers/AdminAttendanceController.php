@@ -324,6 +324,7 @@ class AdminAttendanceController extends Controller
                     'admin_description' => $curAdminComment->admin_description,
                     'admin_comment' => $curAdminComment->admin_comment,
                     'admin_name' => $curAdminComment->admin == null ? null : $curAdminComment->admin->full_name,
+                    'admin_id' => $curAdminComment->admin == null ? null : $curAdminComment->admin->id,
                 ];
 
                 array_push($dailyAttendanceData, $curAttendanceRecord);
@@ -337,13 +338,18 @@ class AdminAttendanceController extends Controller
     {
         $admin_id = Auth::id();
         $adminComment = AdminComment::where('attendance_id', $attendance->id)->first();
+        $workSchedule = WorkSchedule::where('id', $attendance->work_schedule_id)->first();
+        $date = $workSchedule->date;
+
+        if ($request->user()->cannot('update', $adminComment)) {
+            return redirect()->route('admin.daily', compact('date'))->withErrors('自分のコメント以外は更新できません');
+        }
+
         $adminComment->admin_description = $request->admin_description;
         $adminComment->admin_comment = $request->admin_comment;
         $adminComment->admin_id = $admin_id;
         $adminComment->update();
 
-        $workSchedule = WorkSchedule::where('id', $attendance->work_schedule_id)->first();
-        $date = $workSchedule->date;
         return redirect()->route('admin.daily', compact('date'));
     }
     //ここから
