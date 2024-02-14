@@ -62,8 +62,7 @@ class AdminAttendanceController extends Controller
         $monthlyAttendanceData = [];
         $thisMonthWorkSchedules = WorkSchedule::with(['specialSchedule.schedule_type', 'scheduleType', 'attendances' => function ($query) use ($user_id) {
             $query->where('user_id', $user_id);
-        }, 'attendances.rests', 'attendances.overtimes'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
-        // dd($thisMonthWorkSchedules);
+        }, 'attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get(); // dd($thisMonthWorkSchedules);
         foreach ($thisMonthWorkSchedules as $workSchedule) {
             $curAttendance = $workSchedule->attendances->first();
 
@@ -80,6 +79,7 @@ class AdminAttendanceController extends Controller
                     'duration' => "",
                     'workDescription' => "",
                     'workComment' => "",
+                    'admin_comment' => "",
                 ];
                 array_push($monthlyAttendanceData, $curAttendanceObj);
             } else {
@@ -148,6 +148,17 @@ class AdminAttendanceController extends Controller
                     $is_overtime_str = "無";
                 }
 
+                $admin_comments = [];
+
+                // 複数のadminコメントをつなげて1つのテキストにする 各種配列を作$restTimeString = implode("<br>", $restTimes);
+                $curAdminComments = $curAttendance->adminComments;
+                foreach ($curAdminComments as $curAdminComment) {
+                    $admin_comments[] = $curAdminComment->admin == null ? "" : $curAdminComment->admin_description . " :" . $curAdminComment->admin_comment . " (" . $curAdminComment->admin->full_name . ")";
+                }
+
+                $admin_comment = implode("<br>", $admin_comments);
+
+
                 $curAttendanceObj = [
                     'date' => $workSchedule->date,
                     'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
@@ -160,6 +171,7 @@ class AdminAttendanceController extends Controller
                     'duration' => $workDurationInterval->format('%H:%I:%S'),
                     'workDescription' => $curAttendance->work_description,
                     'workComment' => $curAttendance->work_comment,
+                    'admin_comment' => $admin_comment,
                 ];
                 array_push($monthlyAttendanceData, $curAttendanceObj);
             }
@@ -192,6 +204,7 @@ class AdminAttendanceController extends Controller
                 'residence_id' => $user->userDetail->residence->name,
                 'counselor_id' => $user->userDetail->counselor->name,
                 'user_id' => $user->id,
+
             ];
             array_push($userInfoArray, $curUserInfo);
         }
