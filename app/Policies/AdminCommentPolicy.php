@@ -22,6 +22,6 @@ class AdminCommentPolicy
 
     public function update(Admin $admin, AdminComment $adminComment)
     {
-        return $admin->id === $adminComment->admin_id;
+        return $admin->id === $adminComment->admin_id || $adminComment->admin_id == null;
     }
 }
