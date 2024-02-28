@@ -27,6 +27,26 @@ class AdminDetailSeeder extends Seeder
             'company_id' => '1',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
+        ],[
+            'id' => 2,
+            'admin_id' => 2,
+            'emp_number' => '000002',
+            'hire_date' => $hireDate->toDateString(),
+            'termination_date' => null,
+            'role_id' => 1,
+            'company_id' => '1',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ],[
+            'id' => 3,
+            'admin_id' => 3,
+            'emp_number' => '0000013',
+            'hire_date' => $hireDate->toDateString(),
+            'termination_date' => null,
+            'role_id' => 2,
+            'company_id' => '1',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]];
 
         DB::table('admin_details')->insert($param);
