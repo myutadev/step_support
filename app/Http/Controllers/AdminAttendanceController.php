@@ -62,8 +62,7 @@ class AdminAttendanceController extends Controller
         $monthlyAttendanceData = [];
         $thisMonthWorkSchedules = WorkSchedule::with(['specialSchedule.schedule_type', 'scheduleType', 'attendances' => function ($query) use ($user_id) {
             $query->where('user_id', $user_id);
-        }, 'attendances.rests', 'attendances.overtimes'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get();
-        // dd($thisMonthWorkSchedules);
+        }, 'attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get(); // dd($thisMonthWorkSchedules);
         foreach ($thisMonthWorkSchedules as $workSchedule) {
             $curAttendance = $workSchedule->attendances->first();
 
@@ -80,6 +79,7 @@ class AdminAttendanceController extends Controller
                     'duration' => "",
                     'workDescription' => "",
                     'workComment' => "",
+                    'admin_comment' => "",
                 ];
                 array_push($monthlyAttendanceData, $curAttendanceObj);
             } else {
@@ -148,6 +148,17 @@ class AdminAttendanceController extends Controller
                     $is_overtime_str = "無";
                 }
 
+                $admin_comments = [];
+
+                // 複数のadminコメントをつなげて1つのテキストにする 各種配列を作$restTimeString = implode("<br>", $restTimes);
+                $curAdminComments = $curAttendance->adminComments;
+                foreach ($curAdminComments as $curAdminComment) {
+                    $admin_comments[] = $curAdminComment->admin == null ? "" : $curAdminComment->admin_description . " :" . $curAdminComment->admin_comment . " (" . $curAdminComment->admin->full_name . ")";
+                }
+
+                $admin_comment = implode("<br>", $admin_comments);
+
+
                 $curAttendanceObj = [
                     'date' => $workSchedule->date,
                     'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
@@ -160,6 +171,7 @@ class AdminAttendanceController extends Controller
                     'duration' => $workDurationInterval->format('%H:%I:%S'),
                     'workDescription' => $curAttendance->work_description,
                     'workComment' => $curAttendance->work_comment,
+                    'admin_comment' => $admin_comment,
                 ];
                 array_push($monthlyAttendanceData, $curAttendanceObj);
             }
@@ -192,6 +204,7 @@ class AdminAttendanceController extends Controller
                 'residence_id' => $user->userDetail->residence->name,
                 'counselor_id' => $user->userDetail->counselor->name,
                 'user_id' => $user->id,
+
             ];
             array_push($userInfoArray, $curUserInfo);
         }
@@ -293,11 +306,24 @@ class AdminAttendanceController extends Controller
         })->with(['attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin', 'attendances.user.userDetail'])
             ->where('date', $selectedDate)->first();
 
+
+
+
         //本日の勤怠レコード一覧を取得
         $selectedAttendances = $selectedWorkSched == null ? $selectedAttendances = null : $selectedWorkSched->attendances;
         $dailyAttendanceData = [];
 
         if ($selectedAttendances !== null) {
+
+            // AdminComments内で自分がコメントしたレコードが最後に来るようにソートする
+            foreach ($selectedWorkSched->attendances as $attendance) {
+                $sortedAdminComments = $attendance->adminComments->sortBy(function ($comment) use ($admin) {
+                    return $comment->admin_id == $admin->id ? 1 : 0;
+                });
+
+                $attendance->adminComments = $sortedAdminComments;
+            }
+
             foreach ($selectedAttendances as $curAttendance) {
                 $curAttendance->rests == null ? $curRests = [] : $curRests = $curAttendance->rests;
                 $restTimes = [];
@@ -308,7 +334,8 @@ class AdminAttendanceController extends Controller
                 $restTimeString = implode("<br>", $restTimes);
                 $curOvertime = $curAttendance->overtimes->first();
 
-                $curAdminComment = $curAttendance->adminComments->first();
+                $curAdminComments = $curAttendance->adminComments;
+                // dd($curAdminComments);
 
                 $curAttendanceRecord = [
                     'attendance_id' => $curAttendance->id,
@@ -321,10 +348,26 @@ class AdminAttendanceController extends Controller
                     'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
                     'work_description' => $curAttendance->work_description,
                     'work_comment' => $curAttendance->work_comment,
-                    'admin_description' => $curAdminComment->admin_description,
-                    'admin_comment' => $curAdminComment->admin_comment,
-                    'admin_name' => $curAdminComment->admin == null ? null : $curAdminComment->admin->full_name,
+                    'admin_comments' => $curAdminComments,
                 ];
+                // $curAdminComment = $curAttendance->adminComments->first();
+
+                // $curAttendanceRecord = [
+                //     'attendance_id' => $curAttendance->id,
+                //     'beneficialy_number' => $curAttendance->user->userDetail->beneficiary_number,
+                //     'name' => $curAttendance->user->full_name,
+                //     'body_temp' => $curAttendance->body_temp,
+                //     'check_in_time' => $curAttendance->check_in_time,
+                //     'check_out_time' => $curAttendance->check_out_time,
+                //     'rest' => $restTimeString,
+                //     'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+                //     'work_description' => $curAttendance->work_description,
+                //     'work_comment' => $curAttendance->work_comment,
+                //     'admin_description' => $curAdminComment->admin_description,
+                //     'admin_comment' => $curAdminComment->admin_comment,
+                //     'admin_name' => $curAdminComment->admin == null ? null : $curAdminComment->admin->full_name,
+                //     'admin_id' => $curAdminComment->admin == null ? null : $curAdminComment->admin->id,
+                // ];
 
                 array_push($dailyAttendanceData, $curAttendanceRecord);
             }
@@ -333,20 +376,40 @@ class AdminAttendanceController extends Controller
         return view('admin.attendances.daily', compact('dailyAttendanceData', 'selectedDate'));
     }
 
-    public function updateAdminComment(Request $request, Attendance $attendance)
+    public function updateAdminComment(Request $request, AdminComment $admincomment)
     {
         $admin_id = Auth::id();
-        $adminComment = AdminComment::where('attendance_id', $attendance->id)->first();
+        $adminComment = AdminComment::with('attendance.work_schedule')->where('id', $admincomment->id)->first();
+        $workSchedule = WorkSchedule::where('id', $adminComment->attendance->work_schedule_id)->first();
+        $date = $workSchedule->date;
+
+        if ($request->user()->cannot('update', $adminComment)) {
+            return redirect()->route('admin.daily', compact('date'))->withErrors('自分のコメント以外は更新できません');
+        }
+
         $adminComment->admin_description = $request->admin_description;
         $adminComment->admin_comment = $request->admin_comment;
         $adminComment->admin_id = $admin_id;
         $adminComment->update();
 
-        $workSchedule = WorkSchedule::where('id', $attendance->work_schedule_id)->first();
-        $date = $workSchedule->date;
         return redirect()->route('admin.daily', compact('date'));
     }
-    //ここから
+
+    public function storeAdminComment(Request $request, Attendance $attendance)
+    {
+        $admin_id = Auth::id();
+        $workSchedule = WorkSchedule::where('id', $attendance->work_schedule_id)->first();
+        $date = $workSchedule->date;
+
+        $adminComment = new AdminComment();
+        $adminComment->attendance_id = $attendance->id;
+        $adminComment->admin_id = $admin_id;
+        $adminComment->admin_description = $request->admin_description;
+        $adminComment->admin_comment = $request->admin_comment;
+        $adminComment->save();
+
+        return redirect()->route('admin.daily', compact('date'));
+    }
 
     public function showAdmins()
     {

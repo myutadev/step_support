@@ -50,6 +50,7 @@
                             <th scope="col">勤務時間</th>
                             <th scope="col">作業内容</th>
                             <th scope="col">作業コメント</th>
+                            <th scope="col">管理者コメント</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,6 +68,7 @@
                                     <td>{{ $date['duration'] }}</td>
                                     <td>{{ $date['workDescription'] }}</td>
                                     <td>{{ $date['workComment'] }}</td>
+                                    <td>{!! $date['admin_comment'] !!}</td>
                                 </tr>
                             @endforeach
                         @endif
