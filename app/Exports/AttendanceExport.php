@@ -212,7 +212,7 @@ class AttendanceExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            'date', 'schedule_type', 'user_name', 'beneficiary_number', 'attendance', 'check_in_time', 'check_out_time', 'rest', 'over_time', 'workdescription', 'work_comment', 'admin_domment', 'admin_description'
+            'date', 'schedule_type', 'user_name', 'beneficiary_number',  'check_in_time', 'check_out_time', 'rest', 'over_time', 'workdescription', 'work_comment', 'admin_domment', 'admin_description'
         ];
     }
 }

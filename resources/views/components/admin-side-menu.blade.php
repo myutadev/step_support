@@ -20,7 +20,14 @@
                             <p class="mb-0 ms-2">日別出勤状況</p>
                         </div>
                     </a>
-                    <a href="{{ '' }}" class="side-menu-link">
+                    <a href="{{ '/admin/export/show' }}" class="side-menu-link">
+                        <div class="menu-text-light ms-3 my-4 d-flex
+                        align-items-center">
+                            <i class="bi bi-book"></i>
+                            <p class="mb-0 ms-2">月次勤務データ出力</p>
+                        </div>
+                    </a>
+                    {{-- <a href="{{ '' }}" class="side-menu-link">
                         <div class="menu-text-light ms-3 my-4 d-flex
                         align-items-center">
                             <i class="bi bi-book"></i>
@@ -33,7 +40,7 @@
                             <i class="bi bi-layout-text-window-reverse"></i>
                             <p class="mb-0 ms-2">実績記録表出力</p>
                         </div>
-                    </a>
+                    </a> --}}
 
                     <div class="menu-text-dark ms-3">
                         <p>設定</p>
