@@ -112,10 +112,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('settings/workschedules/store', [AdminAttendanceController::class, 'storeWorkschedules'])->name('admin.workschedules.store');
         Route::delete('settings/workschedules/destroy/{id}', [AdminAttendanceController::class, 'deleteWorkschedules'])->name('admin.workschedules.destroy');
         Route::patch('settings/workschedules/{id}/update', [AdminAttendanceController::class, 'updateWorkschedules'])->name('admin.workschedules.update');
+        Route::get('export/show', [AdminAttendanceController::class, 'showExport'])->name('admin.export.show');
+        Route::post('export', [AdminAttendanceController::class, 'export'])->name('admin.export');
     });
 });
 
 // admin用ルート
+
 
 
 

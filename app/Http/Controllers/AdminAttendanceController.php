@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AttendanceExport;
+use App\Exports\UsersExport;
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\CounselorRequest;
@@ -29,6 +31,7 @@ use PhpParser\Node\Expr\FuncCall;
 
 
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminAttendanceController extends Controller
 {
@@ -684,5 +687,34 @@ class AdminAttendanceController extends Controller
         $yearmonth = $year . "-" . $month;
         $special_sched->delete();
         return redirect()->route('admin.workschedules', compact('yearmonth'));
+    }
+
+    //export attendances
+
+    //export users
+    public function showExport($yearmonth = null)
+    {
+        if ($yearmonth == null) {
+            $lastMonth = Carbon::today()->subMonth();
+            $year = $lastMonth->year;
+            $month = sprintf("%02d", $lastMonth->month);
+        } else {
+            $yearMonthArr = explode("-", $yearmonth);
+            $year = $yearMonthArr[0];
+            $month = sprintf("%02d", $yearMonthArr[1]);
+        }
+
+        $yearStr = strval($year);
+        $monthStr = strval($month);
+
+        return view('admin.attendances.exportshow', ['year' => $yearStr, 'month' => $monthStr]);
+    }
+
+
+
+    public function export(Request $request)
+    {
+        $yearmonth = $request->yearmonth;
+        return Excel::download(new AttendanceExport($yearmonth), 'attendances.xlsx');
     }
 }
