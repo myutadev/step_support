@@ -9,14 +9,14 @@
         <!-- メインコンテンツのカラム -->
         <div class="col-md-10">
             {{-- ヘッダー --}}
-            @include('components.header')
+            @include('components.header-admin')
 
 
             <!-- テーブルのグループ -->
             <div class="timecard-title">
                 <p>日別出勤状況</p>
             </div>
-            <div class="timecard-selectors">
+            <div class="timecard-selectors">s
                 <input type="date" name="date" value="{{ $selectedDate }}" id="dateInput">
             </div>
             @if ($errors->any())

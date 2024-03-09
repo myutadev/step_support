@@ -9,7 +9,7 @@
         <!-- メインコンテンツのカラム -->
         <div class="col-md-10">
             {{-- ヘッダー --}}
-            @include('components.header')
+            @include('components.header-admin')
 
             <!-- テーブルのグループ -->
             <div class="timecard-title">

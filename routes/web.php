@@ -72,6 +72,7 @@ Route::group(['prefix' => 'admin'], function () {
         ->name('admin.login');
 
     Route::post('login', [AdminLoginController::class, 'login']);
+    Route::post('logout', [AdminLoginController::class, 'destroy'])->name('admin.destroy');
 
     // 以下の中は認証必須のエンドポイントとなる
     Route::middleware(['auth:admin'])->group(function () {
