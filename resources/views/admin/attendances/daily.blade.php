@@ -16,7 +16,7 @@
             <div class="timecard-title">
                 <p>日別出勤状況</p>
             </div>
-            <div class="timecard-selectors">s
+            <div class="timecard-selectors">
                 <input type="date" name="date" value="{{ $selectedDate }}" id="dateInput">
             </div>
             @if ($errors->any())
