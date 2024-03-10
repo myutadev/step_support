@@ -51,6 +51,7 @@
                             <th scope="col">作業内容</th>
                             <th scope="col">作業コメント</th>
                             <th scope="col">管理者コメント</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -69,6 +70,17 @@
                                     <td>{{ $date['workDescription'] }}</td>
                                     <td>{{ $date['workComment'] }}</td>
                                     <td>{!! $date['admin_comment'] !!}</td>
+                                    @if (!$date['attendance_id'])
+                                        <td></td>
+                                    @else
+                                        <td>
+                                            <button
+                                                onclick="location.href='{{ route('admin.attendance.edit', $date['attendance_id']) }}'"
+                                                class="btn btn-edit">
+                                                編集
+                                            </button>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         @endif

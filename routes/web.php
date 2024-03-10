@@ -115,6 +115,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::patch('settings/workschedules/{id}/update', [AdminAttendanceController::class, 'updateWorkschedules'])->name('admin.workschedules.update');
         Route::get('export/show', [AdminAttendanceController::class, 'showExport'])->name('admin.export.show');
         Route::post('export', [AdminAttendanceController::class, 'export'])->name('admin.export');
+        Route::get('attendance/{id}/edit', [AdminAttendanceController::class, 'editAttendance'])->name('admin.attendance.edit');
+        Route::patch('attendance/{id}/update', [AdminAttendanceController::class, 'updateAttendance'])->name('admin.attendance.update');
     });
 });
 

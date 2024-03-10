@@ -17,6 +17,7 @@ use App\Models\WorkSchedule;
 use App\Models\Admin;
 use App\Models\AdminComment;
 use App\Models\AdminDetail;
+use App\Models\AttendanceType;
 use App\Models\Counselor;
 use App\Models\DisabilityCategory;
 use App\Models\Role;
@@ -71,6 +72,8 @@ class AdminAttendanceController extends Controller
 
             if (!$curAttendance) {
                 $curAttendanceObj = [
+                    'attendance_id' => "",
+                    'date' => $workSchedule->date,
                     'date' => $workSchedule->date,
                     'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => "",
@@ -163,6 +166,7 @@ class AdminAttendanceController extends Controller
 
 
                 $curAttendanceObj = [
+                    'attendance_id' => $curAttendance->id,
                     'date' => $workSchedule->date,
                     'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => $curAttendance->body_temp,
@@ -182,6 +186,8 @@ class AdminAttendanceController extends Controller
 
         return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users', 'user_id'));
     }
+
+
 
     public function showUsers()
     {
@@ -295,7 +301,8 @@ class AdminAttendanceController extends Controller
     {
 
         if ($date == null) {
-            $selectedDate = Carbon::today();
+            $today = Carbon::today();
+            $selectedDate = $today->year . "-" . sprintf("%02d", $today->month) . "-" . sprintf("%02d", $today->day);
         } else {
             $selectedDate = $date;
         }
@@ -716,5 +723,69 @@ class AdminAttendanceController extends Controller
     {
         $yearmonth = $request->yearmonth;
         return Excel::download(new AttendanceExport($yearmonth), 'attendances.xlsx');
+    }
+
+    public function editAttendance($id)
+    {
+        // 体温･出勤 退勤 休憩 残業有無 休憩 残業  勤務時間 作業内容 作業コメント 利用者名 利用者番号 日付 勤務カテゴリ
+        // 編集可能: 出退勤 休憩 残業 体温
+        // 他は表示のみ
+        $attendanceTypes = AttendanceType::all();
+
+        $attendance = Attendance::with(['work_schedule', 'rests', 'overtimes', 'adminComments', 'user.userDetail', 'attendanceType'])->find($id);
+
+        return view('admin.attendances.admintimecardedit', compact('attendance', 'attendanceTypes'));
+    }
+
+    public function updateAttendance(Request $request, $id)
+    {
+        $attendance = Attendance::with(['work_schedule', 'rests', 'overtimes', 'adminComments', 'user.userDetail'])->find($id);
+        $attendance->body_temp = $request->body_temp;
+        $attendance->check_in_time = $request->check_in_time;
+        $attendance->check_out_time = $request->check_out_time;
+        $attendance->is_overtime = $request->is_overtime;
+        $attendance->attendance_type_id = $request->attendance_type;
+        $counter = 1;
+
+        foreach ($attendance->rests as $rest) {
+            $restStartKey = "rest_start_" . $counter;
+            $restEndKey = "rest_end_" . $counter;
+            $rest->start_time = $request->$restStartKey;
+            $rest->end_time = $request->$restEndKey;
+            $rest->update();
+            $counter++;
+        }
+
+        $counter = 1;
+        foreach ($attendance->overtimes as $overtime) {
+            $overtimeStartKey = "overtime_start_" . $counter;
+            $overtimeEndKey = "overtime_end_" . $counter;
+            $overtime->start_time = $request->$overtimeStartKey;
+            $overtime->end_time = $request->$overtimeEndKey;
+            $overtime->update();
+            $counter++;
+        }
+
+        if ($request->rest_start_add) {
+            $newRest = new Rest();
+            $newRest->attendance_id = $id;
+            $newRest->start_time = $request->rest_start_add;
+            $newRest->end_time = $request->rest_end_add;
+            // dd($newRest);
+            $newRest->save();
+        }
+
+        if ($request->overtime_start_add) {
+            $newOvertime = new Overtime();
+            $newOvertime->attendance_id = $id;
+            $newOvertime->start_time = $request->overtime_start_add;
+            $newOvertime->end_time = $request->overtime_end_add;
+            // dd($newRest);
+            $newOvertime->save();
+        }
+
+        $attendance->update();
+
+        return redirect()->route('admin.attendance.edit', $id);
     }
 }
