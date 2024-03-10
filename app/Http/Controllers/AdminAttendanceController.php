@@ -295,7 +295,8 @@ class AdminAttendanceController extends Controller
     {
 
         if ($date == null) {
-            $selectedDate = Carbon::today();
+            $today = Carbon::today();
+            $selectedDate = $today->year . "-" . sprintf("%02d", $today->month) . "-" . sprintf("%02d", $today->day);
         } else {
             $selectedDate = $date;
         }
