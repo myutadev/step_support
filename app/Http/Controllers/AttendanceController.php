@@ -182,8 +182,15 @@ class AttendanceController extends Controller
         $userDetail = $user->userDetail;
 
         $attendance->company_id = $userDetail->company_id;
-        $attendance->attendance_type_id = 1;
         $attendance->check_in_time = Carbon::now()->toTimeString();
+
+        //10時以降のcheck-in→遅刻 basetimeを設定
+        $baseCheckInTime = Carbon::parse('10:00:00');
+        if (Carbon::now()->gt($baseCheckInTime)) {
+            $attendance->attendance_type_id = 2;
+        } else {
+            $attendance->attendance_type_id = 1;
+        }
 
         //work_schedulesからdateidを取得
         $today = Carbon::today();
