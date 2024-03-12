@@ -42,7 +42,7 @@
                         </div>
                     </a> --}}
 
-                    <div class="menu-text-dark ms-3">
+                    <div class="menu-text-dark ms-3 mt-4">
                         <p>設定</p>
                     </div>
                     <a href="{{ route('admin.users') }}" class="side-menu-link">

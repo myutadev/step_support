@@ -28,8 +28,8 @@
                     </ul>
                 </div>
             @endif
-            <div class="record-list mt-5">
-                <table class="table">
+            <div class="record-list mt-3 scrollable-table">
+                <table class="table table-fixed">
                     <thead>
                         <tr>
                             <th>受給者番号</th>

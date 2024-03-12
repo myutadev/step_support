@@ -25,7 +25,7 @@
                     <div class="col-sm-2">
                         <div class="form-group mb-2 mr-sm-2">
                             <p class="mb-4">利用者名</p>
-                            <select class="form-control" id="userInput" name="user" style="color:red">
+                            <select class="form-control" id="userInput" name="user">
                                 @foreach ($users as $user)
                                     <option value="{{ $user['id'] }}" {{ $user['id'] == $user_id ? 'selected' : '' }}>
                                         {{ $user->full_name }}</option>
@@ -35,8 +35,8 @@
                     </div>
                 </div>
             </div>
-            <div class="record-list mt-5">
-                <table class="table table-striped">
+            <div class="record-list scrollable-table">
+                <table class="table table-striped table-fixed my-table">
                     <thead>
                         <tr>
                             <th scope="col">日付</th>
@@ -59,7 +59,7 @@
                         @if ($monthlyAttendanceData)
                             @foreach ($monthlyAttendanceData as $date)
                                 <tr>
-                                    <td>{{ $date['date'] }}</td>
+                                    <td >{{ $date['date'] }}</td>
                                     <td>{{ $date['scheduleType'] }}</td>
                                     <td>{{ $date['attendance_type'] }}</td>
                                     <td>{{ $date['bodyTemp'] }}</td>
@@ -70,8 +70,8 @@
                                     <td>{{ $date['overtime'] }}</td>
                                     <td>{{ $date['duration'] }}</td>
                                     <td>{{ $date['workDescription'] }}</td>
-                                    <td>{{ $date['workComment'] }}</td>
-                                    <td>{!! $date['admin_comment'] !!}</td>
+                                    <td class="td-max">{{ $date['workComment'] }}</td>
+                                    <td class="td-mid">{!! $date['admin_comment'] !!}</td>
                                     @if (!$date['attendance_id'])
                                         @if ($date['scheduleType'] == $date['workday_name'])
                                             <td>
