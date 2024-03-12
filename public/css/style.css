@@ -211,6 +211,30 @@
     line-height: normal !important;
 }
 
+.btn-edit {
+    border-radius: 3px !important;
+    border: 0.5px solid #C1C1C1 !important;
+    background: #F8F8F8 !important;
+    color: #4874B4 !important;
+    font-family: Roboto !important;
+    font-size: 9px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+}
+
+.btn-store-leave {
+    border-radius: 3px !important;
+    border: 0.5px solid #C1C1C1 !important;
+    background: #F8F8F8 !important;
+    color: red !important;
+    font-family: Roboto !important;
+    font-size: 9px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+}
+
 .btn-create {
     border-radius: 4px !important;
     background: #D0A307 !important;
@@ -244,6 +268,10 @@
 .error {
 
     color: red;
+}
+
+.select2-container--default .select2-results__option {
+    color: red; /* オプションの文字色を赤にする */
 }
 
 /* 

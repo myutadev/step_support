@@ -45,6 +45,8 @@ class AdminAttendanceController extends Controller
         $users = User::whereHas('userDetail', function ($query) use ($companyId) {
             $query->where('company_id', $companyId);
         })->with('userDetail')->get();
+        $workDayName = ScheduleType::find(1)->name;
+        $leaveTypes = AttendanceType::where('name', 'LIKE', '%欠勤%')->orWhere('name', 'LIKE', '%有給%')->get();
 
         if ($yearmonth == null) {
             $today = Carbon::today();
@@ -66,14 +68,15 @@ class AdminAttendanceController extends Controller
         $monthlyAttendanceData = [];
         $thisMonthWorkSchedules = WorkSchedule::with(['specialSchedule.schedule_type', 'scheduleType', 'attendances' => function ($query) use ($user_id) {
             $query->where('user_id', $user_id);
-        }, 'attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get(); // dd($thisMonthWorkSchedules);
+        }, 'attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin', 'attendances.attendanceType'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get(); // dd($thisMonthWorkSchedules);
         foreach ($thisMonthWorkSchedules as $workSchedule) {
             $curAttendance = $workSchedule->attendances->first();
 
             if (!$curAttendance) {
                 $curAttendanceObj = [
                     'attendance_id' => "",
-                    'date' => $workSchedule->date,
+                    'attendance_type' => "",
+                    'workSchedule_id' => $workSchedule->id,
                     'date' => $workSchedule->date,
                     'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => "",
@@ -86,6 +89,7 @@ class AdminAttendanceController extends Controller
                     'workDescription' => "",
                     'workComment' => "",
                     'admin_comment' => "",
+                    'workday_name' => $workDayName
                 ];
                 array_push($monthlyAttendanceData, $curAttendanceObj);
             } else {
@@ -167,24 +171,27 @@ class AdminAttendanceController extends Controller
 
                 $curAttendanceObj = [
                     'attendance_id' => $curAttendance->id,
+                    'attendance_type' => $curAttendance->attendanceType->name,
+                    'workSchedule_id' => $workSchedule->id,
                     'date' => $workSchedule->date,
                     'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => $curAttendance->body_temp,
-                    'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
+                    'checkin' => $curAttendance->check_in_time == null ? "" : Carbon::parse($curAttendance->check_in_time)->format('H:i'),
                     'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
                     'is_overtime' => $is_overtime_str,
                     'rest' => $restTimeString,
                     'overtime' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
-                    'duration' => $workDurationInterval->format('%H:%I:%S'),
+                    'duration' => $curAttendance->check_in_time == null ? "" : $workDurationInterval->format('%H:%I:%S'),
                     'workDescription' => $curAttendance->work_description,
                     'workComment' => $curAttendance->work_comment,
                     'admin_comment' => $admin_comment,
+                    'workday_name' => $workDayName
                 ];
                 array_push($monthlyAttendanceData, $curAttendanceObj);
             }
         }
 
-        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users', 'user_id'));
+        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users', 'user_id', 'leaveTypes'));
     }
 
 
@@ -787,5 +794,30 @@ class AdminAttendanceController extends Controller
         $attendance->update();
 
         return redirect()->route('admin.attendance.edit', $id);
+    }
+
+    public function storeLeave(Request $request, $user_id, $sched_id)
+    {
+        $adminId = Auth::id();
+        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
+
+        $attendance = new Attendance();
+        $attendance->attendance_type_id = $request->leave_type_id;
+        $attendance->user_id = $user_id;
+        $attendance->work_schedule_id = $sched_id;
+        $attendance->company_id = $companyId;
+
+        $attendance->save();
+
+        $admin_comment = AdminComment::find($attendance->id);
+        $admin_comment->admin_description = $request->admin_description;
+        $admin_comment->admin_comment = $request->admin_comment;
+        $admin_comment->admin_id = $adminId;
+        $admin_comment->update();
+
+        $yearmonth = $request->yearmonth;
+
+        // return $this->showTimecard($yearmonth, $user_id);
+        return redirect()->route('admin.timecard', ['yearmonth' => $yearmonth, 'id' => $user_id]);
     }
 }

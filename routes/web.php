@@ -117,6 +117,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('export', [AdminAttendanceController::class, 'export'])->name('admin.export');
         Route::get('attendance/{id}/edit', [AdminAttendanceController::class, 'editAttendance'])->name('admin.attendance.edit');
         Route::patch('attendance/{id}/update', [AdminAttendanceController::class, 'updateAttendance'])->name('admin.attendance.update');
+        Route::post('attendance/store/leave/{user_id}/{sched_id}', [AdminAttendanceController::class, 'storeLeave'])->name('admin.store.leave');
     });
 });
 
