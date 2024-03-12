@@ -20,6 +20,8 @@ class AttendanceTypeSeeder extends Seeder
         ], [
             'name' => '欠勤',
         ], [
+            'name' => '無断欠勤',
+        ], [
             'name' => '有給',
         ]];
 
