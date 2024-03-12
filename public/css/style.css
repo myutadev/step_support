@@ -270,8 +270,39 @@
     color: red;
 }
 
-.select2-container--default .select2-results__option {
-    color: red; /* オプションの文字色を赤にする */
+.scrollable-table {
+    overflow-y: auto;
+    height: 2000px;
+    /* 任意の高さ */
+}
+
+.table-fixed thead th {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    /* ヘッダーの背景色を設定することが重要 */
+    z-index: 1;
+    /* テーブルボディの内容と重ならないように */
+}
+
+.td-min {
+    width: 10%;
+}
+
+.td-mid {
+    width: 20%;
+}
+
+.td-max {
+    width: 30%;
+}
+
+.admin-side-menu {
+
+    top: 0;
+
+    overflow-y: auto;
+    /* 高さがビューポートを超える場合にスクロール可能にする */
 }
 
 /* 
