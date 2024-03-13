@@ -26,13 +26,13 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
-            $table->time('check_in_time');
+            $table->time('check_in_time')->nullable();
             $table->time('check_out_time')->nullable();
             $table->foreignId('work_schedule_id')
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();;
-            $table->decimal('body_temp', 5, 2);
+            $table->decimal('body_temp', 5, 2)->nullable();
             $table->text('work_description')->nullable();
             $table->text('work_comment')->nullable();
             $table->timestamps();
