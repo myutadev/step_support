@@ -42,22 +42,17 @@ class AttendanceSeeder extends Seeder
 【体調面】特にないです',
         ]);
 
-        $usersIds = range(1, 3); // 仮のユーザーIDの配列
-        $workScheduleIds = range(1, $yesterdayWorkSchedId); // 処理するwork_schedule_idの範囲
+        for ($userId = 1; $userId <= 3; $userId++) {
+            for ($workSchedId = 397; $workSchedId <= $yesterdayWorkSchedId; $workSchedId++) {
 
-        foreach ($usersIds as $userId) {
-            foreach (array_chunk($workScheduleIds, 100) as $chunkedWorkScheduleIds) { // 100単位でチャンク
-                foreach ($chunkedWorkScheduleIds as $workSchedId) {
-                    $schedTypeId = WorkSchedule::find($workSchedId)->schedule_type_id;
-                    if ($schedTypeId == "1") {
-                        // ここでAttendanceを作成
-                        Attendance::factory()->create([
-                            'work_schedule_id' => $workSchedId,
-                            'user_id' => $userId,
-                            'work_description' => $descriptionSamples->random(),
-                            'work_comment' => $commentSamples->random(),
-                        ]);
-                    }
+                $schedTypeId = WorkSchedule::find($workSchedId)->schedule_type_id;
+                if ($schedTypeId == "1") {
+                    Attendance::factory()->create([
+                        'work_schedule_id' => $workSchedId,
+                        'user_id' => $userId,
+                        'work_description' => $descriptionSamples->random(),
+                        'work_comment' => $commentSamples->random(),
+                    ]);
                 }
             }
         }
