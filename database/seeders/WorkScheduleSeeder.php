@@ -7,7 +7,6 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-
 class WorkScheduleSeeder extends Seeder
 {
     /**
@@ -18,8 +17,11 @@ class WorkScheduleSeeder extends Seeder
         $startDate = Carbon::create(2023, 1, 1);
         $endDate = Carbon::create(2030, 12, 31);
 
+        $batchSize = 500; // 一度に挿入するレコードの数
+        $data = []; // 挿入データを一時的に保持する配列
+
         while ($startDate->lte($endDate)) {
-            DB::table('work_schedules')->insert([
+            $data[] = [
                 'date' => $startDate->toDateString(),
                 'year' => $startDate->year,
                 'month' => $startDate->month,
@@ -27,9 +29,20 @@ class WorkScheduleSeeder extends Seeder
                 'schedule_type_id' => $this->getScheduleTypeId($startDate),
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ];
+
+            // バッチサイズに達したらデータベースに挿入
+            if (count($data) >= $batchSize) {
+                DB::table('work_schedules')->insert($data);
+                $data = []; // データ配列をリセット
+            }
 
             $startDate->addDay();
+        }
+
+        // 残りのデータがあれば挿入
+        if (!empty($data)) {
+            DB::table('work_schedules')->insert($data);
         }
     }
 

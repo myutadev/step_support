@@ -15,7 +15,7 @@ class AttendanceSeeder extends Seeder
     public function run(): void
     {
         $yesterday = now()->subDay()->format('Y-m-d');
-        $yestedayWorkSchedId = WorkSchedule::where('date', $yesterday)->first()->id;
+        $yesterdayWorkSchedId = WorkSchedule::where('date', $yesterday)->first()->id;
 
         $descriptionSamples = collect([
             'Instagram・ブログ記事作成',
@@ -42,17 +42,22 @@ class AttendanceSeeder extends Seeder
 【体調面】特にないです',
         ]);
 
-        for ($userId = 1; $userId <= 3; $userId++) {
-            for ($workSchedId = 1; $workSchedId <= $yestedayWorkSchedId; $workSchedId++) {
+        $usersIds = range(1, 3); // 仮のユーザーIDの配列
+        $workScheduleIds = range(1, $yesterdayWorkSchedId); // 処理するwork_schedule_idの範囲
 
-                $schedTypeId = WorkSchedule::find($workSchedId)->schedule_type_id;
-                if ($schedTypeId == "1") {
-                    Attendance::factory()->create([
-                        'work_schedule_id' => $workSchedId,
-                        'user_id' => $userId,
-                        'work_description' => $descriptionSamples->random(),
-                        'work_comment' => $commentSamples->random(),
-                    ]);
+        foreach ($usersIds as $userId) {
+            foreach (array_chunk($workScheduleIds, 100) as $chunkedWorkScheduleIds) { // 100単位でチャンク
+                foreach ($chunkedWorkScheduleIds as $workSchedId) {
+                    $schedTypeId = WorkSchedule::find($workSchedId)->schedule_type_id;
+                    if ($schedTypeId == "1") {
+                        // ここでAttendanceを作成
+                        Attendance::factory()->create([
+                            'work_schedule_id' => $workSchedId,
+                            'user_id' => $userId,
+                            'work_description' => $descriptionSamples->random(),
+                            'work_comment' => $commentSamples->random(),
+                        ]);
+                    }
                 }
             }
         }
