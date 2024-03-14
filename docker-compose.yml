@@ -23,7 +23,7 @@ services:
             - sail
         depends_on:
             - mariadb
-        mem_limit: 256m
+        # mem_limit: 256m
     mariadb:
         image: 'mariadb:10'
         ports:
@@ -48,7 +48,7 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
-        mem_limit: 256m
+        # mem_limit: 256m
 networks:
     sail:
         driver: bridge
