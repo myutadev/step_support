@@ -182,13 +182,14 @@ class AttendanceExport implements FromCollection, WithHeadings
                     $admin_comment = implode("", $admin_comments);
                     $admin_name = implode("", $admin_names);
 
+                    $isAttend = $curAttendance->attendance_type_id == 1 || $curAttendance->attendance_type_id == 2;
 
                     $curAttendanceObj = [
                         'date' => $workSchedule->date,
                         'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                         'user_name' => $curAttendance->user->full_name,
                         'beneficiary_number' => $curAttendance->user->userDetail->beneficiary_number,
-                        'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
+                        'checkin' => $isAttend ? Carbon::parse($curAttendance->check_in_time)->format('H:i') : "",
                         'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
                         'rest' => $restTimeString,
                         // 'is_overtime' => $is_overtime_str,

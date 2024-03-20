@@ -729,7 +729,11 @@ class AdminAttendanceController extends Controller
     public function export(Request $request)
     {
         $yearmonth = $request->yearmonth;
-        return Excel::download(new AttendanceExport($yearmonth), 'attendances.xlsx');
+
+        $dateTimeNow = now()->format('Y-m-d_H-i');
+        $fileName = 'attendances_' . $yearmonth . '_' . $dateTimeNow . '.xlsx';
+
+        return Excel::download(new AttendanceExport($yearmonth), $fileName);
     }
 
     public function editAttendance($id)
