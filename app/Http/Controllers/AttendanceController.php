@@ -469,17 +469,20 @@ class AttendanceController extends Controller
                     $is_overtime_str = "無";
                 }
 
+                //出席+遅刻かどうか? それ以外は欠席レコード有り
+                $isAttend = $curAttendance->attendance_type_id == 1 || $curAttendance->attendance_type_id == 2;
+            
                 $curAttendObj = [
                     'date' => $workSchedule->date,
                     'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
                     'bodyTemp' => $curAttendance->body_temp,
-                    'checkin' => Carbon::parse($curAttendance->check_in_time)->format('H:i'),
+                    'checkin' => $isAttend ? Carbon::parse($curAttendance->check_in_time)->format('H:i') : "",
                     'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
-                    'is_overtime' => $is_overtime_str,
+                    'is_overtime' => $isAttend ? $is_overtime_str : "",
                     'rest' => $restTimeString,
                     'overtime' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
-                    'duration' => $workDurationInterval->format('%H:%I:%S'),
-                    'workDescription' => $curAttendance->work_description,
+                    'duration' => $isOvertime ? $workDurationInterval->format('%H:%I:%S') : "",
+                    'workDescription' => $isAttend ? $curAttendance->work_description : "欠勤/有給休暇",
                     'workComment' => $curAttendance->work_comment,
                 ];
 
