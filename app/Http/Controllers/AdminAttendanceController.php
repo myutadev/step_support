@@ -813,7 +813,8 @@ class AdminAttendanceController extends Controller
 
         $attendance->save();
 
-        $admin_comment = AdminComment::find($attendance->id);
+
+        $admin_comment = AdminComment::where('attendance_id', $attendance->id)->first();
         $admin_comment->admin_description = $request->admin_description;
         $admin_comment->admin_comment = $request->admin_comment;
         $admin_comment->admin_id = $adminId;
