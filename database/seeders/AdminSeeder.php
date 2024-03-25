@@ -19,7 +19,7 @@ class AdminSeeder extends Seeder
             'id' => 1,
             'last_name' => '花村',
             'first_name' => '昭良',
-            'email' => 'admin@test.co.jp',
+            'email' => 'admin1@test.co.jp',
             'email_verified_at' => null,
             'password' => Hash::make('1111'),
             'created_at' => date('Y-m-d H:i:s'),
