@@ -27,6 +27,13 @@
                             <p class="mb-0 ms-2">月次勤務データ出力</p>
                         </div>
                     </a>
+                    <a href="{{ '/admin/report' }}" class="side-menu-link">
+                        <div class="menu-text-light ms-3 my-4 d-flex
+                        align-items-center">
+                            <i class="bi bi-book"></i>
+                            <p class="mb-0 ms-2">月次勤務レポート</p>
+                        </div>
+                    </a>
                     {{-- <a href="{{ '' }}" class="side-menu-link">
                         <div class="menu-text-light ms-3 my-4 d-flex
                         align-items-center">
