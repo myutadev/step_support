@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Attendance\DailyAdminComment;
+use App\Domains\Attendance\DailyOvertime;
+use App\Domains\Attendance\DailyRest;
+use App\Domains\Attendance\DailyTimeSlot;
+use App\Domains\Attendance\DailyUserAttendance;
+use App\Domains\Attendance\NullDailyTimeSlot;
+use App\Domains\Attendance\TimeSlot;
 use App\Exports\AttendanceExport;
 use App\Exports\UsersExport;
 use App\Http\Requests\AdminRequest;
@@ -43,7 +50,7 @@ class AdminAttendanceController extends Controller
     {
         $this->workTimeService = $workTimeService;
     }
-
+    // memo: 100lines 
     public function showTimecard($yearmonth = null, $user_id = null)
     {
         $adminId = Auth::id();
@@ -54,6 +61,7 @@ class AdminAttendanceController extends Controller
         })->with('userDetail')->get();
         $workDayName = ScheduleType::find(1)->name;
         $leaveTypes = AttendanceType::where('name', 'LIKE', '%欠勤%')->orWhere('name', 'LIKE', '%有給%')->get();
+        $leaveTypesIds = $leaveTypes->pluck('id')->toArray();
 
         if ($yearmonth == null) {
             $today = Carbon::today();
@@ -76,8 +84,10 @@ class AdminAttendanceController extends Controller
         $thisMonthWorkSchedules = WorkSchedule::with(['specialSchedule.schedule_type', 'scheduleType', 'attendances' => function ($query) use ($user_id) {
             $query->where('user_id', $user_id);
         }, 'attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin', 'attendances.attendanceType'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get(); // dd($thisMonthWorkSchedules);
+
         foreach ($thisMonthWorkSchedules as $workSchedule) {
             $curAttendance = $workSchedule->attendances->first();
+            //出席レコードがない場合
 
             if (!$curAttendance) {
                 $curAttendanceObj = [
@@ -96,118 +106,59 @@ class AdminAttendanceController extends Controller
                     'workDescription' => "",
                     'workComment' => "",
                     'admin_comment' => "",
-                    'workday_name' => $workDayName
+                    // 'workday_name' => $workDayName
                 ];
                 array_push($monthlyAttendanceData, $curAttendanceObj);
-            } else {
-                $curRests = $curAttendance->rests;
-                //休憩は複数回入る可能性あり。
-                $restTimes = [];
-                foreach ($curRests as $rest) {
-                    $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
-                }
-                $restTimeString = implode("<br>", $restTimes);
-
-                $curOvertime = $curAttendance->overtimes->first();
-
-                $workDurationInterval = $this->workTimeService->calculateWorkDuration(
-                    $curAttendance->check_in_time,
-                    $curAttendance->check_out_time,
-                    $curAttendance->is_overtime,
-                    $curRests,
-                    $curOvertime,
-                );
-                // //ここから1日の勤務時間の計算 1. 出勤 10時以前→10時、10時以降→15分単位で切り上げ
-                // $checkInTimeForCalc = Carbon::parse($curAttendance->check_in_time);
-                // $checkOutTimeForCalc = Carbon::parse($curAttendance->check_out_time);
-                // $baseTimeForIn = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 10:00:00');
-                // $baseTimeForOut = Carbon::parse($checkInTimeForCalc->format('Y-m-d') . ' 15:00:00');
-
-                // $isOvertime = $curAttendance->is_overtime;
-
-                // //出勤時間の切り上げ
-                // if ($checkInTimeForCalc->lt($baseTimeForIn)) {
-                //     $checkInTimeForCalc->hour(10)->minute(0)->second(0);
-                // } else {
-                //     $checkInTimeForCalc->ceilMinute(15);
-                // }
-
-
-                // //退勤時間の切り下げ 残業なし(isOvertime=0) かつ 15時以降の打刻であれば
-                // if ($checkOutTimeForCalc->gt($baseTimeForOut) && $isOvertime == 0) {
-                //     $checkOutTimeForCalc->hour(15)->minute(0)->second(0);
-                // } else {
-                //     $checkOutTimeForCalc->floorminute(15);
-                // }
-
-                // $totalRestDuration = CarbonInterval::seconds(0); // 0秒で初期化
-
-                // foreach ($curRests as $rest) {
-                //     $restStart = Carbon::parse($rest->start_time);
-                //     $restEnd = Carbon::parse($rest->end_time);
-                //     $restDuration = $restStart->floorminute(15)->diff($restEnd->ceilminute(15));
-
-                //     $totalRestDuration = $totalRestDuration->add($restDuration);
-                // }
-                // //残業代:なければ 0のcarboninterval,あれば計算する。
-
-                // if ($curOvertime == null) {
-                //     $overtimeDuration = CarbonInterval::seconds(0);
-                // } else {
-                //     $overtimeStart = Carbon::parse($curOvertime->start_time)->ceilMinute(15);
-                //     $overtimeEnd = Carbon::parse($curOvertime->end_time)->floorMinute(15);
-                //     $overtimeDuration = $overtimeStart->diff($overtimeEnd);
-                // }
-
-                // // duration - 休憩の合計 + 残業の時間
-                // $workDuration = $checkInTimeForCalc->diff($checkOutTimeForCalc);
-                // $workDurationInterval = CarbonInterval::instance($workDuration);
-                // $overTimeInterval = CarbonInterval::instance($overtimeDuration);
-                // $restInterval = CarbonInterval::instance($totalRestDuration);
-                // $workDurationInterval =
-                //     $workDurationInterval->add($overTimeInterval)->sub($restInterval);
-                // dd($workDurationInterval);
-
-                if ($curAttendance->is_overtime === 1) {
-                    $is_overtime_str = "有";
-                } else {
-                    $is_overtime_str = "無";
-                }
-
-                $admin_comments = [];
-
-                // 複数のadminコメントをつなげて1つのテキストにする 各種配列を作$restTimeString = implode("<br>", $restTimes);
-                $curAdminComments = $curAttendance->adminComments;
-                foreach ($curAdminComments as $curAdminComment) {
-                    $admin_comments[] = $curAdminComment->admin == null ? "" : $curAdminComment->admin_description . " :" . $curAdminComment->admin_comment . " (" . $curAdminComment->admin->full_name . ")";
-                }
-
-                $admin_comment = implode("<br>", $admin_comments);
-
-
-                $curAttendanceObj = [
-                    'attendance_id' => $curAttendance->id,
-                    'attendance_type' => $curAttendance->attendanceType->name,
-                    'workSchedule_id' => $workSchedule->id,
-                    'date' => $workSchedule->date,
-                    'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
-                    'bodyTemp' => $curAttendance->body_temp,
-                    'checkin' => $curAttendance->check_in_time == null ? "" : Carbon::parse($curAttendance->check_in_time)->format('H:i'),
-                    'checkout' => $curAttendance->check_out_time == null ? "" : Carbon::parse($curAttendance->check_out_time)->format('H:i'),
-                    'is_overtime' => $is_overtime_str,
-                    'rest' => $restTimeString,
-                    'overtime' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
-                    'duration' => $curAttendance->check_in_time == null ? "" : $workDurationInterval->format('%H:%I:%S'),
-                    'workDescription' => $curAttendance->work_description,
-                    'workComment' => $curAttendance->work_comment,
-                    'admin_comment' => $admin_comment,
-                    'workday_name' => $workDayName
-                ];
-                array_push($monthlyAttendanceData, $curAttendanceObj);
+                continue;
             }
+            //出席レコードがある確認
+            $isAttend = !in_array($curAttendance->id, $leaveTypesIds);
+
+            //0.DailyUserAttendanceの作成- 欠席も出席も共通で存在
+            $curDailyAdminComment = new DailyAdminComment();
+            $curAdminComments = $curAttendance->adminComments;
+
+            foreach ($curAdminComments as $adminComment) {
+                $curDailyAdminComment->push($adminComment);
+            }
+
+            //欠席レコードの場合Nullオブジェクトを返す
+            if (!$isAttend) {
+                $curDailyRest = new DailyRest();
+                $curDailyOvertime = new DailyOvertime();
+            }
+
+            //1.DailyRest作成 = TimeSlotの作成, 
+            $dailyTimeSlotForRest = new DailyTimeSlot($curAttendance->id);
+            $curRests = $curAttendance->rests;
+
+            foreach ($curRests as $rest) {
+                $curTimeSlot = new TimeSlot(Carbon::parse($rest->start_time), Carbon::parse($rest->end_time));
+                $dailyTimeSlotForRest->push($curTimeSlot);
+            }
+
+            $curDailyRest = new DailyRest($dailyTimeSlotForRest);
+
+            //2.DailyOvertime作成 = TimeSlotの作成, 
+
+            $dailyTimeSlotForOvertime = new DailyTimeSlot($curAttendance->id);
+            $curOvertimes = $curAttendance->overtimes;
+
+            foreach ($curOvertimes as $overtime) {
+                $curTimeSlot = new TimeSlot(Carbon::parse($overtime->start_time), Carbon::parse($overtime->end_time));
+                $dailyTimeSlotForOvertime->push($curTimeSlot);
+            }
+
+            $curDailyOvertime = new DailyOvertime($dailyTimeSlotForOvertime);
+
+            $curDailyUserAttendance = new DailyUserAttendance($curAttendance, $workSchedule, $curDailyOvertime, $curDailyRest, $curDailyAdminComment);
+            $curAttendanceObj =   $curDailyUserAttendance->createAttendanceObj();
+
+
+            array_push($monthlyAttendanceData, $curAttendanceObj);
         }
 
-        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users', 'user_id', 'leaveTypes'));
+        return view('admin.attendances.admintimecard', compact('monthlyAttendanceData', 'year', 'month', 'users', 'user_id', 'leaveTypes', 'workDayName'));
     }
 
 

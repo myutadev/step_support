@@ -73,7 +73,6 @@ class AdminReportController extends Controller
         $firstWorkScheduleId =  $thisMonthWorkSchedules->getFirstId();
         $lastWorkScheduleId =  $thisMonthWorkSchedules->getLastId();
 
-        //2.$userInfoArrayを作成
         $userInfoArray = [];
 
         //請求人数累計カウント用 + 合計実勤務時間計算用

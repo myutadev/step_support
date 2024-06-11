@@ -4,6 +4,7 @@ namespace App\Domains;
 
 use App\Models\User;
 use App\Services\WorkTimeService;
+use App\Utils\TimeFormatter;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Collection;
@@ -117,7 +118,7 @@ class UserAttendanceRange
     public function getFormattedTotalWorkDuration(): string
     {
         $totalWorkDurationInterval = $this->getTotalWorkDurationInterval();
-        return WorkTimeService::convertDaysToHours($totalWorkDurationInterval->cascade())->format('%H:%I:%S');
+        return TimeFormatter::convertDaysToHours($totalWorkDurationInterval->cascade())->format('%H:%I:%S');
     }
     public function getRestToAchieveTarget(int $targetHour): CarbonInterval
     {
@@ -126,6 +127,6 @@ class UserAttendanceRange
         $totalWorkDurationInterval = $this->getTotalWorkDurationInterval();
         $restToAchieveTargetByDays = $totalWorkDurationInterval->sub($TARGET_HOURS)->cascade();
 
-        return WorkTimeService::convertDaysToHours($restToAchieveTargetByDays);
+        return TimeFormatter::convertDaysToHours($restToAchieveTargetByDays);
     }
 }

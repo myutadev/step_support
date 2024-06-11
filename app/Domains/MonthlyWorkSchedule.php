@@ -32,7 +32,10 @@ class MonthlyWorkSchedule
     public function getTotalOpeningSchedules(): array
     {
         $workSchedules = $this->monthlyWorkSchedule->filter(function ($schedule) {
-            return $schedule->schedule_type_id === 1;
+            if ($schedule->specialSchedule == null) {
+                return $schedule->schedule_type_id === 1;
+            }
+            return $schedule->specialSchedule->schedule_type_id === 1;
         });
         return $workSchedules->toArray();
     }

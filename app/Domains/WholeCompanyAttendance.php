@@ -3,6 +3,7 @@
 namespace App\Domains;
 
 use App\Services\WorkTimeService;
+use App\Utils\TimeFormatter;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -36,7 +37,7 @@ class WholeCompanyAttendance
     public function getCompanyTotalWorkDuration(int $firstWorkScheduleId, int $lastWorkScheduleId): string
     {
         $companyTotalWorkDurationInterval = $this->getCompanyTotalWorkDurationInterval($firstWorkScheduleId, $lastWorkScheduleId);
-        return WorkTimeService::convertDaysToHours($companyTotalWorkDurationInterval->cascade())->format('%H:%I:%S');
+        return TimeFormatter::convertDaysToHours($companyTotalWorkDurationInterval->cascade())->format('%H:%I:%S');
     }
 
     public function getTotalClaimCount(int $firstWorkScheduleId, int $lastWorkScheduleId): int
@@ -62,7 +63,7 @@ class WholeCompanyAttendance
     {
         $targetTotalWorkDurationInterval = $this->getTargetTotalWorkDurationInterval($TARGET_HOURS,  $firstWorkScheduleId, $lastWorkScheduleId);
 
-        $targetTotalWorkDuration = WorkTimeService::convertDaysToHours($targetTotalWorkDurationInterval->cascade())->format('%H:%I:%S');
+        $targetTotalWorkDuration = TimeFormatter::convertDaysToHours($targetTotalWorkDurationInterval->cascade())->format('%H:%I:%S');
 
         return $targetTotalWorkDuration;
     }
@@ -76,8 +77,8 @@ class WholeCompanyAttendance
         $restToAchieveCompanyTargetInterval = $companyTotalWorkDurationInterval->sub($targetTotalWorkDurationInterval)->cascade();
         $restToAchieveCompanyTarget =
             $restToAchieveCompanyTargetInterval->invert == 1 ?
-            "-" . WorkTimeService::convertDaysToHours($restToAchieveCompanyTargetInterval->cascade())->format('%H:%I:%S')
-            : WorkTimeService::convertDaysToHours($restToAchieveCompanyTargetInterval->cascade())->format('%H:%I:%S');
+            "-" . TimeFormatter::convertDaysToHours($restToAchieveCompanyTargetInterval->cascade())->format('%H:%I:%S')
+            : TimeFormatter::convertDaysToHours($restToAchieveCompanyTargetInterval->cascade())->format('%H:%I:%S');
 
         return $restToAchieveCompanyTarget;
     }
@@ -92,7 +93,7 @@ class WholeCompanyAttendance
         $maxClaimSecondsPerDay = CarbonInterval::hours($maxClaimHoursPerCompany)->totalSeconds;
         $maxTotalWorkDurationSeconds = $maxClaimSecondsPerDay * $openingSoFarThisMonth;
 
-        $maxTotalWorkDuration = WorkTimeService::convertSecondsToHours(CarbonInterval::seconds($maxTotalWorkDurationSeconds))->format('%H:%I:%S');
+        $maxTotalWorkDuration = TimeFormatter::convertSecondsToHours(CarbonInterval::seconds($maxTotalWorkDurationSeconds))->format('%H:%I:%S');
         return $maxTotalWorkDuration;
     }
 }

@@ -67,13 +67,13 @@
                                     <td>{{ $date['checkout'] }}</td>
                                     <td>{{ $date['is_overtime'] }}</td>
                                     <td> {!! $date['rest'] !!} </td>
-                                    <td>{{ $date['overtime'] }}</td>
+                                    <td>{!! $date['overtime'] !!}</td>
                                     <td>{{ $date['duration'] }}</td>
                                     <td>{{ $date['workDescription'] }}</td>
                                     <td class="td-max">{{ $date['workComment'] }}</td>
                                     <td class="td-mid">{!! $date['admin_comment'] !!}</td>
                                     @if (!$date['attendance_id'])
-                                        @if ($date['scheduleType'] == $date['workday_name'])
+                                        @if ($date['scheduleType'] == $workDayName)
                                             <td>
                                                 <!-- 欠勤登録ボタン -->
                                                 <button type="button" class="btn btn-store-leave store-leave"

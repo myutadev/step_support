@@ -71,27 +71,27 @@ class WorkTimeService
 
     //これらは一般的な機能
 
-    public static function convertDaysToHours(CarbonInterval $interval)
-    {
-        $totalHours = $interval->d * 24 + $interval->hours;
+    // public static function convertDaysToHours(CarbonInterval $interval): CarbonInterval
+    // {
+    //     $totalHours = $interval->d * 24 + $interval->hours;
 
-        $newInterval = CarbonInterval::hours($totalHours)
-            ->minutes($interval->minutes)
-            ->seconds($interval->seconds);
+    //     $newInterval = CarbonInterval::hours($totalHours)
+    //         ->minutes($interval->minutes)
+    //         ->seconds($interval->seconds);
 
-        $newInterval->invert = $interval->invert == 0 ? 0 : 1;
+    //     $newInterval->invert = $interval->invert == 0 ? 0 : 1;
 
-        return $newInterval;
-    }
+    //     return $newInterval;
+    // }
 
-    public static function convertSecondsToHours(CarbonInterval $interval)
-    {
-        $totalHours = ($interval->s / 60 / 60) + $interval->hours;
+    // public static function convertSecondsToHours(CarbonInterval $interval): CarbonInterval
+    // {
+    //     $totalHours = ($interval->s / 60 / 60) + $interval->hours;
 
-        $newInterval = CarbonInterval::hours($totalHours);
+    //     $newInterval = CarbonInterval::hours($totalHours);
 
-        $newInterval->invert = $interval->invert == 0 ? 0 : 1;
+    //     $newInterval->invert = $interval->invert == 0 ? 0 : 1;
 
-        return $newInterval;
-    }
+    //     return $newInterval;
+    // }
 };

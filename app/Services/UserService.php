@@ -4,12 +4,13 @@ namespace App\Services;
 
 use App\Models\Admin;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class UserService
 {
 
-    public function getCompanyUsers()
+    public function getCompanyUsers(): Collection
     {
         $adminId = Auth::id();
         $admin = Admin::with('adminDetail')->find($adminId);
