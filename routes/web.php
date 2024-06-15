@@ -4,9 +4,11 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
+use App\Http\Controllers\Admin\Timecard\IndexTimecardController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AdminReportController;
+// use App\Http\Controllers\AdminTimecard\IndexTimecardController;
 use App\Models\Attendance;
 
 /*
@@ -81,7 +83,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('dashboard', fn () => view('admin.dashboard'))
             ->name('admin.dashboard');
 
-        Route::get('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'showTimecard'])->name('admin.timecard');
+        Route::get('timecard/{yearmonth?}/{id?}', IndexTimecardController::class)->name('admin.timecard');
         // Route::post('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('admin.timecard.submit.month')->middleware('auth');
         Route::get('daily/{date?}', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
         Route::get('users', [AdminAttendanceController::class, 'showUsers'])->name('admin.users');

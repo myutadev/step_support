@@ -2,24 +2,27 @@
 
 namespace App\Services;
 
-use App\Models\WorkSchedule;
+use App\Repositories\WorkScheduleRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
 class WorkScheduleService
 {
+    protected $workScheduleRepository;
 
+    public function __construct(WorkScheduleRepository $workScheduleRepository)
+    {
+        $this->workScheduleRepository = $workScheduleRepository;
+    }
+
+    public function getSelectedMonthWorkSchedulesByUser(int $year, int $month, int $user_id): Collection
+    {
+        return $this->workScheduleRepository->getSelectedMonthWorkSchedulesByUser($year, $month, $user_id);
+    }
 
     public function getAllSchedulesForMonth(int $year, int $month): Collection
     {
-        $thisMonthAllSchedules =
-            WorkSchedule::with(['scheduleType', 'specialSchedule'])
-            ->whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->orderBy('date', 'asc')
-            ->get();
-
-        return $thisMonthAllSchedules;
+        return $this->workScheduleRepository->getAllSchedulesForMonth($year, $month);
     }
 
     public function getTotalOpeningSchedule(collection $schedules): array
