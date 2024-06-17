@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\AttendanceType;
+use Illuminate\Database\Eloquent\Collection;
 
 class AttendanceTypeRepository
 {
@@ -13,7 +14,7 @@ class AttendanceTypeRepository
         $this->attendanceType = $attendanceType;
     }
 
-    public function getLeaveTypes(): AttendanceType
+    public function getLeaveTypes(): Collection
     {
         return $this->attendanceType->where('name', 'LIKE', '%欠勤%')->orWhere('name', 'LIKE', '%有給%')->get();
     }

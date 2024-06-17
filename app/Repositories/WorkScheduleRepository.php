@@ -2,12 +2,18 @@
 
 namespace App\Repositories;
 
+use App\Models\ScheduleType;
 use App\Models\WorkSchedule;
 use Illuminate\Database\Eloquent\Collection;
 
 class WorkScheduleRepository
 {
 
+    public function getWorkDayName(): string
+    {
+        return ScheduleType::find(1)->name;
+    }
+    
     public function getSelectedMonthWorkSchedulesByUser(int $year, int $month, int $user_id): Collection
     {
         return WorkSchedule::with(

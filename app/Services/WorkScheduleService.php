@@ -15,6 +15,11 @@ class WorkScheduleService
         $this->workScheduleRepository = $workScheduleRepository;
     }
 
+    public function getWorkDayName(): string
+    {
+        return $this->workScheduleRepository->getWorkDayName();
+    }
+
     public function getSelectedMonthWorkSchedulesByUser(int $year, int $month, int $user_id): Collection
     {
         return $this->workScheduleRepository->getSelectedMonthWorkSchedulesByUser($year, $month, $user_id);

@@ -17,6 +17,7 @@ use App\Models\ScheduleType;
 use App\Models\User;
 use App\Models\WorkSchedule;
 use App\Models\Admin;
+use App\Models\Attendance;
 use App\Models\AttendanceType;
 use App\Models\UserDetail;
 use Carbon\Carbon;
@@ -28,131 +29,168 @@ class TimeCardService
     protected $adminRepository;
     protected $attendanceTypeRepository;
     protected $userRepository;
+    protected $attendanceService;
+    protected $workScheduleService;
 
-    public function __construct(AdminRepository $adminRepository, AttendanceTypeRepository $attendanceTypeRepository, UserRepository $userRepository)
-    {
+    public function __construct(
+        AdminRepository $adminRepository,
+        AttendanceTypeRepository $attendanceTypeRepository,
+        UserRepository $userRepository,
+        AttendanceService $attendanceService,
+        WorkScheduleService $workScheduleService,
+    ) {
         $this->adminRepository = $adminRepository;
         $this->attendanceTypeRepository = $attendanceTypeRepository;
         $this->userRepository = $userRepository;
+        $this->attendanceService = $attendanceService;
+        $this->workScheduleService = $workScheduleService;
+    }
+    /**
+     * 出勤日以外の表示レコードを作成。
+     * 出勤日か休日か、そのID、日付、のみを含んだオブジェクトを返す。
+     *@param  \App\Models\WorkSchedule $workschedule 
+     *@return array 出勤レコードが無いようのオブジェクト
+     */
+    // privateに変えるかも?
+    public function generateNoAttendanceRecordObj(WorkSchedule $workSchedule)
+    {
+        return
+            $curAttendanceObj = [
+                'attendance_id' => "",
+                'attendance_type' => "",
+                'workSchedule_id' => $workSchedule->id,
+                'date' => $workSchedule->date,
+                'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
+                'bodyTemp' => "",
+                'checkin' => "",
+                'checkout' => "",
+                'is_overtime' => "",
+                'rest' => "",
+                'overtime' => "",
+                'duration' => "",
+                'workDescription' => "",
+                'workComment' => "",
+                'admin_comment' => "",
+            ];
     }
 
-    public function showTimecard($yearmonth = null, $user_id = null)
+    private function isAttendedRecord(Attendance $attendance): bool
     {
-        // Move to Admin Repository 
-        $adminId = Auth::id();
-        $admin = Admin::with('adminDetail')->find($adminId);
-        $companyId = $admin->adminDetail->company_id;
-        // Move to UseRepository   
-        $users = User::whereHas('userDetail', function ($query) use ($companyId) {
-            $query->where('company_id', $companyId);
-        })->with('userDetail')->get();
+        return !in_array($attendance->id, $this->attendanceService->getLeaveTypeIds());
+    }
 
-        // アクセサを記述
-        $workDayName = ScheduleType::find(1)->name;
-        // Move to AttendanceType Repository 
-        $leaveTypes = AttendanceType::where('name', 'LIKE', '%欠勤%')->orWhere('name', 'LIKE', '%有給%')->get();
-        $leaveTypesIds = $leaveTypes->pluck('id')->toArray();
+    /**
+     *管理者コメントを生成する
+     *DailyAdminCommentクラスを作成。
+     *@param \App\Models\Attendance $attendance
+     *@return DailyAdminComment タイムカード画面表示用の管理者コメントクラス
+     */
+    private function generateDailyAdminCommentClass(Attendance $attendance): DailyAdminComment
+    {
+        $curDailyAdminComment = new DailyAdminComment();
+        $curAdminComments = $attendance->adminComments;
 
 
-        //ここはトレイト?
-        if ($yearmonth == null) {
-            $today = Carbon::today();
-            $year = $today->year;
-            $month = sprintf("%02d", $today->month);
-        } else {
-            $yearMonthArr = explode("-", $yearmonth);
-            $year = $yearMonthArr[0];
-            $month = sprintf("%02d", $yearMonthArr[1]);
+        foreach ($curAdminComments as $adminComment) {
+            $curDailyAdminComment->push($adminComment);
         }
 
+        return $curDailyAdminComment;
+    }
 
-        if ($user_id == null) {
-            $userDetail = UserDetail::where('company_id', $companyId)->first();
-            $user_id = $userDetail->user_id;
+    /**
+     *Attendanceに紐づく当日の休憩レコードを保持するDailyTimeSloctを生成する
+     *Attendanceに休憩レコードが複数紐づく場合もある。Attendanceが欠席系のレコードだった場合Nullオブジェクトを返す。
+     *@param \App\Models\Attendance $attendancen
+     *@return DailyRest 1つのAttendanceに紐づく休憩レコードを表現するクラス
+     */
+    private function generateDailyRestClass(Attendance $attendance): DailyRest
+    {
+        if (!$this->isAttendedRecord($attendance)) return new DailyRest();
+        $dailyTimeSlotForRest = new DailyTimeSlot($attendance->id);
+        $curRests = $attendance->rests;
+
+        foreach ($curRests as $rest) {
+            $curTimeSlot = new TimeSlot(Carbon::parse($rest->start_time), Carbon::parse($rest->end_time));
+            $dailyTimeSlotForRest->push($curTimeSlot);
         }
 
-        // 表示データの作成
+        return new DailyRest($dailyTimeSlotForRest);
+    }
+
+    /**
+     *Attendanceに紐づく当日の残業レコードを保持するDailyOvertimeSloctを生成する
+     *Attendanceに残業レコードが複数紐づく場合もある。Attendanceが欠席系のレコードだった場合Nullオブジェクトを返す。
+     *@param \App\Models\Attendance $attendancen
+     *@return DailyOvertime 1つのAttendanceに紐づく休憩レコードを表現するクラス
+     */
+    private function generateDailyOvertimeClass(Attendance $attendance): DailyOvertime
+    {
+
+        if (!$this->isAttendedRecord($attendance)) return new DailyOvertime();
+
+        $dailyTimeSlotForOvertime = new DailyTimeSlot($attendance->id);
+        $curOvertimes = $attendance->overtimes;
+
+        foreach ($curOvertimes as $overtime) {
+            $curTimeSlot = new TimeSlot(Carbon::parse($overtime->start_time), Carbon::parse($overtime->end_time));
+            $dailyTimeSlotForOvertime->push($curTimeSlot);
+        }
+
+        return new DailyOvertime($dailyTimeSlotForOvertime);
+    }
+    /**
+     *出席レコードがあった場合の出席レコードオブジェクトを返すメソッド
+     *
+     *@param \App\Models\Attendance $attendance 
+     *@return Array 1日の出席レコードが入ったDailyUserAttendanceオブジェクトのメソッドを使って、表示用レコードを取得
+     */
+    private function generateAttendanceRecordObj(Attendance $attendance, Workschedule $workSchedule)
+    {
+        $curDailyAdminComment = $this->generateDailyAdminCommentClass($attendance);
+        $curDailyRest = $this->generateDailyRestClass($attendance);
+        $curDailyOvertime = $this->generateDailyOvertimeClass($attendance);
+        $curDailyUserAttendance = new DailyUserAttendance($attendance, $workSchedule, $curDailyOvertime, $curDailyRest, $curDailyAdminComment);
+        return $curDailyUserAttendance->createAttendanceObj();
+    }
+
+    /**
+     *出席日に紐づくAttendanceレコードの有無を確認し、適切な出席データを返す
+     *WorkScheduleからその日付に紐づく、Attendanceレコードを取得。紐づくレコードがなければ、レコードが内容のAttendanceObjを返す。
+     *レコードがあれば、Attendanceが存在する用のレコードを返す。
+     *
+     *@param \App\Models\Workschedule $workSchedule
+     *@return Array timetableに表示する1日のレコードオブジェクトを作成
+     */
+    private function generateDailyAttendanceRecordObj(WorkSchedule $workSchedule)
+    {
+        $attendance = $workSchedule->attendances->first();
+
+        //初期値として、出席レコードがない場合のオブジェクトを保存
+        $dailyAttendanceObj = $this->generateNoAttendanceRecordObj($workSchedule);
+
+        //出席レコードある場合には上書き
+        if ($attendance) $dailyAttendanceObj = $this->generateAttendanceRecordObj($attendance, $workSchedule);
+
+        return $dailyAttendanceObj;
+    }
+    /**
+     *各ユーザーごとのTimecard用の月次出席表示用の配列を返す
+     *1ヶ月分のデータを格納する配列monthlyAttendanceDataを用意し、1日毎にデータを作成し順にmonthlyAttendanceDataへ格納する
+     *
+     *@param \App\Models\Workschedule $workSchedule
+     *@return Array timetableに表示する月次のレコードオブジェクトを作成
+     */
+    public function generateMonthlyAttendanceData($year, $month, $user_id): array
+    {
         $monthlyAttendanceData = [];
-        //WorkSchedule repository
-        $thisMonthWorkSchedules = WorkSchedule::with(['specialSchedule.schedule_type', 'scheduleType', 'attendances' => function ($query) use ($user_id) {
-            $query->where('user_id', $user_id);
-        }, 'attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin', 'attendances.attendanceType'])->whereYear('date', $year)->whereMonth('date', $month)->orderBy('date', 'asc')->get(); // dd($thisMonthWorkSchedules);
 
+        $thisMonthWorkSchedules = $this->workScheduleService->getSelectedMonthWorkSchedulesByUser($year, $month, $user_id);
 
-        // showMonthlyAttendanceData(MonthlyWorkSchedule)
         foreach ($thisMonthWorkSchedules as $workSchedule) {
-            $curAttendance = $workSchedule->attendances->first();
-            //出席レコードがない場合 -> private method? 
-
-            if (!$curAttendance) {
-                $curAttendanceObj = [
-                    'attendance_id' => "",
-                    'attendance_type' => "",
-                    'workSchedule_id' => $workSchedule->id,
-                    'date' => $workSchedule->date,
-                    'scheduleType' => $workSchedule->specialSchedule == null ? $workSchedule->scheduleType->name : $workSchedule->specialSchedule->schedule_type->name,
-                    'bodyTemp' => "",
-                    'checkin' => "",
-                    'checkout' => "",
-                    'is_overtime' => "",
-                    'rest' => "",
-                    'overtime' => "",
-                    'duration' => "",
-                    'workDescription' => "",
-                    'workComment' => "",
-                    'admin_comment' => "",
-                    // 'workday_name' => $workDayName
-                ];
-                array_push($monthlyAttendanceData, $curAttendanceObj);
-                continue;
-            }
-
-            //出席レコードがある確認 private method
-            $isAttend = !in_array($curAttendance->id, $leaveTypesIds);
-
-            //0.DailyUserAttendanceの作成- 欠席も出席も共通で存在
-            $curDailyAdminComment = new DailyAdminComment();
-            $curAdminComments = $curAttendance->adminComments;
-
-            foreach ($curAdminComments as $adminComment) {
-                $curDailyAdminComment->push($adminComment);
-            }
-
-            //欠席レコードの場合Nullオブジェクトを返す
-            if (!$isAttend) {
-                $curDailyRest = new DailyRest();
-                $curDailyOvertime = new DailyOvertime();
-            }
-
-            //1.DailyRest作成 = TimeSlotの作成, 
-            $dailyTimeSlotForRest = new DailyTimeSlot($curAttendance->id);
-            $curRests = $curAttendance->rests;
-
-            foreach ($curRests as $rest) {
-                $curTimeSlot = new TimeSlot(Carbon::parse($rest->start_time), Carbon::parse($rest->end_time));
-                $dailyTimeSlotForRest->push($curTimeSlot);
-            }
-
-            $curDailyRest = new DailyRest($dailyTimeSlotForRest);
-
-            //2.DailyOvertime作成 = TimeSlotの作成, 
-
-            $dailyTimeSlotForOvertime = new DailyTimeSlot($curAttendance->id);
-            $curOvertimes = $curAttendance->overtimes;
-
-            foreach ($curOvertimes as $overtime) {
-                $curTimeSlot = new TimeSlot(Carbon::parse($overtime->start_time), Carbon::parse($overtime->end_time));
-                $dailyTimeSlotForOvertime->push($curTimeSlot);
-            }
-
-            $curDailyOvertime = new DailyOvertime($dailyTimeSlotForOvertime);
-
-            $curDailyUserAttendance = new DailyUserAttendance($curAttendance, $workSchedule, $curDailyOvertime, $curDailyRest, $curDailyAdminComment);
-            $curAttendanceObj =   $curDailyUserAttendance->createAttendanceObj();
-
-
+            $curAttendanceObj =   $this->generateDailyAttendanceRecordObj($workSchedule);
             array_push($monthlyAttendanceData, $curAttendanceObj);
-            
         }
+        return $monthlyAttendanceData;
     }
 }

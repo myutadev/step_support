@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Repositories\AdminRepository;
 use App\Repositories\UserRepository;
 use Carbon\Carbon;
@@ -23,12 +24,12 @@ class MonthUserSelectorService
         return $this->adminRepository->getCurrentCompanyId();
     }
 
-    public function getUsersByCompanyId(): Collection
+    private function getUsersByCompanyId(): Collection
     {
         return  $this->userRepository->getUsersByCompanyId($this->getCurrentCompanyId());
     }
 
-    public function getSelectedYearMonth($yearmonth)
+    private function getSelectedYearMonth($yearmonth): array
     {
         if ($yearmonth == null) {
             $today = Carbon::today();
@@ -47,12 +48,27 @@ class MonthUserSelectorService
         return $selectedYearMonth;
     }
 
-    public function getSelectedUserId($user_id = null)
+    private function getSelectedUserId($user_id = null): int
     {
         $companyId = $this->getCurrentCompanyId();
         if ($user_id == null) {
-            return $this->userRepository->getFirstUserByCompanyId($companyId);
+            return $this->userRepository->getFirstUserByCompanyId($companyId)->id;
         }
         return $user_id;
+    }
+
+    public function createMonthUserSelectorDataObj($yearmonth, $user_id): array
+    {
+        $users = $this->getUsersByCompanyId();
+        $selectedYearMonth = $this->getSelectedYearMonth($yearmonth);
+        $year = $selectedYearMonth["year"];
+        $month = $selectedYearMonth["month"];
+        $user_id = $this->getSelectedUserId($user_id);
+        return [
+            'users' => $users,
+            'year' => $year,
+            'month' => $month,
+            'user_id' => $user_id,
+        ];
     }
 }
