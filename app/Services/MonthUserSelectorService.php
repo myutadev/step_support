@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Repositories\AdminRepository;
 use App\Repositories\UserRepository;
 use Carbon\Carbon;

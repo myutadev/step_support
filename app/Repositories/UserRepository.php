@@ -18,10 +18,11 @@ class UserRepository
     {
         return $this->user->whereHas('userDetail', function ($query) use ($companyId) {
             $query->where('company_id', $companyId);
-        })->with('userDetail')->get();
+        })->with('userDetail', 'attendances.rests', 'attendances.overtimes')->get();
     }
     public function getFirstUserByCompanyId(int $companyId): User
     {
         return $this->getUsersByCompanyId($companyId)->first();
     }
+
 }
