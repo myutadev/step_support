@@ -3,15 +3,23 @@
 namespace App\Http\Controllers\Admin\User;
 
 use App\Http\Controllers\Controller;
+use App\Services\UserWriteService;
 use Illuminate\Http\Request;
 
 class EditUserController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
-    public function __invoke(Request $request)
+    protected $userWriteService;
+
+    public function __construct(UserWriteService $userWriteService)
     {
-        //
+        $this->userWriteService = $userWriteService;
+    }
+
+    public function __invoke($id)
+    {
+        $userRegistrationData = $this->userWriteService->getUserResistrationData();
+        $user = $this->userWriteService->getUserWithDetailsByUserId($id);
+
+        return view('admin.attendances.usersedit', compact('userRegistrationData', 'user'));
     }
 }

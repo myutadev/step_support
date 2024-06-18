@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
 use App\Http\Controllers\Admin\Timecard\IndexTimecardController;
 use App\Http\Controllers\Admin\User\CreateUserController;
+use App\Http\Controllers\Admin\User\EditUserController;
 use App\Http\Controllers\Admin\User\IndexUserController;
 use App\Http\Controllers\Admin\User\StoreUserController;
 use App\Http\Controllers\AttendanceController;
@@ -92,7 +93,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('users', IndexUserController::class)->name('admin.users');
         Route::get('users/create', CreateUserController::class)->name('admin.users.create');
         Route::post('users/store', StoreUserController::class)->name('admin.users.store');
-        Route::get('users/{id}/edit', [AdminAttendanceController::class, 'editUser'])->name('admin.users.edit');
+        Route::get('users/{id}/edit', EditUserController::class)->name('admin.users.edit');
         Route::patch('users/{id}/update', [AdminAttendanceController::class, 'updateUser'])->name('admin.users.update');
         Route::get('admins', [AdminAttendanceController::class, 'showAdmins'])->name('admin.admins');
         Route::get('admins/create', [AdminAttendanceController::class, 'createAdmin'])->name('admin.admins.create');

@@ -71,4 +71,16 @@ class UserWriteService
         $userDetail->company_id = $companyId;
         $userDetail->update();
     }
+
+    /**
+     *ユーザー編集画面表示用のユーザーデータを取得する
+     *ユーザーIDを元に、UserモデルからuserDetails, DisabilityCategory,Residnce,Counselor情報をリレーションで取得して返す。
+     *@param int ブラウザからリクエストされたユーザーID
+     *@return User ユーザー詳細、障害区分、相談員、住居名を付加したユーザーデータ
+     */
+    public function getUserWithDetailsByUserId($id)
+    {
+        $user = $this->userRepository->getUserWithDetailsByUserId($id);
+        return $user;
+    }
 }

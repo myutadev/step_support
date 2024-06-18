@@ -224,16 +224,16 @@ class AdminAttendanceController extends Controller
 
     //     return $this->showUsers();
     // }
-    public function editUser($id)
-    {
-        $disability_categories = DisabilityCategory::get();
-        $residences = Residence::get();
-        $counselors = Counselor::get();
+    // public function editUser($id)
+    // {
+    //     $disability_categories = DisabilityCategory::get();
+    //     $residences = Residence::get();
+    //     $counselors = Counselor::get();
 
-        $user = User::with(['userDetail.disabilityCategory', 'userDetail.residence', 'userDetail.counselor'])->firstWhere('id', $id);
+    //     $user = User::with(['userDetail.disabilityCategory', 'userDetail.residence', 'userDetail.counselor'])->firstWhere('id', $id);
 
-        return view('admin.attendances.usersedit', compact('disability_categories', 'residences', 'counselors', 'user'));
-    }
+    //     return view('admin.attendances.usersedit', compact('disability_categories', 'residences', 'counselors', 'user'));
+    // }
 
     public function updateUser(UserRequest $request, $id)
     {

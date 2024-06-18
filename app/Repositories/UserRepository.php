@@ -35,4 +35,9 @@ class UserRepository
     {
         return UserDetail::where('user_id', $user->id)->first();
     }
+
+    public function getUserWithDetailsByUserId($id): User
+    {
+        return User::with(['userDetail.disabilityCategory', 'userDetail.residence', 'userDetail.counselor'])->firstWhere('id', $id);
+    }
 }

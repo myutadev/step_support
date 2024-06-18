@@ -7,16 +7,16 @@ use App\Services\UserWriteService;
 
 class CreateUserController extends Controller
 {
-    protected $userCreateService;
+    protected $userWriteService;
 
-    public function __construct(UserWriteService $userCreateService)
+    public function __construct(UserWriteService $userWriteService)
     {
-        $this->userCreateService = $userCreateService;
+        $this->userWriteService = $userWriteService;
     }
 
     public function __invoke()
     {
-        $userRegistrationData = $this->userCreateService->getUserResistrationData();
+        $userRegistrationData = $this->userWriteService->getUserResistrationData();
         return view('admin.attendances.userscreate', compact('userRegistrationData'));
     }
 }

@@ -83,7 +83,7 @@
                             {{-- ドロップダウンここから --}}
                             <div class="dropdown">
                                 <select class="btn btn-light" name="disability_category_id" id="disability_category_id">
-                                    @foreach ($disability_categories as $disability_category)
+                                    @foreach ($userRegistrationData['disabilityCategories'] as $disability_category)
                                         <option value="{{ $disability_category->id }}"
                                             {{ old('disability_category_id', $user->userDetail->disability_category_id) == $disability_category->id ? 'selected' : '' }}>
                                             {{ $disability_category->name }}
@@ -117,7 +117,7 @@
 
                             <div class="dropdown">
                                 <select class="btn btn-light" name="residence_id" id="residence_id">
-                                    @foreach ($residences as $residence)
+                                    @foreach ($userRegistrationData['residences'] as $residence)
                                         <option value="{{ $residence->id }}"
                                             {{ old('residence_id', $user->userDetail->residence_id) == $residence->id ? 'selected' : '' }}>
                                             {{ $residence->name }}
@@ -137,7 +137,7 @@
                             {{-- ドロップダウンここから --}}
                             <div class="dropdown">
                                 <select class="btn btn-light" name="counselor_id" id="counselor_id">
-                                    @foreach ($counselors as $counselor)
+                                    @foreach ($userRegistrationData['counselors'] as $counselor)
                                         <option value="{{ $counselor->id }}"
                                             {{ old('counselor_id', $user->userDetail->counselor_id) == $counselor->id ? 'selected' : '' }}>
                                             {{ $counselor->name }}
