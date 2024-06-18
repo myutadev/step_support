@@ -2,15 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Domains\Attendance\DailyAdminComment;
-use App\Domains\Attendance\DailyOvertime;
-use App\Domains\Attendance\DailyRest;
-use App\Domains\Attendance\DailyTimeSlot;
-use App\Domains\Attendance\DailyUserAttendance;
-use App\Domains\Attendance\NullDailyTimeSlot;
-use App\Domains\Attendance\TimeSlot;
+
 use App\Exports\AttendanceExport;
-use App\Exports\UsersExport;
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\CounselorRequest;
@@ -203,34 +196,34 @@ class AdminAttendanceController extends Controller
     //     return view('admin.attendances.userscreate', compact('disability_categories', 'residences', 'counselors'));
     // }
 
-    public function storeUser(UserRequest $request)
-    {
-        $adminId = Auth::id();
-        $adminDetail = AdminDetail::where('admin_id', $adminId)->first();
-        $companyId = $adminDetail->company_id;
+    // public function storeUser(UserRequest $request)
+    // {
+    //     $adminId = Auth::id();
+    //     $adminDetail = AdminDetail::where('admin_id', $adminId)->first();
+    //     $companyId = $adminDetail->company_id;
 
-        $user = new User();
-        $user->last_name = $request->last_name;
-        $user->first_name = $request->first_name;
-        $user->email = $request->email;
-        $user->password = $request->password;
-        $user->save();
+    //     $user = new User();
+    //     $user->last_name = $request->last_name;
+    //     $user->first_name = $request->first_name;
+    //     $user->email = $request->email;
+    //     $user->password = $request->password;
+    //     $user->save();
 
-        $userDetail = UserDetail::where('user_id', $user->id)->first();
-        $userDetail->birthdate = $request->birthdate;
-        $userDetail->beneficiary_number = $request->beneficiary_number;
-        $userDetail->disability_category_id = $request->disability_category_id;
-        //is_on_welfareの有無をチェック
-        $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
+    //     $userDetail = UserDetail::where('user_id', $user->id)->first();
+    //     $userDetail->birthdate = $request->birthdate;
+    //     $userDetail->beneficiary_number = $request->beneficiary_number;
+    //     $userDetail->disability_category_id = $request->disability_category_id;
+    //     //is_on_welfareの有無をチェック
+    //     $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
 
-        $userDetail->residence_id = $request->residence_id;
-        $userDetail->counselor_id = $request->counselor_id;
-        $userDetail->admission_date = $request->admission_date;
-        $userDetail->company_id = $companyId;
-        $userDetail->update();
+    //     $userDetail->residence_id = $request->residence_id;
+    //     $userDetail->counselor_id = $request->counselor_id;
+    //     $userDetail->admission_date = $request->admission_date;
+    //     $userDetail->company_id = $companyId;
+    //     $userDetail->update();
 
-        return $this->showUsers();
-    }
+    //     return $this->showUsers();
+    // }
     public function editUser($id)
     {
         $disability_categories = DisabilityCategory::get();

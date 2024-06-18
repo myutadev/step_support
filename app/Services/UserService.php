@@ -23,7 +23,7 @@ class UserService
         return  $this->UserRepository->getUsersByCompanyId($companyId);
     }
 
-    function getActiveUsers($allCompanyUsers, $dischargeDateCondition)
+    public function getActiveUsers($allCompanyUsers, $dischargeDateCondition)
     {
         return $allCompanyUsers->filter(function ($user) use ($dischargeDateCondition) {
             return $user->userDetail->discharge_date >= $dischargeDateCondition || is_null(
@@ -31,6 +31,14 @@ class UserService
             );
         });
     }
+
+    //このメソッドはいろいろなところで使い回すのでUserメソッドにしてよいのか疑問。Traitか別クラスを作るべき?
+    // traitは検討したが、依存性が隠蔽されて良くないため、結局このクラスに残す。Adminサービスでも必要になれば作成
+    public function getCompanyId(): int
+    {
+        return $this->AdminRepository->getCurrentCompanyId();
+    }
+
 
     /**
      *利用者アカウント管理画面に表示する用の利用者アカウントオブジェクトを作成

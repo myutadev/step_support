@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use App\Models\UserDetail;
 use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository
@@ -25,4 +26,13 @@ class UserRepository
         return $this->getUsersByCompanyId($companyId)->first();
     }
 
+    public function createNewUser(): User
+    {
+        return new User();
+    }
+
+    public function getUserDetailByUser(User $user): UserDetail
+    {
+        return UserDetail::where('user_id', $user->id)->first();
+    }
 }
