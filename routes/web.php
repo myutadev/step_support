@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\User\CreateUserController;
 use App\Http\Controllers\Admin\User\EditUserController;
 use App\Http\Controllers\Admin\User\IndexUserController;
 use App\Http\Controllers\Admin\User\StoreUserController;
+use App\Http\Controllers\Admin\User\UpdateUserController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AdminReportController;
@@ -94,7 +95,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('users/create', CreateUserController::class)->name('admin.users.create');
         Route::post('users/store', StoreUserController::class)->name('admin.users.store');
         Route::get('users/{id}/edit', EditUserController::class)->name('admin.users.edit');
-        Route::patch('users/{id}/update', [AdminAttendanceController::class, 'updateUser'])->name('admin.users.update');
+        Route::patch('users/{id}/update', UpdateUserController::class)->name('admin.users.update');
         Route::get('admins', [AdminAttendanceController::class, 'showAdmins'])->name('admin.admins');
         Route::get('admins/create', [AdminAttendanceController::class, 'createAdmin'])->name('admin.admins.create');
         Route::post('admins/store', [AdminAttendanceController::class, 'storeAdmin'])->name('admin.admins.store');

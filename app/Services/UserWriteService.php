@@ -83,4 +83,37 @@ class UserWriteService
         $user = $this->userRepository->getUserWithDetailsByUserId($id);
         return $user;
     }
+    /**
+     * 編集したユーザーデータを保存する。
+     *
+     * リクエストとIDを受け取り、該当ユーザーの情報、UserDetailを編集する。
+     *
+     * @param Request $request ブラウザからリクエストされたユーザーの詳細データ
+     * @param int $id ブラウザからリクエストされたユーザーID
+     * @return void
+     */
+    public function updateUser(Request $request, $id): void
+    {
+
+        $companyId = $this->AdminRepository->getCurrentCompanyId();
+
+        $user = $this->userRepository->getUserWithDetailsByUserId($id);
+        $user->last_name = $request->last_name;
+        $user->first_name = $request->first_name;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->update();
+
+        $user->userDetail->beneficiary_number = $request->beneficiary_number;
+        $user->userDetail->disability_category_id = $request->disability_category_id;
+        $user->userDetail->birthdate = $request->birthdate;
+        //is_on_welfareの有無をチェック
+        $user->userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
+        $user->userDetail->residence_id = $request->residence_id;
+        $user->userDetail->counselor_id = $request->counselor_id;
+        $user->userDetail->admission_date = $request->admission_date;
+        $user->userDetail->discharge_date = $request->discharge_date;
+        $user->userDetail->company_id = $companyId;
+        $user->userDetail->update();
+    }
 }

@@ -235,33 +235,33 @@ class AdminAttendanceController extends Controller
     //     return view('admin.attendances.usersedit', compact('disability_categories', 'residences', 'counselors', 'user'));
     // }
 
-    public function updateUser(UserRequest $request, $id)
-    {
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
+    // public function updateUser(UserRequest $request, $id)
+    // {
+    //     $admin = Auth::user();
+    //     $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+    //     $companyId = $adminDetail->company_id;
 
-        $user = User::with('userDetail')->firstWhere('id', $id);
-        $user->last_name = $request->last_name;
-        $user->first_name = $request->first_name;
-        $user->email = $request->email;
-        $user->password = $request->password;
-        $user->update();
+    //     $user = User::with('userDetail')->firstWhere('id', $id);
+    //     $user->last_name = $request->last_name;
+    //     $user->first_name = $request->first_name;
+    //     $user->email = $request->email;
+    //     $user->password = $request->password;
+    //     $user->update();
 
-        $user->userDetail->beneficiary_number = $request->beneficiary_number;
-        $user->userDetail->disability_category_id = $request->disability_category_id;
-        $user->userDetail->birthdate = $request->birthdate;
-        //is_on_welfareの有無をチェック
-        $user->userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
-        $user->userDetail->residence_id = $request->residence_id;
-        $user->userDetail->counselor_id = $request->counselor_id;
-        $user->userDetail->admission_date = $request->admission_date;
-        $user->userDetail->discharge_date = $request->discharge_date;
-        $user->userDetail->company_id = $companyId;
-        $user->userDetail->update();
+    //     $user->userDetail->beneficiary_number = $request->beneficiary_number;
+    //     $user->userDetail->disability_category_id = $request->disability_category_id;
+    //     $user->userDetail->birthdate = $request->birthdate;
+    //     //is_on_welfareの有無をチェック
+    //     $user->userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
+    //     $user->userDetail->residence_id = $request->residence_id;
+    //     $user->userDetail->counselor_id = $request->counselor_id;
+    //     $user->userDetail->admission_date = $request->admission_date;
+    //     $user->userDetail->discharge_date = $request->discharge_date;
+    //     $user->userDetail->company_id = $companyId;
+    //     $user->userDetail->update();
 
-        return $this->showUsers();
-    }
+    //     return $this->showUsers();
+    // }
 
 
     public function showDaily($date = null)
