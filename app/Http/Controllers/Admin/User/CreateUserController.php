@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin\User;
 
 use App\Http\Controllers\Controller;
-use App\Services\UserCreateService;
+use App\Services\UserWriteService;
 
 class CreateUserController extends Controller
 {
     protected $userCreateService;
 
-    public function __construct(UserCreateService $userCreateService)
+    public function __construct(UserWriteService $userCreateService)
     {
         $this->userCreateService = $userCreateService;
     }

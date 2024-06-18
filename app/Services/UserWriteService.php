@@ -9,7 +9,7 @@ use App\Repositories\AdminRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 
-class UserCreateService
+class UserWriteService
 {
     protected $counselorRepository;
     protected $residenceRepository;
