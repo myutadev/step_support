@@ -163,45 +163,45 @@ class AdminAttendanceController extends Controller
 
 
 
-    public function showUsers()
-    {
-        $adminId = Auth::id();
-        $admin = Admin::with('adminDetail')->find($adminId);
-        $companyId = $admin->adminDetail->company_id;
-        $users = User::whereHas('userDetail', function ($query) use ($companyId) {
-            $query->where('company_id', $companyId);
-        })->with(['userDetail.disabilityCategory', 'userDetail.residence', 'userDetail.counselor'])->get();
+    // public function showUsers()
+    // {
+    //     $adminId = Auth::id();
+    //     $admin = Admin::with('adminDetail')->find($adminId);
+    //     $companyId = $admin->adminDetail->company_id;
+    //     $users = User::whereHas('userDetail', function ($query) use ($companyId) {
+    //         $query->where('company_id', $companyId);
+    //     })->with(['userDetail.disabilityCategory', 'userDetail.residence', 'userDetail.counselor'])->get();
 
-        $userInfoArray = [];
-        foreach ($users as $user) {
+    //     $userInfoArray = [];
+    //     foreach ($users as $user) {
 
-            $curUserInfo = [
-                'beneficiary_number' => $user->userDetail->beneficiary_number,
-                'name' => $user->full_name,
-                'email' => $user->email,
-                'is_on_welfare' => $user->userDetail->is_on_welfare == 1 ? "有" : "無",
-                'admission_date' => $user->userDetail->admission_date,
-                'discharge_date' => $user->userDetail->discharge_date,
-                'birthdate' => $user->userDetail->birthdate,
-                'disability_category_id' => $user->userDetail->disabilityCategory->name,
-                'residence_id' => $user->userDetail->residence->name,
-                'counselor_id' => $user->userDetail->counselor->name,
-                'user_id' => $user->id,
+    //         $curUserInfo = [
+    //             'beneficiary_number' => $user->userDetail->beneficiary_number,
+    //             'name' => $user->full_name,
+    //             'email' => $user->email,
+    //             'is_on_welfare' => $user->userDetail->is_on_welfare == 1 ? "有" : "無",
+    //             'admission_date' => $user->userDetail->admission_date,
+    //             'discharge_date' => $user->userDetail->discharge_date,
+    //             'birthdate' => $user->userDetail->birthdate,
+    //             'disability_category_id' => $user->userDetail->disabilityCategory->name,
+    //             'residence_id' => $user->userDetail->residence->name,
+    //             'counselor_id' => $user->userDetail->counselor->name,
+    //             'user_id' => $user->id,
 
-            ];
-            array_push($userInfoArray, $curUserInfo);
-        }
+    //         ];
+    //         array_push($userInfoArray, $curUserInfo);
+    //     }
 
-        return view('admin.attendances.users', compact('userInfoArray'));
-    }
+    //     return view('admin.attendances.users', compact('userInfoArray'));
+    // }
 
-    public function createUser()
-    {
-        $disability_categories = DisabilityCategory::get();
-        $residences = Residence::get();
-        $counselors = Counselor::get();
-        return view('admin.attendances.userscreate', compact('disability_categories', 'residences', 'counselors'));
-    }
+    // public function createUser()
+    // {
+    //     $disability_categories = DisabilityCategory::get();
+    //     $residences = Residence::get();
+    //     $counselors = Counselor::get();
+    //     return view('admin.attendances.userscreate', compact('disability_categories', 'residences', 'counselors'));
+    // }
 
     public function storeUser(UserRequest $request)
     {

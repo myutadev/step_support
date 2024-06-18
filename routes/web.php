@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
 use App\Http\Controllers\Admin\Timecard\IndexTimecardController;
+use App\Http\Controllers\Admin\User\CreateUserController;
 use App\Http\Controllers\Admin\User\IndexUserController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminAttendanceController;
@@ -88,7 +89,7 @@ Route::group(['prefix' => 'admin'], function () {
         // Route::post('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('admin.timecard.submit.month')->middleware('auth');
         Route::get('daily/{date?}', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
         Route::get('users', IndexUserController::class)->name('admin.users');
-        Route::get('users/create', [AdminAttendanceController::class, 'createUser'])->name('admin.users.create');
+        Route::get('users/create', CreateUserController::class)->name('admin.users.create');
         Route::post('users/store', [AdminAttendanceController::class, 'storeUser'])->name('admin.users.store');
         Route::get('users/{id}/edit', [AdminAttendanceController::class, 'editUser'])->name('admin.users.edit');
         Route::patch('users/{id}/update', [AdminAttendanceController::class, 'updateUser'])->name('admin.users.update');
