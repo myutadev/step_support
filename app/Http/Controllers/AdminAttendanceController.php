@@ -352,40 +352,40 @@ class AdminAttendanceController extends Controller
     //     return view('admin.attendances.daily', compact('dailyAttendanceData', 'selectedDate'));
     // }
 
-    public function updateAdminComment(Request $request, AdminComment $admincomment)
-    {
-        $admin_id = Auth::id();
-        $adminComment = AdminComment::with('attendance.work_schedule')->where('id', $admincomment->id)->first();
-        $workSchedule = WorkSchedule::where('id', $adminComment->attendance->work_schedule_id)->first();
-        $date = $workSchedule->date;
+    // public function updateAdminComment(Request $request, AdminComment $admincomment)
+    // {
+    //     $admin_id = Auth::id();
+    //     $adminComment = AdminComment::with('attendance.work_schedule')->where('id', $admincomment->id)->first();
+    //     $workSchedule = WorkSchedule::where('id', $adminComment->attendance->work_schedule_id)->first();
+    //     $date = $workSchedule->date;
 
-        if ($request->user()->cannot('update', $adminComment)) {
-            return redirect()->route('admin.daily', compact('date'))->withErrors('自分のコメント以外は更新できません');
-        }
+    //     if ($request->user()->cannot('update', $adminComment)) {
+    //         return redirect()->route('admin.daily', compact('date'))->withErrors('自分のコメント以外は更新できません');
+    //     }
 
-        $adminComment->admin_description = $request->admin_description;
-        $adminComment->admin_comment = $request->admin_comment;
-        $adminComment->admin_id = $admin_id;
-        $adminComment->update();
+    //     $adminComment->admin_description = $request->admin_description;
+    //     $adminComment->admin_comment = $request->admin_comment;
+    //     $adminComment->admin_id = $admin_id;
+    //     $adminComment->update();
 
-        return redirect()->route('admin.daily', compact('date'));
-    }
+    //     return redirect()->route('admin.daily', compact('date'));
+    // }
 
-    public function storeAdminComment(Request $request, Attendance $attendance)
-    {
-        $admin_id = Auth::id();
-        $workSchedule = WorkSchedule::where('id', $attendance->work_schedule_id)->first();
-        $date = $workSchedule->date;
+    // public function storeAdminComment(Request $request, Attendance $attendance)
+    // {
+    //     $admin_id = Auth::id();
+    //     $workSchedule = WorkSchedule::where('id', $attendance->work_schedule_id)->first();
+    //     $date = $workSchedule->date;
 
-        $adminComment = new AdminComment();
-        $adminComment->attendance_id = $attendance->id;
-        $adminComment->admin_id = $admin_id;
-        $adminComment->admin_description = $request->admin_description;
-        $adminComment->admin_comment = $request->admin_comment;
-        $adminComment->save();
+    //     $adminComment = new AdminComment();
+    //     $adminComment->attendance_id = $attendance->id;
+    //     $adminComment->admin_id = $admin_id;
+    //     $adminComment->admin_description = $request->admin_description;
+    //     $adminComment->admin_comment = $request->admin_comment;
+    //     $adminComment->save();
 
-        return redirect()->route('admin.daily', compact('date'));
-    }
+    //     return redirect()->route('admin.daily', compact('date'));
+    // }
 
     public function showAdmins()
     {

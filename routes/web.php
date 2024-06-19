@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
 use App\Http\Controllers\Admin\DailyAttendance\IndexDailyAttendanceController;
+use App\Http\Controllers\Admin\DailyAttendance\StoreAdminCommentController;
 use App\Http\Controllers\Admin\DailyAttendance\UpdateAdminCommentController;
 use App\Http\Controllers\Admin\Timecard\IndexTimecardController;
 use App\Http\Controllers\Admin\User\CreateUserController;
@@ -92,19 +93,19 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('timecard/{yearmonth?}/{id?}', IndexTimecardController::class)->name('admin.timecard');
         // Route::post('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('admin.timecard.submit.month')->middleware('auth');
-        Route::get('daily/{date?}', IndexDailyAttendanceController::class)->name('admin.daily');
         Route::get('users', IndexUserController::class)->name('admin.users');
         Route::get('users/create', CreateUserController::class)->name('admin.users.create');
         Route::post('users/store', StoreUserController::class)->name('admin.users.store');
         Route::get('users/{id}/edit', EditUserController::class)->name('admin.users.edit');
         Route::patch('users/{id}/update', UpdateUserController::class)->name('admin.users.update');
+        Route::get('daily/{date?}', IndexDailyAttendanceController::class)->name('admin.daily');
+        Route::patch('daily/{admincomment}', UpdateAdminCommentController::class)->name('admin.daily.update');
+        Route::patch('daily/{attendance}/store', StoreAdminCommentController::class)->name('admin.daily.store');
         Route::get('admins', [AdminAttendanceController::class, 'showAdmins'])->name('admin.admins');
         Route::get('admins/create', [AdminAttendanceController::class, 'createAdmin'])->name('admin.admins.create');
         Route::post('admins/store', [AdminAttendanceController::class, 'storeAdmin'])->name('admin.admins.store');
         Route::get('admins/{id}/edit', [AdminAttendanceController::class, 'editAdmin'])->name('admin.admins.edit');
         Route::patch('admins/{id}/update', [AdminAttendanceController::class, 'updateAdmin'])->name('admin.admins.update');
-        Route::patch('daily/{admincomment}', UpdateAdminCommentController::class)->name('admin.daily.update');
-        Route::patch('daily/{attendance}/store', [AdminAttendanceController::class, 'storeAdminComment'])->name('admin.daily.store');
 
         //report 
         Route::get('report', [AdminReportController::class, 'index'])->name('admin.report');

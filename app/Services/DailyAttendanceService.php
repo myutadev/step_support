@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AdminComment;
+use App\Models\Attendance;
 use App\Models\WorkSchedule;
 use App\Repositories\AdminCommentRepository;
 use App\Repositories\AdminRepository;
@@ -135,8 +136,8 @@ class DailyAttendanceService
         $admin_id = $this->adminRepository->getAdminId();
         $adminComment = $this->adminCommentRepository->getAdminCommentById($admincomment->id);
         $workSchedule = $this->workScheduleRepository->getWorkScheduleByAdminComment($adminComment);
-
         $date = $workSchedule->date;
+
 
         if ($request->user()->cannot('update', $adminComment)) {
             return redirect()->route('admin.daily', compact('date'))->withErrors('自分のコメント以外は更新できません');
@@ -149,10 +150,30 @@ class DailyAttendanceService
         return redirect()->route('admin.daily', compact('date'));
     }
 
+    //これは本当はView側でdateを送れば済むけど、一旦こっちのほうが早いためこれで処理する。
     public function getDateByAdminComment($admincomment)
     {
         $adminComment = $this->adminCommentRepository->getAdminCommentById($admincomment->id);
         $workSchedule = $this->workScheduleRepository->getWorkScheduleByAdminComment($adminComment);
+        return $workSchedule->date;
+    }
+
+    public function storeAdminComment(Request $request, Attendance $attendance): void
+    {
+        $admin_id = $this->adminRepository->getAdminId();
+
+        $adminComment = $this->adminCommentRepository->createNewAdminComment();
+        $adminComment->attendance_id = $attendance->id;
+        $adminComment->admin_id = $admin_id;
+        $adminComment->admin_description = $request->admin_description;
+        $adminComment->admin_comment = $request->admin_comment;
+        $adminComment->save();
+    }
+
+    //これは本当はView側でdateを送れば済むけど、一旦こっちのほうが早いためこれで処理する。
+    public function getDateByAttendance($attendance)
+    {
+        $workSchedule = $this->workScheduleRepository->getWorkScheduleByAttendance($attendance);
         return $workSchedule->date;
     }
 }

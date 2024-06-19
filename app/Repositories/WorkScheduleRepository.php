@@ -74,4 +74,16 @@ class WorkScheduleRepository
     {
         return WorkSchedule::where('id', $adminComment->attendance->work_schedule_id)->first();
     }
+
+    /**
+     *attendanceからWorkScheduleを取得するメソッド
+     *日別出勤状況の管理者コメント編集機能で使われる
+     *@param Attendance 
+     *@return Collection
+     */
+
+    public function getWorkScheduleByAttendance($attendance)
+    {
+        return WorkSchedule::where('id', $attendance->work_schedule_id)->first();
+    }
 }

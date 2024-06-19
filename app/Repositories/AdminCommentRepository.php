@@ -18,4 +18,9 @@ class AdminCommentRepository
     {
         return AdminComment::with('attendance.work_schedule')->where('id', $adminCommentId)->first();
     }
+
+    public function createNewAdminComment()
+    {
+        return new AdminComment();
+    }
 }

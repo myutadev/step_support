@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin\DailyAttendance;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminComment;
+use App\Models\Attendance;
 use App\Services\DailyAttendanceService;
 use Illuminate\Http\Request;
 
-class UpdateAdminCommentController extends Controller
+class StoreAdminCommentController extends Controller
 {
     protected $dailyAttendanceService;
 
@@ -17,11 +17,11 @@ class UpdateAdminCommentController extends Controller
     }
 
 
-
-    public function __invoke(Request $request, AdminComment $admincomment)
+    public function __invoke(Request $request, Attendance $attendance)
     {
-        $date = $this->dailyAttendanceService->getDateByAdminComment($admincomment);
-        $this->dailyAttendanceService->updateAdminComment($request, $admincomment);
+        $date = $this->dailyAttendanceService->getDateByAttendance($attendance);
+        $this->dailyAttendanceService->storeAdminComment($request, $attendance);
+
         return redirect()->route('admin.daily', compact('date'));
     }
 }
