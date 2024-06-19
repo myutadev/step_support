@@ -27,5 +27,8 @@ class AdminRepository
         return $admin->adminDetail->company_id;
     }
 
-    
+    public function getAdminId()
+    {
+        return Auth::id();
+    }
 }

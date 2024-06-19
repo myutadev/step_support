@@ -13,7 +13,7 @@ class WorkScheduleRepository
     {
         return ScheduleType::find(1)->name;
     }
-    
+
     public function getSelectedMonthWorkSchedulesByUser(int $year, int $month, int $user_id): Collection
     {
         return WorkSchedule::with(
@@ -34,6 +34,7 @@ class WorkScheduleRepository
             ->orderBy('date', 'asc')
             ->get();
     }
+
     public function getAllSchedulesForMonth(int $year, int $month): Collection
     {
         $thisMonthAllSchedules =
@@ -45,4 +46,21 @@ class WorkScheduleRepository
 
         return $thisMonthAllSchedules;
     }
+
+    /**
+     *日別出勤状況に表示させるデータを抽出する
+     *companyId, $selectedDateでデータを絞る
+     *
+     *@param $comanyId 
+     *@param $selectedDate 
+     *@return Collection 
+     */
+    public function generateDailyAttenanceData($companyId, $selectedDate) 
+    {
+        return  WorkSchedule::whereHas('attendances', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId);
+        })->with(['attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin', 'attendances.user.userDetail'])
+            ->where('date', $selectedDate)->first();
+    }
+
 }

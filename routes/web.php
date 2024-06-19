@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
+use App\Http\Controllers\Admin\DailyAttendance\IndexDailyAttendanceController;
 use App\Http\Controllers\Admin\Timecard\IndexTimecardController;
 use App\Http\Controllers\Admin\User\CreateUserController;
 use App\Http\Controllers\Admin\User\EditUserController;
@@ -90,7 +91,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('timecard/{yearmonth?}/{id?}', IndexTimecardController::class)->name('admin.timecard');
         // Route::post('timecard/{yearmonth?}/{id?}', [AdminAttendanceController::class, 'submitMonth'])->name('admin.timecard.submit.month')->middleware('auth');
-        Route::get('daily/{date?}', [AdminAttendanceController::class, 'showDaily'])->name('admin.daily');
+        Route::get('daily/{date?}', IndexDailyAttendanceController::class)->name('admin.daily');
         Route::get('users', IndexUserController::class)->name('admin.users');
         Route::get('users/create', CreateUserController::class)->name('admin.users.create');
         Route::post('users/store', StoreUserController::class)->name('admin.users.store');

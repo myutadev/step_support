@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin\User;
 
 use App\Http\Controllers\Controller;
 use App\Services\UserWriteService;
-use Illuminate\Http\Request;
 
 class EditUserController extends Controller
 {

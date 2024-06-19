@@ -264,94 +264,93 @@ class AdminAttendanceController extends Controller
     // }
 
 
-    public function showDaily($date = null)
-    {
+    // public function showDaily($date = null)
+    // {
 
-        if ($date == null) {
-            $today = Carbon::today();
-            $selectedDate = $today->year . "-" . sprintf("%02d", $today->month) . "-" . sprintf("%02d", $today->day);
-        } else {
-            $selectedDate = $date;
-        }
+    //     if ($date == null) {
+    //         $today = Carbon::today();
+    //         $selectedDate = $today->year . "-" . sprintf("%02d", $today->month) . "-" . sprintf("%02d", $today->day);
+    //     } else {
+    //         $selectedDate = $date;
+    //     }
 
-        $admin = Auth::user();
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $companyId = $adminDetail->company_id;
+    //     $admin = Auth::user();
+    //     $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+    //     $companyId = $adminDetail->company_id;
 
-        $selectedWorkSched = WorkSchedule::whereHas('attendances', function ($query) use ($companyId) {
-            $query->where('company_id', $companyId);
-        })->with(['attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin', 'attendances.user.userDetail'])
-            ->where('date', $selectedDate)->first();
-
-
+    //     $selectedWorkSched = WorkSchedule::whereHas('attendances', function ($query) use ($companyId) {
+    //         $query->where('company_id', $companyId);
+    //     })->with(['attendances.rests', 'attendances.overtimes', 'attendances.adminComments.admin', 'attendances.user.userDetail'])
+    //         ->where('date', $selectedDate)->first();
 
 
-        //本日の勤怠レコード一覧を取得
-        $selectedAttendances = $selectedWorkSched == null ? $selectedAttendances = null : $selectedWorkSched->attendances;
-        $dailyAttendanceData = [];
 
-        if ($selectedAttendances !== null) {
+    //     //本日の勤怠レコード一覧を取得
+    //     $selectedAttendances = $selectedWorkSched == null ? $selectedAttendances = null : $selectedWorkSched->attendances;
+    //     $dailyAttendanceData = [];
 
-            // AdminComments内で自分がコメントしたレコードが最後に来るようにソートする
-            foreach ($selectedWorkSched->attendances as $attendance) {
-                $sortedAdminComments = $attendance->adminComments->sortBy(function ($comment) use ($admin) {
-                    return $comment->admin_id == $admin->id ? 1 : 0;
-                });
+    //     if ($selectedAttendances !== null) {
 
-                $attendance->adminComments = $sortedAdminComments;
-            }
+    //         // AdminComments内で自分がコメントしたレコードが最後に来るようにソートする
+    //         foreach ($selectedWorkSched->attendances as $attendance) {
+    //             $sortedAdminComments = $attendance->adminComments->sortBy(function ($comment) use ($admin) {
+    //                 return $comment->admin_id == $admin->id ? 1 : 0;
+    //             });
 
-            foreach ($selectedAttendances as $curAttendance) {
-                $curAttendance->rests == null ? $curRests = [] : $curRests = $curAttendance->rests;
-                $restTimes = [];
+    //             $attendance->adminComments = $sortedAdminComments;
+    //         }
 
-                foreach ($curRests as $rest) {
-                    $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
-                }
-                $restTimeString = implode("<br>", $restTimes);
-                $curOvertime = $curAttendance->overtimes->first();
+    //         foreach ($selectedAttendances as $curAttendance) {
+    //             $curAttendance->rests == null ? $curRests = [] : $curRests = $curAttendance->rests;
+    //             $restTimes = [];
 
-                $curAdminComments = $curAttendance->adminComments;
-                // dd($curAdminComments);
+    //             foreach ($curRests as $rest) {
+    //                 $restTimes[] = Carbon::parse($rest->start_time)->format('H:i') . '-' . Carbon::parse($rest->end_time)->format('H:i');
+    //             }
+    //             $restTimeString = implode("<br>", $restTimes);
+    //             $curOvertime = $curAttendance->overtimes->first();
 
-                $curAttendanceRecord = [
-                    'attendance_id' => $curAttendance->id,
-                    'beneficialy_number' => $curAttendance->user->userDetail->beneficiary_number,
-                    'name' => $curAttendance->user->full_name,
-                    'body_temp' => $curAttendance->body_temp,
-                    'check_in_time' => $curAttendance->check_in_time,
-                    'check_out_time' => $curAttendance->check_out_time,
-                    'rest' => $restTimeString,
-                    'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
-                    'work_description' => $curAttendance->work_description,
-                    'work_comment' => $curAttendance->work_comment,
-                    'admin_comments' => $curAdminComments,
-                ];
-                // $curAdminComment = $curAttendance->adminComments->first();
+    //             $curAdminComments = $curAttendance->adminComments;
+    //             // dd($curAdminComments);
 
-                // $curAttendanceRecord = [
-                //     'attendance_id' => $curAttendance->id,
-                //     'beneficialy_number' => $curAttendance->user->userDetail->beneficiary_number,
-                //     'name' => $curAttendance->user->full_name,
-                //     'body_temp' => $curAttendance->body_temp,
-                //     'check_in_time' => $curAttendance->check_in_time,
-                //     'check_out_time' => $curAttendance->check_out_time,
-                //     'rest' => $restTimeString,
-                //     'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
-                //     'work_description' => $curAttendance->work_description,
-                //     'work_comment' => $curAttendance->work_comment,
-                //     'admin_description' => $curAdminComment->admin_description,
-                //     'admin_comment' => $curAdminComment->admin_comment,
-                //     'admin_name' => $curAdminComment->admin == null ? null : $curAdminComment->admin->full_name,
-                //     'admin_id' => $curAdminComment->admin == null ? null : $curAdminComment->admin->id,
-                // ];
+    //             $curAttendanceRecord = [
+    //                 'attendance_id' => $curAttendance->id,
+    //                 'beneficialy_number' => $curAttendance->user->userDetail->beneficiary_number,
+    //                 'name' => $curAttendance->user->full_name,
+    //                 'body_temp' => $curAttendance->body_temp,
+    //                 'check_in_time' => $curAttendance->check_in_time,
+    //                 'check_out_time' => $curAttendance->check_out_time,
+    //                 'rest' => $restTimeString,
+    //                 'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+    //                 'work_description' => $curAttendance->work_description,
+    //                 'work_comment' => $curAttendance->work_comment,
+    //                 'admin_comments' => $curAdminComments,
+    //             ];
+    //             // $curAdminComment = $curAttendance->adminComments->first();
 
-                array_push($dailyAttendanceData, $curAttendanceRecord);
-            }
-        }
+    //             // $curAttendanceRecord = [
+    //             //     'attendance_id' => $curAttendance->id,
+    //             //     'beneficialy_number' => $curAttendance->user->userDetail->beneficiary_number,
+    //             //     'name' => $curAttendance->user->full_name,
+    //             //     'body_temp' => $curAttendance->body_temp,
+    //             //     'check_in_time' => $curAttendance->check_in_time,
+    //             //     'check_out_time' => $curAttendance->check_out_time,
+    //             //     'rest' => $restTimeString,
+    //             //     'over_time' => $curOvertime == null ? "" : Carbon::parse($curOvertime->start_time)->format('H:i') . '-' . Carbon::parse($curOvertime->end_time)->format('H:i'),
+    //             //     'work_description' => $curAttendance->work_description,
+    //             //     'work_comment' => $curAttendance->work_comment,
+    //             //     'admin_description' => $curAdminComment->admin_description,
+    //             //     'admin_comment' => $curAdminComment->admin_comment,
+    //             //     'admin_name' => $curAdminComment->admin == null ? null : $curAdminComment->admin->full_name,
+    //             //     'admin_id' => $curAdminComment->admin == null ? null : $curAdminComment->admin->id,
+    //             // ];
 
-        return view('admin.attendances.daily', compact('dailyAttendanceData', 'selectedDate'));
-    }
+    //             array_push($dailyAttendanceData, $curAttendanceRecord);
+    //         }
+    //     }
+
+    //     return view('admin.attendances.daily', compact('dailyAttendanceData', 'selectedDate'));
+    // }
 
     public function updateAdminComment(Request $request, AdminComment $admincomment)
     {

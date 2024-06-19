@@ -35,4 +35,5 @@ class TimeFormatter
 
         return $newInterval;
     }
+
 }
