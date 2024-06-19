@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\AdminComment;
 use App\Models\WorkSchedule;
+use App\Repositories\AdminCommentRepository;
 use App\Repositories\AdminRepository;
 use App\Repositories\WorkScheduleRepository;
 use App\Traits\AttendanceTrait;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
 
 class DailyAttendanceService
@@ -15,15 +18,18 @@ class DailyAttendanceService
 
     protected $adminRepository;
     protected $workScheduleRepository;
+    protected $adminCommentRepository;
     protected $date;
 
     public function __construct(
         AdminRepository $adminRepository,
         WorkScheduleRepository $workScheduleRepository,
+        AdminCommentRepository $adminCommentRepository,
         String $date = null
     ) {
         $this->adminRepository = $adminRepository;
         $this->workScheduleRepository = $workScheduleRepository;
+        $this->adminCommentRepository = $adminCommentRepository;
         $this->date = $date;
     }
 
@@ -98,7 +104,7 @@ class DailyAttendanceService
         if ($selectedAttendances == null) return $dailyAttendanceData;
 
         $this->sortAdminCommentsByAdminId($selectedAttendances);
-    
+
         foreach ($selectedAttendances as $curAttendance) {
             $curAttendanceRecord = [
                 'attendance_id' => $curAttendance->id,
@@ -116,5 +122,37 @@ class DailyAttendanceService
             array_push($dailyAttendanceData, $curAttendanceRecord);
         }
         return $dailyAttendanceData;
+    }
+
+    /**
+     *日別出勤状況画面で管理者コメントを更新するメソッド
+     *
+     *
+     *@return view
+     */
+    public function updateAdminComment(Request $request, AdminComment $admincomment)
+    {
+        $admin_id = $this->adminRepository->getAdminId();
+        $adminComment = $this->adminCommentRepository->getAdminCommentById($admincomment->id);
+        $workSchedule = $this->workScheduleRepository->getWorkScheduleByAdminComment($adminComment);
+
+        $date = $workSchedule->date;
+
+        if ($request->user()->cannot('update', $adminComment)) {
+            return redirect()->route('admin.daily', compact('date'))->withErrors('自分のコメント以外は更新できません');
+        }
+
+        $adminComment->admin_description = $request->admin_description;
+        $adminComment->admin_comment = $request->admin_comment;
+        $adminComment->admin_id = $admin_id;
+        $adminComment->update();
+        return redirect()->route('admin.daily', compact('date'));
+    }
+
+    public function getDateByAdminComment($admincomment)
+    {
+        $adminComment = $this->adminCommentRepository->getAdminCommentById($admincomment->id);
+        $workSchedule = $this->workScheduleRepository->getWorkScheduleByAdminComment($adminComment);
+        return $workSchedule->date;
     }
 }

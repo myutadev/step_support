@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
 use App\Http\Controllers\Admin\DailyAttendance\IndexDailyAttendanceController;
+use App\Http\Controllers\Admin\DailyAttendance\UpdateAdminCommentController;
 use App\Http\Controllers\Admin\Timecard\IndexTimecardController;
 use App\Http\Controllers\Admin\User\CreateUserController;
 use App\Http\Controllers\Admin\User\EditUserController;
@@ -102,7 +103,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('admins/store', [AdminAttendanceController::class, 'storeAdmin'])->name('admin.admins.store');
         Route::get('admins/{id}/edit', [AdminAttendanceController::class, 'editAdmin'])->name('admin.admins.edit');
         Route::patch('admins/{id}/update', [AdminAttendanceController::class, 'updateAdmin'])->name('admin.admins.update');
-        Route::patch('daily/{admincomment}', [AdminAttendanceController::class, 'updateAdminComment'])->name('admin.daily.update');
+        Route::patch('daily/{admincomment}', UpdateAdminCommentController::class)->name('admin.daily.update');
         Route::patch('daily/{attendance}/store', [AdminAttendanceController::class, 'storeAdminComment'])->name('admin.daily.store');
 
         //report 

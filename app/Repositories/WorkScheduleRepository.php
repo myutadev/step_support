@@ -55,7 +55,7 @@ class WorkScheduleRepository
      *@param $selectedDate 
      *@return Collection 
      */
-    public function generateDailyAttenanceData($companyId, $selectedDate) 
+    public function generateDailyAttenanceData($companyId, $selectedDate)
     {
         return  WorkSchedule::whereHas('attendances', function ($query) use ($companyId) {
             $query->where('company_id', $companyId);
@@ -63,4 +63,15 @@ class WorkScheduleRepository
             ->where('date', $selectedDate)->first();
     }
 
+    /**
+     *adminCommentからWorkScheduleを取得するメソッド
+     *日別出勤状況の管理者コメント編集機能で使われる
+     *@param AdminComment 
+     *@return Collection
+     */
+
+    public function getWorkScheduleByAdminComment($adminComment)
+    {
+        return WorkSchedule::where('id', $adminComment->attendance->work_schedule_id)->first();
+    }
 }
