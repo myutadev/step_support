@@ -423,35 +423,35 @@ class AdminAttendanceController extends Controller
     //     dd($roles);
     //     return view('admin.attendances.adminscreate', compact('roles'));
     // }
-    public function storeAdmin(AdminRequest $request)
-    {
+    // public function storeAdmin(AdminRequest $request)
+    // {
 
-        $adminId = Auth::id();
-        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
+    //     $adminId = Auth::id();
+    //     $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
 
-        $admin = new Admin();
-        $admin->last_name = $request->last_name;
-        $admin->first_name = $request->first_name;
-        $admin->email = $request->email;
-        $admin->password = $request->password;
-        $admin->save();
+    //     $admin = new Admin();
+    //     $admin->last_name = $request->last_name;
+    //     $admin->first_name = $request->first_name;
+    //     $admin->email = $request->email;
+    //     $admin->password = $request->password;
+    //     $admin->save();
 
-        $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
-        $adminDetail->hire_date = $request->hire_date;
-        $adminDetail->emp_number = $request->emp_number;
-        $adminDetail->role_id = $request->role_id;
-        $adminDetail->company_id = $companyId;
-        $adminDetail->update();
+    //     $adminDetail = AdminDetail::where('admin_id', $admin->id)->first();
+    //     $adminDetail->hire_date = $request->hire_date;
+    //     $adminDetail->emp_number = $request->emp_number;
+    //     $adminDetail->role_id = $request->role_id;
+    //     $adminDetail->company_id = $companyId;
+    //     $adminDetail->update();
 
-        return redirect()->route('admin.admins');
-    }
-    public function editAdmin($id)
-    {
-        $roles = Role::get();
-        $admin = Admin::with('adminDetail.role')->where('id', $id)->first();
+    //     return redirect()->route('admin.admins');
+    // }
+    // public function editAdmin($id)
+    // {
+    //     $roles = Role::get();
+    //     $admin = Admin::with('adminDetail.role')->where('id', $id)->first();
 
-        return view('admin.attendances.adminsedit', compact('admin', 'roles'));
-    }
+    //     return view('admin.attendances.adminsedit', compact('admin', 'roles'));
+    // }
 
     public function updateAdmin(AdminRequest $request, $id)
     {

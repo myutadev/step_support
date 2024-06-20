@@ -51,4 +51,9 @@ class AdminRepository
     {
         return AdminDetail::where('admin_id', $this->admin->id)->first();
     }
+
+    public function getAdminById($id): Admin
+    {
+        return Admin::with('adminDetail.role')->where('id', $id)->first();
+    }
 }

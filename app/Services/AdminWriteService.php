@@ -92,6 +92,11 @@ class AdminWriteService
         $adminDetail->update();
     }
 
+    public function getEditAdminData($id)
+    {
+        return $this->AdminRepository->getAdminById($id);
+    }
+
     // /**
     //  *ユーザー編集画面表示用のユーザーデータを取得する
     //  *ユーザーIDを元に、UserモデルからuserDetails, DisabilityCategory,Residnce,Counselor情報をリレーションで取得して返す。
