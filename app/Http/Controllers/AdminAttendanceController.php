@@ -420,6 +420,7 @@ class AdminAttendanceController extends Controller
     public function createAdmin()
     {
         $roles = Role::get();
+        dd($roles);
         return view('admin.attendances.adminscreate', compact('roles'));
     }
     public function storeAdmin(AdminRequest $request)

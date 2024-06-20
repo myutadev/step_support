@@ -6,6 +6,7 @@ use App\Models\Counselor;
 use App\Models\DisabilityCategory;
 use App\Models\Residence;
 use App\Repositories\AdminRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,8 @@ class AdminWriteService
     protected $disabilityCategoryRepository;
     protected $userRepository;
     protected $AdminRepository;
+    protected $roleRepository;
+
 
 
     public function __construct(
@@ -23,13 +26,15 @@ class AdminWriteService
         DisabilityCategory $disabilityCategoryRepository,
         Residence $residenceRepository,
         UserRepository $userRepository,
-        AdminRepository $adminRepository
+        AdminRepository $adminRepository,
+        RoleRepository $roleRepository
     ) {
         $this->counselorRepository = $counselorRepository;
         $this->residenceRepository = $residenceRepository;
         $this->disabilityCategoryRepository = $disabilityCategoryRepository;
         $this->userRepository = $userRepository;
         $this->AdminRepository = $adminRepository;
+        $this->roleRepository = $roleRepository;
     }
 
     /**
@@ -58,8 +63,15 @@ class AdminWriteService
 
         return $adminInfoArray;
     }
-
-    // }
+    /**
+     *admin/create用の役割データを取得する
+     *
+     *@return array 役割名が入ったrolesテーブルを全取得
+     */
+    public function getRoles()
+    {
+        return $this->roleRepository->get();
+    }
 
     // public function storeUser(Request $request): void
     // {
