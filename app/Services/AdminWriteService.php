@@ -73,31 +73,24 @@ class AdminWriteService
         return $this->roleRepository->get();
     }
 
-    // public function storeUser(Request $request): void
-    // {
+    public function storeAdmin(Request $request): void
+    {
+        $companyId = $this->AdminRepository->getCurrentCompanyId();
+        $admin = $this->AdminRepository->create();
 
-    //     $companyId = $this->AdminRepository->getCurrentCompanyId();
+        $admin->last_name = $request->last_name;
+        $admin->first_name = $request->first_name;
+        $admin->email = $request->email;
+        $admin->password = $request->password;
+        $admin->save();
 
-    //     $user = $this->userRepository->createNewUser();
-    //     $user->last_name = $request->last_name;
-    //     $user->first_name = $request->first_name;
-    //     $user->email = $request->email;
-    //     $user->password = $request->password;
-    //     $user->save();
-
-    //     $userDetail = $this->userRepository->getUserDetailByUser($user);
-    //     $userDetail->birthdate = $request->birthdate;
-    //     $userDetail->beneficiary_number = $request->beneficiary_number;
-    //     $userDetail->disability_category_id = $request->disability_category_id;
-    //     //is_on_welfareの有無をチェック
-    //     $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
-
-    //     $userDetail->residence_id = $request->residence_id;
-    //     $userDetail->counselor_id = $request->counselor_id;
-    //     $userDetail->admission_date = $request->admission_date;
-    //     $userDetail->company_id = $companyId;
-    //     $userDetail->update();
-    // }
+        $adminDetail = $admin->adminDetail;
+        $adminDetail->hire_date = $request->hire_date;
+        $adminDetail->emp_number = $request->emp_number;
+        $adminDetail->role_id = $request->role_id;
+        $adminDetail->company_id = $companyId;
+        $adminDetail->update();
+    }
 
     // /**
     //  *ユーザー編集画面表示用のユーザーデータを取得する

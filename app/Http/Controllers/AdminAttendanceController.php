@@ -417,12 +417,12 @@ class AdminAttendanceController extends Controller
     //     return view('admin.attendances.admins', compact('adminInfoArray'));
     // }
 
-    public function createAdmin()
-    {
-        $roles = Role::get();
-        dd($roles);
-        return view('admin.attendances.adminscreate', compact('roles'));
-    }
+    // public function createAdmin()
+    // {
+    //     $roles = Role::get();
+    //     dd($roles);
+    //     return view('admin.attendances.adminscreate', compact('roles'));
+    // }
     public function storeAdmin(AdminRequest $request)
     {
 

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Admin;
+use App\Models\AdminDetail;
 use Illuminate\Support\Facades\Auth;
 
 class AdminRepository
@@ -39,5 +40,15 @@ class AdminRepository
         return Admin::whereHas('adminDetail', function ($query) use ($companyId) {
             $query->where('company_id', $companyId);
         })->with(['adminDetail.role'])->get();
+    }
+
+    public function create()
+    {
+        return new Admin();
+    }
+
+    public function getAdminDetail(): AdminDetail
+    {
+        return AdminDetail::where('admin_id', $this->admin->id)->first();
     }
 }
