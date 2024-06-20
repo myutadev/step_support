@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Admin\IndexAdminController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
@@ -101,7 +102,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('daily/{date?}', IndexDailyAttendanceController::class)->name('admin.daily');
         Route::patch('daily/{admincomment}', UpdateAdminCommentController::class)->name('admin.daily.update');
         Route::patch('daily/{attendance}/store', StoreAdminCommentController::class)->name('admin.daily.store');
-        Route::get('admins', [AdminAttendanceController::class, 'showAdmins'])->name('admin.admins');
+        Route::get('admins', IndexAdminController::class)->name('admin.admins');
         Route::get('admins/create', [AdminAttendanceController::class, 'createAdmin'])->name('admin.admins.create');
         Route::post('admins/store', [AdminAttendanceController::class, 'storeAdmin'])->name('admin.admins.store');
         Route::get('admins/{id}/edit', [AdminAttendanceController::class, 'editAdmin'])->name('admin.admins.edit');

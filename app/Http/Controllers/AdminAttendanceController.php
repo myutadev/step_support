@@ -387,35 +387,36 @@ class AdminAttendanceController extends Controller
     //     return redirect()->route('admin.daily', compact('date'));
     // }
 
-    public function showAdmins()
-    {
-        $adminId = Auth::id();
-        $adminDetail = AdminDetail::where('admin_id', $adminId)->first();
-        $companyId = $adminDetail->company_id;
+    // public function showAdmins()
+    // {
+    //     $adminId = Auth::id();
+    //     $adminDetail = AdminDetail::where('admin_id', $adminId)->first();
+    //     $companyId = $adminDetail->company_id;
 
-        $adminInfoArray = [];
+    //     $adminInfoArray = [];
 
-        $admins = Admin::whereHas('adminDetail', function ($query) use ($companyId) {
-            $query->where('company_id', $companyId);
-        })->with(['adminDetail.role'])->get();
+    //     $admins = Admin::whereHas('adminDetail', function ($query) use ($companyId) {
+    //         $query->where('company_id', $companyId);
+    //     })->with(['adminDetail.role'])->get();
 
 
-        foreach ($admins as $admin) {
+    //     foreach ($admins as $admin) {
 
-            $curAdminInfo = [
-                'emp_number' => $admin->adminDetail->emp_number,
-                'name' => $admin->full_name,
-                'email' => $admin->email,
-                'role' => $admin->adminDetail->name,
-                'hire_date' => $admin->adminDetail->hire_date,
-                'termination_date' => $admin->adminDetail->termination_date,
-                'admin_id' => $admin->id,
-            ];
-            array_push($adminInfoArray, $curAdminInfo);
-        }
+    //         $curAdminInfo = [
+    //             'emp_number' => $admin->adminDetail->emp_number,
+    //             'name' => $admin->full_name,
+    //             'email' => $admin->email,
+    //             'role' => $admin->adminDetail->name,
+    //             'hire_date' => $admin->adminDetail->hire_date,
+    //             'termination_date' => $admin->adminDetail->termination_date,
+    //             'admin_id' => $admin->id,
+    //         ];
+    //         array_push($adminInfoArray, $curAdminInfo);
+    //     }
 
-        return view('admin.attendances.admins', compact('adminInfoArray'));
-    }
+    //     return view('admin.attendances.admins', compact('adminInfoArray'));
+    // }
+
     public function createAdmin()
     {
         $roles = Role::get();
@@ -628,7 +629,7 @@ class AdminAttendanceController extends Controller
     public function createWorkschedules(Request $request)
     {
         $workSchedule = WorkSchedule::find($request->id);
-        $carbonDate = Carbon::parse($workSchedule->date);
+        $carbonDate = Carbon::parse($workSchedule->datde);
         $day = $carbonDate->isoFormat('ddd');
         $targetWorkSchedule = [
             'id' => $workSchedule->id,

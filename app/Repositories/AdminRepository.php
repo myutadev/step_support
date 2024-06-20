@@ -31,4 +31,13 @@ class AdminRepository
     {
         return Auth::id();
     }
+
+    public function getAllAdminsByCompanyId()
+    {
+        $companyId = $this->getCurrentCompanyId();
+
+        return Admin::whereHas('adminDetail', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId);
+        })->with(['adminDetail.role'])->get();
+    }
 }
