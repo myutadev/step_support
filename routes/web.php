@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\User\EditUserController;
 use App\Http\Controllers\Admin\User\IndexUserController;
 use App\Http\Controllers\Admin\User\StoreUserController;
 use App\Http\Controllers\Admin\User\UpdateUserController;
+use App\Http\Controllers\Admin\Workschedule\IndexWorkscheduleController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AdminReportController;
@@ -143,7 +144,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::patch('settings/residences/{id}/update', UpdateResidenceController::class)->name('admin.residences.update');
         Route::delete('settings/residences/{id}', DeleteResidenceController::class)->name('admin.residences.destroy');
         //workshcedule
-        Route::get('settings/workschedules/show/{yearmonth?}', [AdminAttendanceController::class, 'showWorkschedules'])->name('admin.workschedules');
+        Route::get('settings/workschedules/show/{yearmonth?}', IndexWorkscheduleController::class)->name('admin.workschedules');
         Route::get('settings/workschedules/create/{id}', [AdminAttendanceController::class, 'createWorkschedules'])->name('admin.workschedules.create');
         Route::post('settings/workschedules/store', [AdminAttendanceController::class, 'storeWorkschedules'])->name('admin.workschedules.store');
         Route::delete('settings/workschedules/destroy/{id}', [AdminAttendanceController::class, 'deleteWorkschedules'])->name('admin.workschedules.destroy');

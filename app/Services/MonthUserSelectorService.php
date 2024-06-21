@@ -28,7 +28,7 @@ class MonthUserSelectorService
         return  $this->userRepository->getUsersByCompanyId($this->getCurrentCompanyId());
     }
 
-    private function getSelectedYearMonth($yearmonth): array
+    public function getSelectedYearMonth($yearmonth): array
     {
         if ($yearmonth == null) {
             $today = Carbon::today();

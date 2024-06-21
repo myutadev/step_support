@@ -568,64 +568,64 @@ class AdminAttendanceController extends Controller
     //     return $this->showResidences();
     // }
 
-    public function showWorkschedules($yearmonth = null)
-    {
+    // public function showWorkschedules($yearmonth = null)
+    // {
 
-        $adminId = Auth::id();
-        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
+    //     $adminId = Auth::id();
+    //     $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
 
-        if ($yearmonth == null) {
-            $today = Carbon::today();
-            $year = $today->year;
-            $month = sprintf("%02d", $today->month);
-        } else {
-            $yearMonthArr = explode("-", $yearmonth);
-            $year = $yearMonthArr[0];
-            $month = sprintf("%02d", $yearMonthArr[1]);
-        }
+    //     if ($yearmonth == null) {
+    //         $today = Carbon::today();
+    //         $year = $today->year;
+    //         $month = sprintf("%02d", $today->month);
+    //     } else {
+    //         $yearMonthArr = explode("-", $yearmonth);
+    //         $year = $yearMonthArr[0];
+    //         $month = sprintf("%02d", $yearMonthArr[1]);
+    //     }
 
-        $monthlyWorkScheduleData = [];
+    //     $monthlyWorkScheduleData = [];
 
-        // need  workSchedule.specialSchedule / workSchedule.scheduleType
-        $thisMonthWorkSchedules =
-            WorkSchedule::with(['scheduleType', 'specialSchedule'])
-            ->whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->orderBy('date', 'asc')
-            ->get();
+    //     // need  workSchedule.specialSchedule / workSchedule.scheduleType
+    //     $thisMonthWorkSchedules =
+    //         WorkSchedule::with(['scheduleType', 'specialSchedule'])
+    //         ->whereYear('date', $year)
+    //         ->whereMonth('date', $month)
+    //         ->orderBy('date', 'asc')
+    //         ->get();
 
-        foreach ($thisMonthWorkSchedules as $workSchedule) {
-            $curScheduleType = $workSchedule->scheduleType;
-            $curSpecialSchedule = $workSchedule->specialSchedule;
-            $curCarbonDate = Carbon::parse($workSchedule->date);
-            $curDay = $curCarbonDate->isoFormat('ddd');
+    //     foreach ($thisMonthWorkSchedules as $workSchedule) {
+    //         $curScheduleType = $workSchedule->scheduleType;
+    //         $curSpecialSchedule = $workSchedule->specialSchedule;
+    //         $curCarbonDate = Carbon::parse($workSchedule->date);
+    //         $curDay = $curCarbonDate->isoFormat('ddd');
 
-            if (!$curSpecialSchedule) {
-                $curScheduleObj = [
-                    'id' => $workSchedule->id,
-                    'special_sched_id' => "",
-                    'date' => $workSchedule->date,
-                    'day' => $curDay,
-                    'scheduleType' => $curScheduleType->name,
-                    'description' => "",
-                ];
-                array_push($monthlyWorkScheduleData, $curScheduleObj);
-            } else {
-                $overwriteScheduleType = $curSpecialSchedule->schedule_type;
-                // dd($overwriteScheduleType);
-                $curScheduleObj = [
-                    'id' => $workSchedule->id,
-                    'special_sched_id' => $curSpecialSchedule->id,
-                    'date' => $workSchedule->date,
-                    'day' => $curDay,
-                    'scheduleType' => $overwriteScheduleType->name,
-                    'description' => $curSpecialSchedule->description,
-                ];
-                array_push($monthlyWorkScheduleData, $curScheduleObj);
-            }
-        }
-        return view('admin.attendances.workschedule', compact('monthlyWorkScheduleData', 'year', 'month'));
-    }
+    //         if (!$curSpecialSchedule) {
+    //             $curScheduleObj = [
+    //                 'id' => $workSchedule->id,
+    //                 'special_sched_id' => "",
+    //                 'date' => $workSchedule->date,
+    //                 'day' => $curDay,
+    //                 'scheduleType' => $curScheduleType->name,
+    //                 'description' => "",
+    //             ];
+    //             array_push($monthlyWorkScheduleData, $curScheduleObj);
+    //         } else {
+    //             $overwriteScheduleType = $curSpecialSchedule->schedule_type;
+    //             // dd($overwriteScheduleType);
+    //             $curScheduleObj = [
+    //                 'id' => $workSchedule->id,
+    //                 'special_sched_id' => $curSpecialSchedule->id,
+    //                 'date' => $workSchedule->date,
+    //                 'day' => $curDay,
+    //                 'scheduleType' => $overwriteScheduleType->name,
+    //                 'description' => $curSpecialSchedule->description,
+    //             ];
+    //             array_push($monthlyWorkScheduleData, $curScheduleObj);
+    //         }
+    //     }
+    //     return view('admin.attendances.workschedule', compact('monthlyWorkScheduleData', 'year', 'month'));
+    // }
 
     public function createWorkschedules(Request $request)
     {

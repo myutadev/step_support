@@ -13,7 +13,6 @@ class IndexUserController extends Controller
     protected $userService;
 
     public function __construct(
-
         WorkScheduleService $workScheduleService,
         UserService $userService
     ) {
