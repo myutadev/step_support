@@ -519,54 +519,54 @@ class AdminAttendanceController extends Controller
     //     return $this->showCounselors();
     // }
  
-    public function showResidences()
-    {
-        $adminId = Auth::id();
-        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
-        $residences = Residence::where('company_id', $companyId)->get();
+    // public function showResidences()
+    // {
+    //     $adminId = Auth::id();
+    //     $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
+    //     $residences = Residence::where('company_id', $companyId)->get();
 
-        return view('admin.attendances.residences', compact('residences'));
-    }
-    public function createResidence()
-    {
-        return view('admin.attendances.residencecreate');
-    }
-    public function storeResidences(ResidenceRequest $request)
-    {
-        $adminId = Auth::id();
-        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
-        $residence = new Residence();
-        $residence->name = $request->name;
-        $residence->contact_name = $request->contact_name;
-        $residence->contact_phone = $request->contact_phone;
-        $residence->contact_email = $request->contact_email;
-        $residence->company_id = $companyId;
-        $residence->save();
-        return $this->showResidences();
-    }
+    //     return view('admin.attendances.residences', compact('residences'));
+    // }
+    // public function createResidence()
+    // {
+    //     return view('admin.attendances.residencecreate');
+    // }
+    // public function storeResidences(ResidenceRequest $request)
+    // {
+    //     $adminId = Auth::id();
+    //     $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
+    //     $residence = new Residence();
+    //     $residence->name = $request->name;
+    //     $residence->contact_name = $request->contact_name;
+    //     $residence->contact_phone = $request->contact_phone;
+    //     $residence->contact_email = $request->contact_email;
+    //     $residence->company_id = $companyId;
+    //     $residence->save();
+    //     return $this->showResidences();
+    // }
 
-    public function editResidences($id)
-    {
-        $residence = Residence::where('id', $id)->first();
-        return view('admin.attendances.residencesedit', compact('residence'));
-    }
-    public function updateResidences(ResidenceRequest $request, $id)
-    {
-        $residnece = Residence::where('id', $id)->first();
-        $residnece->name = $request->name;
-        $residnece->contact_name = $request->contact_name;
-        $residnece->contact_phone = $request->contact_phone;
-        $residnece->contact_email = $request->contact_email;
-        $residnece->update();
+    // public function editResidences($id)
+    // {
+    //     $residence = Residence::where('id', $id)->first();
+    //     return view('admin.attendances.residencesedit', compact('residence'));
+    // }
+    // public function updateResidences(ResidenceRequest $request, $id)
+    // {
+    //     $residnece = Residence::where('id', $id)->first();
+    //     $residnece->name = $request->name;
+    //     $residnece->contact_name = $request->contact_name;
+    //     $residnece->contact_phone = $request->contact_phone;
+    //     $residnece->contact_email = $request->contact_email;
+    //     $residnece->update();
 
-        return $this->showResidences();
-    }
-    public function deleteResidences($id)
-    {
-        $residence = Residence::where('id', $id)->first();
-        $residence->delete();
-        return $this->showResidences();
-    }
+    //     return $this->showResidences();
+    // }
+    // public function deleteResidences($id)
+    // {
+    //     $residence = Residence::where('id', $id)->first();
+    //     $residence->delete();
+    //     return $this->showResidences();
+    // }
 
     public function showWorkschedules($yearmonth = null)
     {

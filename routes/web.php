@@ -18,6 +18,12 @@ use App\Http\Controllers\Admin\Counselor\UpdateCounselorController;
 use App\Http\Controllers\Admin\DailyAttendance\IndexDailyAttendanceController;
 use App\Http\Controllers\Admin\DailyAttendance\StoreAdminCommentController;
 use App\Http\Controllers\Admin\DailyAttendance\UpdateAdminCommentController;
+use App\Http\Controllers\Admin\Residence\CreateResidenceController;
+use App\Http\Controllers\Admin\Residence\DeleteResidenceController;
+use App\Http\Controllers\Admin\Residence\EditResidenceController;
+use App\Http\Controllers\Admin\Residence\IndexResidenceController;
+use App\Http\Controllers\Admin\Residence\StoreResidenceController;
+use App\Http\Controllers\Admin\Residence\UpdateResidenceController;
 use App\Http\Controllers\Admin\Timecard\IndexTimecardController;
 use App\Http\Controllers\Admin\User\CreateUserController;
 use App\Http\Controllers\Admin\User\EditUserController;
@@ -130,12 +136,12 @@ Route::group(['prefix' => 'admin'], function () {
         Route::patch('settings/counselors/{id}/update', UpdateCounselorController::class)->name('admin.counselors.update');
         Route::delete('settings/counselors/{id}', DeleteCounselorController::class)->name('admin.counselors.destroy');
         //residence
-        Route::get('settings/residences', [AdminAttendanceController::class, 'showResidences'])->name('admin.residences');
-        Route::get('settings/residences/create', [AdminAttendanceController::class, 'createResidence'])->name('admin.residences.create');
-        Route::post('settings/residences/store', [AdminAttendanceController::class, 'storeResidences'])->name('admin.residences.store');
-        Route::get('settings/residences/{id}/edit', [AdminAttendanceController::class, 'editResidences'])->name('admin.residences.edit');
-        Route::patch('settings/residences/{id}/update', [AdminAttendanceController::class, 'updateResidences'])->name('admin.residences.update');
-        Route::delete('settings/residences/{id}', [AdminAttendanceController::class, 'deleteResidences'])->name('admin.residences.destroy');
+        Route::get('settings/residences', IndexResidenceController::class)->name('admin.residences');
+        Route::get('settings/residences/create', CreateResidenceController::class)->name('admin.residences.create');
+        Route::post('settings/residences/store', StoreResidenceController::class)->name('admin.residences.store');
+        Route::get('settings/residences/{id}/edit', EditResidenceController::class)->name('admin.residences.edit');
+        Route::patch('settings/residences/{id}/update', UpdateResidenceController::class)->name('admin.residences.update');
+        Route::delete('settings/residences/{id}', DeleteResidenceController::class)->name('admin.residences.destroy');
         //workshcedule
         Route::get('settings/workschedules/show/{yearmonth?}', [AdminAttendanceController::class, 'showWorkschedules'])->name('admin.workschedules');
         Route::get('settings/workschedules/create/{id}', [AdminAttendanceController::class, 'createWorkschedules'])->name('admin.workschedules.create');
