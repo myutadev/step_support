@@ -453,72 +453,72 @@ class AdminAttendanceController extends Controller
     //     return view('admin.attendances.adminsedit', compact('admin', 'roles'));
     // }
 
-    public function updateAdmin(AdminRequest $request, $id)
-    {
-        $admin = Admin::with('adminDetail')->firstWhere('id', $id);
-        $admin->last_name = $request->last_name;
-        $admin->first_name = $request->first_name;
-        $admin->email = $request->email;
-        $admin->password = $request->password;
-        $admin->update();
+    // public function updateAdmin(AdminRequest $request, $id)
+    // {
+    //     $admin = Admin::with('adminDetail')->firstWhere('id', $id);
+    //     $admin->last_name = $request->last_name;
+    //     $admin->first_name = $request->first_name;
+    //     $admin->email = $request->email;
+    //     $admin->password = $request->password;
+    //     $admin->update();
 
-        $admin->adminDetail->hire_date = $request->hire_date;
-        $admin->adminDetail->termination_date = $request->termination_date;
-        $admin->adminDetail->emp_number = $request->emp_number;
-        $admin->adminDetail->role_id = $request->role_id;
-        $admin->adminDetail->update();
+    //     $admin->adminDetail->hire_date = $request->hire_date;
+    //     $admin->adminDetail->termination_date = $request->termination_date;
+    //     $admin->adminDetail->emp_number = $request->emp_number;
+    //     $admin->adminDetail->role_id = $request->role_id;
+    //     $admin->adminDetail->update();
 
-        return $this->showAdmins();
-    }
+    //     return $this->showAdmins();
+    // }
 
-    public function showCounselors()
-    {
-        $adminId = Auth::id();
-        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
-        $counselors = Counselor::where('company_id', $companyId)->get();
+    // public function showCounselors()
+    // {
+    //     $adminId = Auth::id();
+    //     $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
+    //     $counselors = Counselor::where('company_id', $companyId)->get();
 
-        return view('admin.attendances.counselors', compact('counselors'));
-    }
-    public function createCounselor()
-    {
-        return view('admin.attendances.counselorcreate');
-    }
-    public function storeCounselor(CounselorRequest $request)
-    {
-        $adminId = Auth::id();
-        $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
-        $counselor = new Counselor();
-        $counselor->name = $request->name;
-        $counselor->contact_phone = $request->contact_phone;
-        $counselor->contact_email = $request->contact_email;
-        $counselor->company_id = $companyId;
-        $counselor->save();
-        return $this->showCounselors();
-    }
+    //     return view('admin.attendances.counselors', compact('counselors'));
+    // }
+    // public function createCounselor()
+    // {
+    //     return view('admin.attendances.counselorcreate');
+    // }
+    // public function storeCounselor(CounselorRequest $request)
+    // {
+    //     $adminId = Auth::id();
+    //     $companyId = AdminDetail::where('admin_id', $adminId)->first()->company_id;
+    //     $counselor = new Counselor();
+    //     $counselor->name = $request->name;
+    //     $counselor->contact_phone = $request->contact_phone;
+    //     $counselor->contact_email = $request->contact_email;
+    //     $counselor->company_id = $companyId;
+    //     $counselor->save();
+    //     return $this->showCounselors();
+    // }
 
-    public function editCounselor($id)
-    {
-        $counselor = Counselor::where('id', $id)->first();
-        return view('admin.attendances.counselorsedit', compact('counselor'));
-    }
+    // public function editCounselor($id)
+    // {
+    //     $counselor = Counselor::where('id', $id)->first();
+    //     return view('admin.attendances.counselorsedit', compact('counselor'));
+    // }
 
-    public function updateCounselor(CounselorRequest $request, $id)
-    {
-        $counselor = Counselor::where('id', $id)->first();
-        $counselor->name = $request->name;
-        $counselor->contact_phone = $request->contact_phone;
-        $counselor->contact_email = $request->contact_email;
-        $counselor->update();
+    // public function updateCounselor(CounselorRequest $request, $id)
+    // {
+    //     $counselor = Counselor::where('id', $id)->first();
+    //     $counselor->name = $request->name;
+    //     $counselor->contact_phone = $request->contact_phone;
+    //     $counselor->contact_email = $request->contact_email;
+    //     $counselor->update();
 
-        return $this->showCounselors();
-    }
-    public function deleteCounselor($id)
-    {
-        $counselor = Counselor::where('id', $id)->first();
-        $counselor->delete();
-        return $this->showCounselors();
-    }
-
+    //     return $this->showCounselors();
+    // }
+    // public function deleteCounselor($id)
+    // {
+    //     $counselor = Counselor::where('id', $id)->first();
+    //     $counselor->delete();
+    //     return $this->showCounselors();
+    // }
+ 
     public function showResidences()
     {
         $adminId = Auth::id();

@@ -4,10 +4,17 @@ use App\Http\Controllers\Admin\Admin\CreateAdminController;
 use App\Http\Controllers\Admin\Admin\EditAdminController;
 use App\Http\Controllers\Admin\Admin\IndexAdminController;
 use App\Http\Controllers\Admin\Admin\StoreAdminController;
+use App\Http\Controllers\Admin\Admin\UpdateAdminController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminRegisterController;
+use App\Http\Controllers\Admin\Counselor\CreateCounselorController;
+use App\Http\Controllers\Admin\Counselor\DeleteCounselorController;
+use App\Http\Controllers\Admin\Counselor\EditCounselorController;
+use App\Http\Controllers\Admin\Counselor\IndexCounselorController;
+use App\Http\Controllers\Admin\Counselor\StoreCounselorController;
+use App\Http\Controllers\Admin\Counselor\UpdateCounselorController;
 use App\Http\Controllers\Admin\DailyAttendance\IndexDailyAttendanceController;
 use App\Http\Controllers\Admin\DailyAttendance\StoreAdminCommentController;
 use App\Http\Controllers\Admin\DailyAttendance\UpdateAdminCommentController;
@@ -109,19 +116,19 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('admins/create', CreateAdminController::class)->name('admin.admins.create');
         Route::post('admins/store', StoreAdminController::class)->name('admin.admins.store');
         Route::get('admins/{id}/edit', EditAdminController::class)->name('admin.admins.edit');
-        Route::patch('admins/{id}/update', [AdminAttendanceController::class, 'updateAdmin'])->name('admin.admins.update');
+        Route::patch('admins/{id}/update', UpdateAdminController::class)->name('admin.admins.update');
 
         //report 
         Route::get('report', [AdminReportController::class, 'index'])->name('admin.report');
 
 
         //settings
-        Route::get('settings/counselors', [AdminAttendanceController::class, 'showCounselors'])->name('admin.counselors');
-        Route::get('settings/counselors/create', [AdminAttendanceController::class, 'createCounselor'])->name('admin.counselors.create');
-        Route::post('settings/counselors/store', [AdminAttendanceController::class, 'storeCounselor'])->name('admin.counselors.store');
-        Route::get('settings/counselors/{id}/edit', [AdminAttendanceController::class, 'editCounselor'])->name('admin.counselors.edit');
-        Route::patch('settings/counselors/{id}/update', [AdminAttendanceController::class, 'updateCounselor'])->name('admin.counselors.update');
-        Route::delete('settings/counselors/{id}', [AdminAttendanceController::class, 'deleteCounselor'])->name('admin.counselors.destroy');
+        Route::get('settings/counselors', IndexCounselorController::class)->name('admin.counselors');
+        Route::get('settings/counselors/create', CreateCounselorController::class)->name('admin.counselors.create');
+        Route::post('settings/counselors/store', StoreCounselorController::class)->name('admin.counselors.store');
+        Route::get('settings/counselors/{id}/edit', EditCounselorController::class)->name('admin.counselors.edit');
+        Route::patch('settings/counselors/{id}/update', UpdateCounselorController::class)->name('admin.counselors.update');
+        Route::delete('settings/counselors/{id}', DeleteCounselorController::class)->name('admin.counselors.destroy');
         //residence
         Route::get('settings/residences', [AdminAttendanceController::class, 'showResidences'])->name('admin.residences');
         Route::get('settings/residences/create', [AdminAttendanceController::class, 'createResidence'])->name('admin.residences.create');
