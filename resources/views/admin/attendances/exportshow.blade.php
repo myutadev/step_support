@@ -35,7 +35,7 @@
             <div class="timecard-selectors">
                 <form action="{{ route('admin.export') }}" method="post">
                     @csrf
-                    <input type="month" name="yearmonth" value="{{ $year }}-{{ $month }}" id="monthInput">
+                    <input type="month" name="yearmonth" value="{{ $selectedYearMonth['year'] }}-{{ $selectedYearMonth['month'] }}" id="monthInput">
                     <br>
                     <button type="submit" class="btn btn-store mt-3">
                         勤務データ出力

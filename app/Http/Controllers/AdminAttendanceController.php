@@ -518,7 +518,7 @@ class AdminAttendanceController extends Controller
     //     $counselor->delete();
     //     return $this->showCounselors();
     // }
- 
+
     // public function showResidences()
     // {
     //     $adminId = Auth::id();
@@ -659,48 +659,48 @@ class AdminAttendanceController extends Controller
     //     $workSchedule->save();
     //     return redirect()->route('admin.workschedules', compact('yearmonth'));
     // }
-    public function deleteWorkschedules(Request $request)
-    {
-        $special_sched = SpecialSchedule::find($request->id);
-        $year = $special_sched->work_schedule->year;
-        $month = sprintf("%02d", $special_sched->work_schedule->month);
-        $yearmonth = $year . "-" . $month;
-        $special_sched->delete();
-        return redirect()->route('admin.workschedules', compact('yearmonth'));
-    }
+    // public function deleteWorkschedules(Request $request)
+    // {
+    //     $special_sched = SpecialSchedule::find($request->id);
+    //     $year = $special_sched->work_schedule->year;
+    //     $month = sprintf("%02d", $special_sched->work_schedule->month);
+    //     $yearmonth = $year . "-" . $month;
+    //     $special_sched->delete();
+    //     return redirect()->route('admin.workschedules', compact('yearmonth'));
+    // }
 
     //export attendances
 
     //export users
-    public function showExport($yearmonth = null)
-    {
-        if ($yearmonth == null) {
-            $lastMonth = Carbon::today()->subMonth();
-            $year = $lastMonth->year;
-            $month = sprintf("%02d", $lastMonth->month);
-        } else {
-            $yearMonthArr = explode("-", $yearmonth);
-            $year = $yearMonthArr[0];
-            $month = sprintf("%02d", $yearMonthArr[1]);
-        }
+    // public function showExport($yearmonth = null)
+    // {
+    //     if ($yearmonth == null) {
+    //         $lastMonth = Carbon::today()->subMonth();
+    //         $year = $lastMonth->year;
+    //         $month = sprintf("%02d", $lastMonth->month);
+    //     } else {
+    //         $yearMonthArr = explode("-", $yearmonth);
+    //         $year = $yearMonthArr[0];
+    //         $month = sprintf("%02d", $yearMonthArr[1]);
+    //     }
 
-        $yearStr = strval($year);
-        $monthStr = strval($month);
+    //     $yearStr = strval($year);
+    //     $monthStr = strval($month);
 
-        return view('admin.attendances.exportshow', ['year' => $yearStr, 'month' => $monthStr]);
-    }
+    //     return view('admin.attendances.exportshow', ['year' => $yearStr, 'month' => $monthStr]);
+    // }
 
 
 
-    public function export(Request $request)
-    {
-        $yearmonth = $request->yearmonth;
+    // public function export(Request $request)
+    // {
+    //     $yearmonth = $request->yearmonth;
 
-        $dateTimeNow = now()->format('Y-m-d_H-i');
-        $fileName = 'attendances_' . $yearmonth . '_' . $dateTimeNow . '.xlsx';
+    //     $dateTimeNow = now()->format('Y-m-d_H-i');
+    //     $fileName = 'attendances_' . $yearmonth . '_' . $dateTimeNow . '.xlsx';
 
-        return Excel::download(new AttendanceExport($yearmonth), $fileName);
-    }
+    //     return Excel::download(new AttendanceExport($yearmonth), $fileName);
+    // }
 
     public function editAttendance($id)
     {

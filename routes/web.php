@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\Counselor\UpdateCounselorController;
 use App\Http\Controllers\Admin\DailyAttendance\IndexDailyAttendanceController;
 use App\Http\Controllers\Admin\DailyAttendance\StoreAdminCommentController;
 use App\Http\Controllers\Admin\DailyAttendance\UpdateAdminCommentController;
+use App\Http\Controllers\Admin\Export\ExportAttendanceController;
+use App\Http\Controllers\Admin\Export\ShowExportPageController;
 use App\Http\Controllers\Admin\Residence\CreateResidenceController;
 use App\Http\Controllers\Admin\Residence\DeleteResidenceController;
 use App\Http\Controllers\Admin\Residence\EditResidenceController;
@@ -153,8 +155,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('settings/workschedules/destroy/{id}', DeleteWorkscheduleController::class)->name('admin.workschedules.destroy');
         // Route::patch('settings/workschedules/{id}/update', [AdminAttendanceController::class, 'updateWorkschedules'])->name('admin.workschedules.update');
         //export
-        Route::get('export/show', [AdminAttendanceController::class, 'showExport'])->name('admin.export.show');
-        Route::post('export', [AdminAttendanceController::class, 'export'])->name('admin.export');
+        Route::get('export/show', ShowExportPageController::class)->name('admin.export.show');
+        Route::post('export', ExportAttendanceController::class)->name('admin.export');
         //edit attendances
         Route::get('attendance/{id}/edit', [AdminAttendanceController::class, 'editAttendance'])->name('admin.attendance.edit');
         Route::patch('attendance/{id}/update', [AdminAttendanceController::class, 'updateAttendance'])->name('admin.attendance.update');
