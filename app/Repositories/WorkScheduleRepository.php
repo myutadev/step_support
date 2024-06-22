@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\ScheduleType;
+use App\Models\SpecialSchedule;
 use App\Models\WorkSchedule;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -12,6 +13,16 @@ class WorkScheduleRepository
     public function getWorkDayName(): string
     {
         return ScheduleType::find(1)->name;
+    }
+
+    /**
+     *開所日登録時に表示させる選択肢用。全てのスケジュールタイプを取得
+     *
+     *@return  Collection ScheduleTypeモデルからall()で取得した値
+     */
+    public function getAllScheduleType()
+    {
+        return ScheduleType::all();
     }
 
     public function getSelectedMonthWorkSchedulesByUser(int $year, int $month, int $user_id): Collection
@@ -85,5 +96,25 @@ class WorkScheduleRepository
     public function getWorkScheduleByAttendance($attendance)
     {
         return WorkSchedule::where('id', $attendance->work_schedule_id)->first();
+    }
+
+    public function getWorkScheduleById($id)
+    {
+        return WorkSchedule::find($id);
+    }
+
+    public function createSpecialSchedule()
+    {
+        return new SpecialSchedule();
+    }
+
+    public function getSpecialScheduleById($id)
+    {
+        return SpecialSchedule::find($id);
+    }
+    public function getWorkScheduleBySpecialScheduleId($id)
+    {
+        $special_sched = SpecialSchedule::with('work_schedule')->where('id', $id)->first();
+        return $special_sched->work_schedule;
     }
 }

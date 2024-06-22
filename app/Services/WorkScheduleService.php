@@ -6,6 +6,7 @@ use App\Repositories\AdminRepository;
 use App\Repositories\WorkScheduleRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 class WorkScheduleService
 {
@@ -97,5 +98,39 @@ class WorkScheduleService
         }
 
         return $monthlyWorkScheduleData;
+    }
+
+    public function generateCreateWorkscheduleData($request)
+    {
+        $workSchedule = $this->workScheduleRepository->getWorkScheduleById($request->id);
+        $carbonDate = Carbon::parse($workSchedule->datde);
+        $day = $carbonDate->isoFormat('ddd');
+        return  [
+            'id' => $workSchedule->id,
+            'date' => $workSchedule->date,
+            'day' => $day,
+        ];
+    }
+
+    public function getAllScheduleType()
+    {
+        return $this->workScheduleRepository->getAllScheduleType();
+    }
+
+    public function storeSpecialSchedule(Request $request)
+    {
+        $companyId = $this->adminRepository->getCurrentCompanyId();
+        $workSchedule = $this->workScheduleRepository->createSpecialSchedule();
+        $workSchedule->company_id = $companyId;
+        $workSchedule->work_schedule_id =  $request->workSchedule_id;
+        $workSchedule->schedule_type_id = $request->schedule_type_id;
+        $workSchedule->description = $request->description;
+        $workSchedule->save();
+    }
+
+    public function deleteSpecialSchedule(Request $request): void
+    {
+        $special_sched = $this->workScheduleRepository->getSpecialScheduleById($request->id);
+        $special_sched->delete();
     }
 }

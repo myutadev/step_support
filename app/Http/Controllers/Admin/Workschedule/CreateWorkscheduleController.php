@@ -7,7 +7,7 @@ use App\Services\MonthUserSelectorService;
 use App\Services\WorkScheduleService;
 use Illuminate\Http\Request;
 
-class StoreWorkscheduleController extends Controller
+class CreateWorkscheduleController extends Controller
 {
     protected $workScheduleService;
     protected $monthUserSelectorService;
@@ -22,8 +22,8 @@ class StoreWorkscheduleController extends Controller
 
     public function __invoke(Request $request)
     {
-        $yearmonth = $this->monthUserSelectorService->generateSelectedYearMonthByWorkSchedId($request->workSchedule_id);
-        $this->workScheduleService->storeSpecialSchedule($request);
-        return redirect()->route('admin.workschedules', compact('yearmonth'));
+        $targetWorkSchedule  = $this->workScheduleService->generateCreateWorkscheduleData($request);
+        $scheduleTypes = $this->workScheduleService->getAllScheduleType();
+        return view('admin.attendances.workschedulecreate', compact('targetWorkSchedule', 'scheduleTypes'));
     }
 }

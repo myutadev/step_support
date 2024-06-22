@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\AdminRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\WorkScheduleRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -11,11 +12,16 @@ class MonthUserSelectorService
 {
     protected $userRepository;
     protected $adminRepository;
+    protected $workScheduleRepository;
 
-    public function __construct(UserRepository $userRepository, AdminRepository $adminRepository)
-    {
+    public function __construct(
+        UserRepository $userRepository,
+        AdminRepository $adminRepository,
+        WorkScheduleRepository $workScheduleRepository
+    ) {
         $this->userRepository = $userRepository;
         $this->adminRepository = $adminRepository;
+        $this->workScheduleRepository = $workScheduleRepository;
     }
 
     private function getCurrentCompanyId(): int
@@ -69,5 +75,21 @@ class MonthUserSelectorService
             'month' => $month,
             'user_id' => $user_id,
         ];
+    }
+
+    public function generateSelectedYearMonthByWorkSchedId($id)
+    {
+        $targetWorkSchedule = $this->workScheduleRepository->getWorkScheduleById($id);
+        $year = $targetWorkSchedule->year;
+        $month = sprintf("%02d", $targetWorkSchedule->month);
+        return  $year . "-" . $month;
+    }
+    public function generateSelectedYearMonthBySpecialScheduleId($id)
+    {
+
+        $targetWorkSchedule = $this->workScheduleRepository->getWorkScheduleBySpecialScheduleId($id);
+        $year = $targetWorkSchedule->year;
+        $month = sprintf("%02d", $targetWorkSchedule->month);
+        return  $year . "-" . $month;
     }
 }

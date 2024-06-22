@@ -627,38 +627,38 @@ class AdminAttendanceController extends Controller
     //     return view('admin.attendances.workschedule', compact('monthlyWorkScheduleData', 'year', 'month'));
     // }
 
-    public function createWorkschedules(Request $request)
-    {
-        $workSchedule = WorkSchedule::find($request->id);
-        $carbonDate = Carbon::parse($workSchedule->datde);
-        $day = $carbonDate->isoFormat('ddd');
-        $targetWorkSchedule = [
-            'id' => $workSchedule->id,
-            'date' => $workSchedule->date,
-            'day' => $day,
-        ];
+    // public function createWorkschedules(Request $request)
+    // {
+    //     $workSchedule = WorkSchedule::find($request->id);
+    //     $carbonDate = Carbon::parse($workSchedule->datde);
+    //     $day = $carbonDate->isoFormat('ddd');
+    //     $targetWorkSchedule = [
+    //         'id' => $workSchedule->id,
+    //         'date' => $workSchedule->date,
+    //         'day' => $day,
+    //     ];
 
-        $scheduleTypes = ScheduleType::all();
+    //     $scheduleTypes = ScheduleType::all();
 
-        return view('admin.attendances.workschedulecreate', compact('targetWorkSchedule', 'scheduleTypes'));
-    }
-    public function storeWorkschedules(Request $request)
-    {
-        $admin = Auth::user();
-        $targetWorkSchedule = WorkSchedule::where('id', $request->workSchedule_id)->first();
-        $year = $targetWorkSchedule->year;
-        $month = sprintf("%02d", $targetWorkSchedule->month);
-        $yearmonth = $year . "-" . $month;
+    //     return view('admin.attendances.workschedulecreate', compact('targetWorkSchedule', 'scheduleTypes'));
+    // }
+    // public function storeWorkschedules(Request $request)
+    // {
+    //     $admin = Auth::user();
+    //     $targetWorkSchedule = WorkSchedule::where('id', $request->workSchedule_id)->first();
+    //     $year = $targetWorkSchedule->year;
+    //     $month = sprintf("%02d", $targetWorkSchedule->month);
+    //     $yearmonth = $year . "-" . $month;
 
-        $companyId = $admin->adminDetail->company_id;
-        $workSchedule = new SpecialSchedule();
-        $workSchedule->company_id = $companyId;
-        $workSchedule->work_schedule_id =  $request->workSchedule_id;
-        $workSchedule->schedule_type_id = $request->schedule_type_id;
-        $workSchedule->description = $request->description;
-        $workSchedule->save();
-        return redirect()->route('admin.workschedules', compact('yearmonth'));
-    }
+    //     $companyId = $admin->adminDetail->company_id;
+    //     $workSchedule = new SpecialSchedule();
+    //     $workSchedule->company_id = $companyId;
+    //     $workSchedule->work_schedule_id =  $request->workSchedule_id;
+    //     $workSchedule->schedule_type_id = $request->schedule_type_id;
+    //     $workSchedule->description = $request->description;
+    //     $workSchedule->save();
+    //     return redirect()->route('admin.workschedules', compact('yearmonth'));
+    // }
     public function deleteWorkschedules(Request $request)
     {
         $special_sched = SpecialSchedule::find($request->id);
