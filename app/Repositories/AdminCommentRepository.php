@@ -23,4 +23,9 @@ class AdminCommentRepository
     {
         return new AdminComment();
     }
+
+    public function getAdminCommentByAttendanceId($attendanceId)
+    {
+        return AdminComment::where('attendance_id', $attendanceId)->first();
+    }
 }

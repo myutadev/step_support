@@ -26,7 +26,10 @@ use App\Http\Controllers\Admin\Residence\EditResidenceController;
 use App\Http\Controllers\Admin\Residence\IndexResidenceController;
 use App\Http\Controllers\Admin\Residence\StoreResidenceController;
 use App\Http\Controllers\Admin\Residence\UpdateResidenceController;
+use App\Http\Controllers\Admin\Timecard\EditAttendanceController;
 use App\Http\Controllers\Admin\Timecard\IndexTimecardController;
+use App\Http\Controllers\Admin\Timecard\StoreLeaveController;
+use App\Http\Controllers\Admin\Timecard\UpdateAttendanceController;
 use App\Http\Controllers\Admin\User\CreateUserController;
 use App\Http\Controllers\Admin\User\EditUserController;
 use App\Http\Controllers\Admin\User\IndexUserController;
@@ -158,9 +161,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('export/show', ShowExportPageController::class)->name('admin.export.show');
         Route::post('export', ExportAttendanceController::class)->name('admin.export');
         //edit attendances
-        Route::get('attendance/{id}/edit', [AdminAttendanceController::class, 'editAttendance'])->name('admin.attendance.edit');
-        Route::patch('attendance/{id}/update', [AdminAttendanceController::class, 'updateAttendance'])->name('admin.attendance.update');
-        Route::post('attendance/store/leave/{user_id}/{sched_id}', [AdminAttendanceController::class, 'storeLeave'])->name('admin.store.leave');
+        Route::get('attendance/{id}/edit', EditAttendanceController::class)->name('admin.attendance.edit');
+        Route::patch('attendance/{id}/update', UpdateAttendanceController::class)->name('admin.attendance.update');
+        Route::post('attendance/store/leave/{user_id}/{sched_id}', StoreLeaveController::class)->name('admin.store.leave');
     });
 });
 

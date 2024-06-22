@@ -23,4 +23,8 @@ class AttendanceTypeRepository
     {
         return $this->getLeaveTypes()->pluck('id')->toArray();
     }
+    public function getAllAttendaneType()
+    {
+        return AttendanceType::all();
+    }
 }

@@ -55,15 +55,15 @@ class DailyUserAttendance
     {
         return $this->workSchedule->specialSchedule == null ? $this->workSchedule->scheduleType->name : $this->workSchedule->specialSchedule->scheduleType->name;
     }
-    public function getCheckIn(): string
+    public function getCheckIn()
     {
         return $this->attendance->check_in_time;
     }
-    public function getCheckOut(): string
+    public function getCheckOut()
     {
         return $this->attendance->check_out_time;
     }
-    public function getBodyTemp(): float
+    public function getBodyTemp()
     {
         return $this->attendance->body_temp;
     }
@@ -71,11 +71,11 @@ class DailyUserAttendance
     {
         return $this->attendance->is_overtime === 1 ? "有" : "無";
     }
-    public function getDescription(): string
+    public function getDescription()
     {
         return $this->attendance->work_description;
     }
-    public function getComment(): string
+    public function getComment()
     {
         return $this->attendance->work_comment;
     }
