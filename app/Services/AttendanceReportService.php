@@ -4,50 +4,24 @@ namespace App\Services;
 
 use App\Domains\UserAttendanceRange;
 use App\Domains\WholeCompanyAttendance;
-use App\Repositories\AdminCommentRepository;
-use App\Repositories\AdminRepository;
-use App\Repositories\AttendanceRepository;
-use App\Repositories\AttendanceTypeRepository;
-use App\Repositories\OvertimeRepository;
-use App\Repositories\RestRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WorkScheduleRepository;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
 
 class AttendanceReportService
 {
-    protected $attendanceTypeRepository;
-    protected $attendanceRepository;
-    protected $restRepository;
-    protected $overtimeRepository;
-    protected $adminRepository;
-    protected $adminCommentRepository;
     protected $workScheduleRepository;
-    protected $year;
-    protected $month;
     protected $userRepository;
     protected $userAttendanceRange;
+    protected $year;
+    protected $month;
 
     public function __construct(
-        AttendanceTypeRepository $attendanceTypeRepository,
-        AttendanceRepository $attendanceRepository,
-        RestRepository $restRepository,
-        OvertimeRepository $overtimeRepository,
-        AdminRepository $adminRepository,
-        AdminCommentRepository $adminCommentRepository,
         WorkScheduleRepository $workScheduleRepository,
         UserRepository $userRepository,
         UserAttendanceRange $userAttendanceRange,
     ) {
-        $this->attendanceTypeRepository = $attendanceTypeRepository;
-        $this->attendanceRepository = $attendanceRepository;
-        $this->restRepository = $restRepository;
-        $this->overtimeRepository = $overtimeRepository;
-        $this->adminRepository = $adminRepository;
-        $this->adminCommentRepository = $adminCommentRepository;
         $this->workScheduleRepository = $workScheduleRepository;
         $this->userRepository = $userRepository;
         $this->userAttendanceRange = $userAttendanceRange;
