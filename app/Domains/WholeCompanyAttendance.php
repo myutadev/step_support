@@ -11,67 +11,71 @@ class WholeCompanyAttendance
 {
     protected $users;
     protected $userAttendanceRange;
-    protected  $NUMBER_OF_TOTAL_FACILITY = 2;
-    protected  $CLAIM_HOURS_PER_USER = 4;
-    protected  $USERS_PER_FACILITY = 18;
-    protected  $ACCEPT_OVER_USERS_RATE = 1.25;
+    protected $NUMBER_OF_TOTAL_FACILITY = 2;
+    protected $CLAIM_HOURS_PER_USER = 4;
+    protected $USERS_PER_FACILITY = 18;
+    protected $ACCEPT_OVER_USERS_RATE = 1.25;
+    protected $firstWorkScheduleId;
+    protected $lastWorkScheduleId;
 
 
-    public function __construct(Collection $users, UserAttendanceRange $userAttendanceRange)
+    public function __construct(Collection $users, UserAttendanceRange $userAttendanceRange, $firstWorkScheduleId, $lastWorkScheduleId)
     {
         $this->users = $users;
         $this->userAttendanceRange = $userAttendanceRange;
+        $this->firstWorkScheduleId = $firstWorkScheduleId;
+        $this->lastWorkScheduleId = $lastWorkScheduleId;
     }
 
-    public function getCompanyTotalWorkDurationInterval(int $firstWorkScheduleId, int $lastWorkScheduleId): CarbonInterval
+    public function getCompanyTotalWorkDurationInterval(): CarbonInterval
     {
         $companyTotalWorkDurationInterval = CarbonInterval::seconds(0);
         foreach ($this->users as $user) {
-            $userAttendanceRange = $this->userAttendanceRange->create($user, $firstWorkScheduleId, $lastWorkScheduleId);
+            $userAttendanceRange = $this->userAttendanceRange->create($user, $this->firstWorkScheduleId, $this->lastWorkScheduleId);
             $companyTotalWorkDurationInterval->add($userAttendanceRange->getTotalWorkDurationInterval());
         }
 
         return $companyTotalWorkDurationInterval;
     }
 
-    public function getCompanyTotalWorkDuration(int $firstWorkScheduleId, int $lastWorkScheduleId): string
+    public function getCompanyTotalWorkDuration(): string
     {
-        $companyTotalWorkDurationInterval = $this->getCompanyTotalWorkDurationInterval($firstWorkScheduleId, $lastWorkScheduleId);
+        $companyTotalWorkDurationInterval = $this->getCompanyTotalWorkDurationInterval($this->firstWorkScheduleId, $this->lastWorkScheduleId);
         return TimeFormatter::convertDaysToHours($companyTotalWorkDurationInterval->cascade())->format('%H:%I:%S');
     }
 
-    public function getTotalClaimCount(int $firstWorkScheduleId, int $lastWorkScheduleId): int
+    public function getTotalClaimCount(): int
     {
         $totalClaimsCount = 0;
 
         foreach ($this->users as $user) {
-            $userAttendanceRange = $this->userAttendanceRange->create($user, $firstWorkScheduleId, $lastWorkScheduleId);
+            $userAttendanceRange = $this->userAttendanceRange->create($user, $this->firstWorkScheduleId, $this->lastWorkScheduleId);
             $totalClaimsCount += $userAttendanceRange->getPresentCount();
         }
         return $totalClaimsCount;
     }
 
 
-    public function getTargetTotalWorkDurationInterval(int $TARGET_HOURS, int $firstWorkScheduleId, int $lastWorkScheduleId)
+    public function getTargetTotalWorkDurationInterval(int $TARGET_HOURS)
     {
         $targetClaimSecondsPerPerson = CarbonInterval::hours($TARGET_HOURS)->totalSeconds;
-        $targetTotalWorkDurationSeconds = $targetClaimSecondsPerPerson * $this->getTotalClaimCount($firstWorkScheduleId, $lastWorkScheduleId);
+        $targetTotalWorkDurationSeconds = $targetClaimSecondsPerPerson * $this->getTotalClaimCount($this->firstWorkScheduleId, $this->lastWorkScheduleId);
         $targetTotalWorkDurationInterval = CarbonInterval::seconds($targetTotalWorkDurationSeconds);
         return $targetTotalWorkDurationInterval;
     }
-    public function getTargetTotalWorkDuration(int $TARGET_HOURS, int $firstWorkScheduleId, int $lastWorkScheduleId)
+    public function getTargetTotalWorkDuration(int $TARGET_HOURS)
     {
-        $targetTotalWorkDurationInterval = $this->getTargetTotalWorkDurationInterval($TARGET_HOURS,  $firstWorkScheduleId, $lastWorkScheduleId);
+        $targetTotalWorkDurationInterval = $this->getTargetTotalWorkDurationInterval($TARGET_HOURS,  $this->firstWorkScheduleId, $this->lastWorkScheduleId);
 
         $targetTotalWorkDuration = TimeFormatter::convertDaysToHours($targetTotalWorkDurationInterval->cascade())->format('%H:%I:%S');
 
         return $targetTotalWorkDuration;
     }
-    public function getRestToAchieveCompanyTarget(int $TARGET_HOURS, int $firstWorkScheduleId, int $lastWorkScheduleId)
+    public function getRestToAchieveCompanyTarget(int $TARGET_HOURS)
     {
-        $companyTotalWorkDurationInterval = $this->getCompanyTotalWorkDurationInterval($firstWorkScheduleId, $lastWorkScheduleId);
+        $companyTotalWorkDurationInterval = $this->getCompanyTotalWorkDurationInterval($this->firstWorkScheduleId, $this->lastWorkScheduleId);
         // dump('companyTotalWorkDurationInterval', $companyTotalWorkDurationInterval);
-        $targetTotalWorkDurationInterval = $this->getTargetTotalWorkDurationInterval($TARGET_HOURS,  $firstWorkScheduleId, $lastWorkScheduleId);
+        $targetTotalWorkDurationInterval = $this->getTargetTotalWorkDurationInterval($TARGET_HOURS,  $this->firstWorkScheduleId, $this->lastWorkScheduleId);
         // dump('restToAchieveCompanyTargetInterval', $targetTotalWorkDurationInterval);
 
         $restToAchieveCompanyTargetInterval = $companyTotalWorkDurationInterval->sub($targetTotalWorkDurationInterval)->cascade();

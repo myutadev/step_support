@@ -4,15 +4,18 @@ namespace App\Repositories;
 
 use App\Models\User;
 use App\Models\UserDetail;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository
 {
     protected $user;
+    protected $adminRepository;
 
-    public function __construct(User $user)
+    public function __construct(User $user, AdminRepository $adminRepository)
     {
         $this->user = $user;
+        $this->adminRepository = $adminRepository;
     }
 
     public function getUsersByCompanyId(int $companyId): Collection
@@ -39,5 +42,23 @@ class UserRepository
     public function getUserWithDetailsByUserId($id): User
     {
         return User::with(['userDetail.disabilityCategory', 'userDetail.residence', 'userDetail.counselor'])->firstWhere('id', $id);
+    }
+
+    public function getAllCompanyUsers()
+    {
+        $companyId = $this->adminRepository->getCurrentCompanyId();
+
+        return  User::whereHas('userDetail', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId);
+        })->with(['userDetail', 'attendances.rests', 'attendances.overtimes'])->get();
+    }
+
+    public function getActiveUsers(Carbon $dischargeDateCondition)
+    {
+        return $this->getAllCompanyUsers()->filter(function ($user) use ($dischargeDateCondition) {
+            return $user->userDetail->discharge_date >= $dischargeDateCondition || is_null(
+                $user->userDetail->discharge_date
+            );
+        });
     }
 }

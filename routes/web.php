@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\DailyAttendance\StoreAdminCommentController;
 use App\Http\Controllers\Admin\DailyAttendance\UpdateAdminCommentController;
 use App\Http\Controllers\Admin\Export\ExportAttendanceController;
 use App\Http\Controllers\Admin\Export\ShowExportPageController;
+use App\Http\Controllers\Admin\Report\ShowReportController;
 use App\Http\Controllers\Admin\Residence\CreateResidenceController;
 use App\Http\Controllers\Admin\Residence\DeleteResidenceController;
 use App\Http\Controllers\Admin\Residence\EditResidenceController;
@@ -134,7 +135,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::patch('admins/{id}/update', UpdateAdminController::class)->name('admin.admins.update');
 
         //report 
-        Route::get('report', [AdminReportController::class, 'index'])->name('admin.report');
+        Route::get('report', ShowReportController::class)->name('admin.report');
 
 
         //settings

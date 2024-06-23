@@ -216,7 +216,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($userInfoArray as $userInfo)
+                            @foreach ($sorteUserInfoArray as $userInfo)
                                 <tr>
                                     <td>{{ $userInfo['beneficiary_number'] }}</td>
                                     <td> {{ $userInfo['name'] }}</td>
