@@ -24,4 +24,9 @@ class AttendanceRepository
     {
         return new Attendance();
     }
+
+    public function getOvertimeStr()
+    {
+        return $this->attendance->getOvertimeStr();
+    }
 }

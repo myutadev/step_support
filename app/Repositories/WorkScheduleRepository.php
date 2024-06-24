@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\ScheduleType;
 use App\Models\SpecialSchedule;
 use App\Models\WorkSchedule;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
 class WorkScheduleRepository
@@ -116,5 +117,33 @@ class WorkScheduleRepository
     {
         $special_sched = SpecialSchedule::with('work_schedule')->where('id', $id)->first();
         return $special_sched->work_schedule;
+    }
+
+    public function getWorkScheduleByUserIdAndDate($userId, $date)
+    {
+        return WorkSchedule::with([
+            'attendances' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            },
+            'attendances.rests',
+            'attendances.overtimes',
+        ])->where('date', $date)->first();
+    }
+
+    public function getWorkScheduleIdToday()
+    {
+        $today = Carbon::today();
+        $workSchedule = WorkSchedule::where('date', $today)->first();
+        return $workSchedule->id;
+    }
+
+    public function getWorkScheduleTodayByUserId($userId)
+    {
+        $today = Carbon::today();
+        return WorkSchedule::with([
+            'attendances' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            }
+        ])->where('date', $today)->first();
     }
 }

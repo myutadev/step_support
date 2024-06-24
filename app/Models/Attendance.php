@@ -52,4 +52,12 @@ class Attendance extends Model
     {
         return $this->hasMany(AdminComment::class);
     }
+
+    public function getOvertimeStr()
+    {
+        if ($this->is_overtime === 1) {
+            return  "有";
+        }
+        return  "無";
+    }
 }

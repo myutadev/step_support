@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserDetail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class UserRepository
 {
@@ -60,5 +61,10 @@ class UserRepository
                 $user->userDetail->discharge_date
             );
         });
+    }
+
+    public function getCurrentUserId()
+    {
+        return Auth::id();
     }
 }

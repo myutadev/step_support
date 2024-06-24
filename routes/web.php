@@ -43,6 +43,14 @@ use App\Http\Controllers\Admin\Workschedule\StoreWorkscheduleController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\User\Attendance\CheckInController;
+use App\Http\Controllers\User\Attendance\CheckOutController;
+use App\Http\Controllers\User\Attendance\OvertimeEndController;
+use App\Http\Controllers\User\Attendance\OvertimeStartController;
+use App\Http\Controllers\User\Attendance\RestEndController;
+use App\Http\Controllers\User\Attendance\RestStartController;
+use App\Http\Controllers\User\Attendance\ShowAttendanceController;
+use App\Http\Controllers\User\Attendance\UpdateWorkCommentController;
 // use App\Http\Controllers\AdminTimecard\IndexTimecardController;
 use App\Models\Attendance;
 
@@ -76,19 +84,29 @@ Route::get('attendances/timecard/{yearmonth?}', [AttendanceController::class, 't
 
 
 Route::resource('attendances', AttendanceController::class)
-    ->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy'])
+    ->only(['show', 'create', 'store', 'edit', 'destroy'])
     ->middleware('auth');
 
+Route::middleware('auth')->group(function () {
+    Route::get('attendances', ShowAttendanceController::class)->name('attendances.index');
+    Route::post('attendances/store', CheckInController::class)->name('attendances.checkin');
+    Route::post('attendances/checkout', CheckOutController::class)->name('attendances.checkout');
+    Route::post('attendances/rest-start', RestStartController::class)->name('attendances.rest.start');
+    Route::post('attendances/rest-end', RestEndController::class)->name('attendances.rest.end');
+    Route::post('attendances/overtime-start', OvertimeStartController::class)->name('attendances.overtime.start');
+    Route::post('attendances/overtime-end', OvertimeEndController::class)->name('attendances.overtime.end');
+    Route::patch('attendances/{attendance}', UpdateWorkCommentController::class)->name('attendances.update');
+});
 
 
 // 利用者さん用出退勤route
 
-Route::post('attendances/checkin', [AttendanceController::class, 'checkin'])->name('attendances.checkin')->middleware('auth');
-Route::post('attendances/rest-start', [AttendanceController::class, 'restStart'])->name('attendances.rest.start')->middleware('auth');
-Route::post('attendances/rest-end', [AttendanceController::class, 'restEnd'])->name('attendances.rest.end')->middleware('auth');
-Route::post('attendances/overtime-start', [AttendanceController::class, 'overtimeStart'])->name('attendances.overtime.start')->middleware('auth');
-Route::post('attendances/overtime-end', [AttendanceController::class, 'overtimeEnd'])->name('attendances.overtime.end')->middleware('auth');
-Route::post('attendances/checkout', [AttendanceController::class, 'checkout'])->name('attendances.checkout')->middleware('auth');
+// Route::post('attendances/checkin', [AttendanceController::class, 'checkin'])->name('attendances.checkin')->middleware('auth');
+// Route::post('attendances/rest-start', [AttendanceController::class, 'restStart'])->name('attendances.rest.start')->middleware('auth');
+// Route::post('attendances/rest-end', [AttendanceController::class, 'restEnd'])->name('attendances.rest.end')->middleware('auth');
+// Route::post('attendances/overtime-start', [AttendanceController::class, 'overtimeStart'])->name('attendances.overtime.start')->middleware('auth');
+// Route::post('attendances/overtime-end', [AttendanceController::class, 'overtimeEnd'])->name('attendances.overtime.end')->middleware('auth');
+// Route::post('attendances/checkout', [AttendanceController::class, 'checkout'])->name('attendances.checkout')->middleware('auth');
 
 
 
