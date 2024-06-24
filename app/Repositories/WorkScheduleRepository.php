@@ -146,4 +146,5 @@ class WorkScheduleRepository
             }
         ])->where('date', $today)->first();
     }
+
 }

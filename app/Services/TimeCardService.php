@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Repositories\AdminRepository;
 use App\Repositories\AttendanceTypeRepository;
 use App\Repositories\UserRepository;
-use Illuminate\Database\Eloquent\Collection;
 
 use App\Domains\Attendance\DailyAdminComment;
 use App\Domains\Attendance\DailyOvertime;
@@ -13,15 +12,9 @@ use App\Domains\Attendance\DailyRest;
 use App\Domains\Attendance\DailyTimeSlot;
 use App\Domains\Attendance\DailyUserAttendance;
 use App\Domains\Attendance\TimeSlot;
-use App\Models\ScheduleType;
-use App\Models\User;
 use App\Models\WorkSchedule;
-use App\Models\Admin;
 use App\Models\Attendance;
-use App\Models\AttendanceType;
-use App\Models\UserDetail;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 
 class TimeCardService
@@ -51,8 +44,7 @@ class TimeCardService
      *@param  \App\Models\WorkSchedule $workschedule 
      *@return array 出勤レコードが無いようのオブジェクト
      */
-    // privateに変えるかも?
-    public function generateNoAttendanceRecordObj(WorkSchedule $workSchedule)
+    private function generateNoAttendanceRecordObj(WorkSchedule $workSchedule)
     {
         return
             $curAttendanceObj = [
