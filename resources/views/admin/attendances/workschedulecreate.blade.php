@@ -125,35 +125,35 @@
         </div>
     </div>
     </div>
-@endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelectorAll('.dropdown-menu a').forEach(item => {
-            item.addEventListener('click', (e) => {
-                var text = e.target.text;
-                var dropdownButton = e.target.closest('.dropdown').querySelector(
-                    '.dropdown-toggle');
-                dropdownButton.textContent = text;
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.dropdown-menu a').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    var text = e.target.text;
+                    var dropdownButton = e.target.closest('.dropdown').querySelector(
+                        '.dropdown-toggle');
+                    dropdownButton.textContent = text;
+                });
             });
         });
-    });
 
-    // モーダルにフォームの内容を表示させるためのDOM操作
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelector("#update-button").addEventListener('click', function() {
-            const target_date = document.getElementById('target_date').innerHTML;
-            const schedule_type_select = document.getElementById('schedule_type_id');
-            const schedule_type_name = schedule_type_select.options[schedule_type_select.selectedIndex]
-                .text;
-            const description = document.getElementById('description').value;
-            // モーダル内の対応する要素に値を設定
-            document.querySelector('.confirmation-area').innerHTML =
-                `
+        // モーダルにフォームの内容を表示させるためのDOM操作
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelector("#update-button").addEventListener('click', function() {
+                const target_date = document.getElementById('target_date').innerHTML;
+                const schedule_type_select = document.getElementById('schedule_type_id');
+                const schedule_type_name = schedule_type_select.options[schedule_type_select.selectedIndex]
+                    .text;
+                const description = document.getElementById('description').value;
+                // モーダル内の対応する要素に値を設定
+                document.querySelector('.confirmation-area').innerHTML =
+                    `
                 <h4 class="mb-3">編集対象日: ${target_date}</h4>
                 <h4 class="mb-3">開所日区分: ${schedule_type_name}</h4>
                 <h4 class="mb-3">備考: ${description}</h4>
             `
+            });
         });
-    });
-</script>
+    </script>
+@endsection

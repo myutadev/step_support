@@ -63,11 +63,11 @@
         </div>
     </div>
     </div>
-@endsection
 
-<script>
-    // ここにJavaScriptコードを配置
-    document.getElementById('monthInput').addEventListener('change', function() {
-        document.getElementById('monthForm').submit();
-    });
-</script>
+    <script>
+        // ここにJavaScriptコードを配置
+        document.getElementById('monthInput').addEventListener('change', function() {
+            document.getElementById('monthForm').submit();
+        });
+    </script>
+@endsection

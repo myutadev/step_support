@@ -158,10 +158,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/calendar/monthUserChangeHandler.js') }}"></script>
-
-
-    <script>
+    <script src="{{ asset('js/calendar/monthUserChangeHandler.js') }}">
         document.addEventListener('DOMContentLoaded', function() {
             const leaveButtons = document.querySelectorAll('.store-leave'); // 退勤ボタンのID
             leaveButtons.forEach(function(button) {

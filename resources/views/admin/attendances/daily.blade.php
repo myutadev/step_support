@@ -374,28 +374,26 @@
         $baseUrl = url('admin/daily');
     @endphp
 
-    <script src="{{ asset('js/calendar/dateChangeHandler.js') }}"></script>
-@endsection
+    <script src="{{ asset('js/calendar/dateChangeHandler.js') }}">
+        document.addEventListener('DOMContentLoaded', function() {
+            const baseUrl = "{{ $baseUrl }}";
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const baseUrl = "{{ $baseUrl }}";
+            document.querySelectorAll('.btn-edit').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const description = this.getAttribute('data-description');
+                    const comment = this.getAttribute('data-comment');
 
-        document.querySelectorAll('.btn-edit').forEach(button => {
-            button.addEventListener('click', function() {
-                const id = this.getAttribute('data-id');
-                const description = this.getAttribute('data-description');
-                const comment = this.getAttribute('data-comment');
-
-                const form = document.querySelector(`#edit-form-${id}`);
-                if (form) {
-                    form.action = baseUrl + '/' + id;
-                    form.querySelector('.admin_description').value = description;
-                    form.querySelector('.admin_comment').value = comment;
-                } else {
-                    console.error('Form not found for id:', id);
-                }
+                    const form = document.querySelector(`#edit-form-${id}`);
+                    if (form) {
+                        form.action = baseUrl + '/' + id;
+                        form.querySelector('.admin_description').value = description;
+                        form.querySelector('.admin_comment').value = comment;
+                    } else {
+                        console.error('Form not found for id:', id);
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
+@endsection

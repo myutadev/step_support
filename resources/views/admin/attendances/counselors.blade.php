@@ -12,9 +12,10 @@
             @include('components.header-admin')
 
             <!-- テーブルのグループ -->
-            <div class="timecard-title">
+            <div class="timecard-title mb-5">
                 <h3>カウンセラー一覧</h3>
             </div>
+            
             <button type="button" onclick="location.href='{{ route('admin.counselors.create') }}'"
                 class="btn btn-create mt-3">新規カウンセラー登録</button>
             <div class="record-list mt-5">
@@ -53,9 +54,4 @@
             </div>
         </div>
     </div>
-    </div>
 @endsection
-
-<script>
-    // ここにJavaScriptコードを配置
-</script>
