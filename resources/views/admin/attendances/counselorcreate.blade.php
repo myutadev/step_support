@@ -110,34 +110,34 @@
         </div>
     </div>
     </div>
-@endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelectorAll('.dropdown-menu a').forEach(item => {
-            item.addEventListener('click', (e) => {
-                var text = e.target.text;
-                var dropdownButton = e.target.closest('.dropdown').querySelector(
-                    '.dropdown-toggle');
-                dropdownButton.textContent = text;
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.dropdown-menu a').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    var text = e.target.text;
+                    var dropdownButton = e.target.closest('.dropdown').querySelector(
+                        '.dropdown-toggle');
+                    dropdownButton.textContent = text;
+                });
             });
         });
-    });
 
-    // モーダルにフォームの内容を表示させるためのDOM操作
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelector("#update-button").addEventListener('click', function() {
-            const name = document.getElementById('name').value;
-            const contact_phone = document.getElementById('contact_phone').value;
-            const contact_email = document.getElementById('contact_email').value;
+        // モーダルにフォームの内容を表示させるためのDOM操作
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelector("#update-button").addEventListener('click', function() {
+                const name = document.getElementById('name').value;
+                const contact_phone = document.getElementById('contact_phone').value;
+                const contact_email = document.getElementById('contact_email').value;
 
-            // モーダル内の対応する要素に値を設定
-            document.querySelector('.confirmation-area').innerHTML =
-                `
+                // モーダル内の対応する要素に値を設定
+                document.querySelector('.confirmation-area').innerHTML =
+                    `
                 <h4 class="mb-3">氏名: ${name}</h4>
                 <h4 class="mb-3">電話番号: ${contact_phone}</h4>
                 <h4 class="mb-3">メールアドレス: ${contact_email}</h4>
             `
+            });
         });
-    });
-</script>
+    </script>
+@endsection

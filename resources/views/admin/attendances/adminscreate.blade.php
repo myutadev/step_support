@@ -148,40 +148,39 @@
         </div>
     </div>
     </div>
-@endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelectorAll('.dropdown-menu a').forEach(item => {
-            item.addEventListener('click', (e) => {
-                var text = e.target.text;
-                var dropdownButton = e.target.closest('.dropdown').querySelector(
-                    '.dropdown-toggle');
-                dropdownButton.textContent = text;
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.dropdown-menu a').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    var text = e.target.text;
+                    var dropdownButton = e.target.closest('.dropdown').querySelector(
+                        '.dropdown-toggle');
+                    dropdownButton.textContent = text;
+                });
             });
         });
-    });
 
-    // モーダルにフォームの内容を表示させるためのDOM操作
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelector("#store-button").addEventListener('click', function() {
-            const lastName = document.getElementById('last_name').value;
-            const firstName = document.getElementById('first_name').value;
-            const emp_number = document.getElementById('emp_number').value;
-            const email = document.getElementById('email').value;
-            // const is_on_welfare = document.getElementById('is_on_welfare').value;
-            const role_select = document.getElementById('role_id');
-            const role_name = role_select.options[
-                role_select.selectedIndex].text;
+        // モーダルにフォームの内容を表示させるためのDOM操作
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelector("#store-button").addEventListener('click', function() {
+                const lastName = document.getElementById('last_name').value;
+                const firstName = document.getElementById('first_name').value;
+                const emp_number = document.getElementById('emp_number').value;
+                const email = document.getElementById('email').value;
+                // const is_on_welfare = document.getElementById('is_on_welfare').value;
+                const role_select = document.getElementById('role_id');
+                const role_name = role_select.options[
+                    role_select.selectedIndex].text;
 
-            const hire_date = document.getElementById('hire_date').value;
+                const hire_date = document.getElementById('hire_date').value;
 
-            const name = lastName + ' ' + firstName;
+                const name = lastName + ' ' + firstName;
 
 
-            // モーダル内の対応する要素に値を設定
-            document.querySelector('.confirmation-area').innerHTML =
-                `
+                // モーダル内の対応する要素に値を設定
+                document.querySelector('.confirmation-area').innerHTML =
+                    `
                 <h4 class="mb-3">名前: ${name}</h4>
                 <h4 class="mb-3">社員番号: ${emp_number}</h4>
                 <h4 class="mb-3">メールアドレス: ${email}</h4>
@@ -190,6 +189,7 @@
 
 
             `
+            });
         });
-    });
-</script>
+    </script>
+@endsection

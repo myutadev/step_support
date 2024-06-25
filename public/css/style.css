@@ -298,9 +298,7 @@
 }
 
 .admin-side-menu {
-
     top: 0;
-
     overflow-y: auto;
     /* 高さがビューポートを超える場合にスクロール可能にする */
 }

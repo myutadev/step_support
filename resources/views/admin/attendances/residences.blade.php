@@ -57,7 +57,3 @@
     </div>
     </div>
 @endsection
-
-<script>
-    // ここにJavaScriptコードを配置
-</script>

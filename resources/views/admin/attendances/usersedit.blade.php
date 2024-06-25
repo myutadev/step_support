@@ -220,56 +220,55 @@
         </div>
     </div>
     </div>
-@endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelectorAll('.dropdown-menu a').forEach(item => {
-            item.addEventListener('click', (e) => {
-                var text = e.target.text;
-                var dropdownButton = e.target.closest('.dropdown').querySelector(
-                    '.dropdown-toggle');
-                dropdownButton.textContent = text;
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.dropdown-menu a').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    var text = e.target.text;
+                    var dropdownButton = e.target.closest('.dropdown').querySelector(
+                        '.dropdown-toggle');
+                    dropdownButton.textContent = text;
+                });
             });
         });
-    });
 
-    // モーダルにフォームの内容を表示させるためのDOM操作
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelector("#update-button").addEventListener('click', function() {
-            const beneficiaryNumber = document.getElementById('beneficiary_number').value;
-            const lastName = document.getElementById('last_name').value;
-            const firstName = document.getElementById('first_name').value;
-            const email = document.getElementById('email').value;
-            // const is_on_welfare = document.getElementById('is_on_welfare').value;
-            const disability_category_select = document.getElementById('disability_category_id');
-            const disability_category_name = disability_category_select.options[
-                disability_category_select.selectedIndex].text;
+        // モーダルにフォームの内容を表示させるためのDOM操作
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelector("#update-button").addEventListener('click', function() {
+                const beneficiaryNumber = document.getElementById('beneficiary_number').value;
+                const lastName = document.getElementById('last_name').value;
+                const firstName = document.getElementById('first_name').value;
+                const email = document.getElementById('email').value;
+                // const is_on_welfare = document.getElementById('is_on_welfare').value;
+                const disability_category_select = document.getElementById('disability_category_id');
+                const disability_category_name = disability_category_select.options[
+                    disability_category_select.selectedIndex].text;
 
-            const residence_select = document.getElementById('residence_id');
-            const residence_name = residence_select.options[residence_select.selectedIndex].text;
+                const residence_select = document.getElementById('residence_id');
+                const residence_name = residence_select.options[residence_select.selectedIndex].text;
 
-            const counselor_select = document.getElementById('counselor_id');
-            const counselor_name = counselor_select.options[counselor_select.selectedIndex].text;
+                const counselor_select = document.getElementById('counselor_id');
+                const counselor_name = counselor_select.options[counselor_select.selectedIndex].text;
 
-            const admission_date = document.getElementById('admission_date').value;
-            const discharge_date = document.getElementById('discharge_date').value;
-
-
-            const isOnWelfareCheckbox = document.getElementById('is_on_welfare');
-            const isOnWelfareChecked = isOnWelfareCheckbox.checked;
-            const is_on_welfare = isOnWelfareChecked ? '有' : '無'
-
-            console.log('生活保護を受給しているか: ', isOnWelfareChecked ? 'はい' : 'いいえ');
+                const admission_date = document.getElementById('admission_date').value;
+                const discharge_date = document.getElementById('discharge_date').value;
 
 
-            // const counselor_id = document.getElementById('counselor_id').value;
-            const name = lastName + ' ' + firstName;
+                const isOnWelfareCheckbox = document.getElementById('is_on_welfare');
+                const isOnWelfareChecked = isOnWelfareCheckbox.checked;
+                const is_on_welfare = isOnWelfareChecked ? '有' : '無'
+
+                console.log('生活保護を受給しているか: ', isOnWelfareChecked ? 'はい' : 'いいえ');
 
 
-            // モーダル内の対応する要素に値を設定
-            document.querySelector('.confirmation-area').innerHTML =
-                `
+                // const counselor_id = document.getElementById('counselor_id').value;
+                const name = lastName + ' ' + firstName;
+
+
+                // モーダル内の対応する要素に値を設定
+                document.querySelector('.confirmation-area').innerHTML =
+                    `
                 <h4 class="mb-3">受給者番号: ${beneficiaryNumber}</h4>
                 <h4 class="mb-3">名前: ${name}</h4>
                 <h4 class="mb-3">メールアドレス: ${email}</h4>
@@ -280,12 +279,13 @@
                 <h4 class="mb-3">入所日: ${admission_date}</h4>
                 <h4 class="mb-3">退所日: ${discharge_date}</h4>
             `
-            // <h4>生活保護受給:${is_on_welfare}</h4>
+                // <h4>生活保護受給:${is_on_welfare}</h4>
 
 
-            // document.getElementById('modal-full-name').textContent = '名前:' + name;
-            // document.getElementById('modal-email').textContent = 'メールアドレス:' + email;
-            // 他の値も同様に設定
+                // document.getElementById('modal-full-name').textContent = '名前:' + name;
+                // document.getElementById('modal-email').textContent = 'メールアドレス:' + email;
+                // 他の値も同様に設定
+            });
         });
-    });
-</script>
+    </script>
+@endsection
