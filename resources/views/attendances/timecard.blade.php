@@ -41,7 +41,7 @@
                     <form action="{{ '/attendances/timecard/' }}" method="post" id="monthForm"
                         data-base-url="/attendances/timecard/">
                         @csrf
-                        <input type="month" name="month" value="{{ $year }}-{{ $month }}"
+                        <input type="month" name="month" value="{{ $yearmonthObj['year'] }}-{{ $yearmonthObj['month'] }}"
                             id="monthInput">
                     </form>
                 </div>
@@ -82,7 +82,6 @@
                             @endif
                         </tbody>
                     </table>
-
                 </div>
             </div>
         </div>

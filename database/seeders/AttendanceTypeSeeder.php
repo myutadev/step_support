@@ -14,14 +14,19 @@ class AttendanceTypeSeeder extends Seeder
     public function run(): void
     {
         $param = [[
+            'id' => '1',
             'name' => '通常勤務',
         ], [
+            'id' => '2',
             'name' => '遅刻',
         ], [
+            'id' => '3',
             'name' => '欠勤',
         ], [
+            'id' => '4',
             'name' => '無断欠勤',
         ], [
+            'id' => '5',
             'name' => '有給',
         ]];
 

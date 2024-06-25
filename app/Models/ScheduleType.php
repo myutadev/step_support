@@ -17,4 +17,9 @@ class ScheduleType extends Model
     {
         return $this->hasMany(SpecialSchedule::class);
     }
+
+    public function getWorkDayName():string
+    {
+        return  ScheduleType::find(1)->name;
+    }
 }

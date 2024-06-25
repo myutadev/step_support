@@ -18,16 +18,18 @@
                     <!-- 月選択 -->
                     <div class="col-sm-2">
                         <p>タイムカード</p>
-                        <input type="month" name="month" value="{{ $year }}-{{ $month }}" id="monthInput"
-                            class="form-control mb-2 mr-sm-2">
+                        <input type="month" name="month"
+                            value="{{ $monthUserSelectorDataObj['year'] }}-{{ $monthUserSelectorDataObj['month'] }}"
+                            id="monthInput" class="form-control mb-2 mr-sm-2">
                     </div>
                     <!-- 利用者名選択 -->
                     <div class="col-sm-2">
                         <div class="form-group mb-2 mr-sm-2">
                             <p class="mb-4">利用者名</p>
                             <select class="form-control" id="userInput" name="user">
-                                @foreach ($users as $user)
-                                    <option value="{{ $user['id'] }}" {{ $user['id'] == $user_id ? 'selected' : '' }}>
+                                @foreach ($monthUserSelectorDataObj['users'] as $user)
+                                    <option value="{{ $user['id'] }}"
+                                        {{ $user['id'] == $monthUserSelectorDataObj['user_id'] ? 'selected' : '' }}>
                                         {{ $user->full_name }}</option>
                                 @endforeach
                             </select>
@@ -59,7 +61,7 @@
                         @if ($monthlyAttendanceData)
                             @foreach ($monthlyAttendanceData as $date)
                                 <tr>
-                                    <td >{{ $date['date'] }}</td>
+                                    <td>{{ $date['date'] }}</td>
                                     <td>{{ $date['scheduleType'] }}</td>
                                     <td>{{ $date['attendance_type'] }}</td>
                                     <td>{{ $date['bodyTemp'] }}</td>
@@ -67,13 +69,13 @@
                                     <td>{{ $date['checkout'] }}</td>
                                     <td>{{ $date['is_overtime'] }}</td>
                                     <td> {!! $date['rest'] !!} </td>
-                                    <td>{{ $date['overtime'] }}</td>
+                                    <td>{!! $date['overtime'] !!}</td>
                                     <td>{{ $date['duration'] }}</td>
                                     <td>{{ $date['workDescription'] }}</td>
                                     <td class="td-max">{{ $date['workComment'] }}</td>
                                     <td class="td-mid">{!! $date['admin_comment'] !!}</td>
                                     @if (!$date['attendance_id'])
-                                        @if ($date['scheduleType'] == $date['workday_name'])
+                                        @if ($date['scheduleType'] == $workDayName)
                                             <td>
                                                 <!-- 欠勤登録ボタン -->
                                                 <button type="button" class="btn btn-store-leave store-leave"
@@ -96,12 +98,12 @@
                                                                 </h5>
                                                                 {{-- form in modal --}}
                                                                 <form id="attendance-form"
-                                                                    action="{{ route('admin.store.leave', ['user_id' => $user_id, 'sched_id' => $date['workSchedule_id']]) }}"
+                                                                    action="{{ route('admin.store.leave', ['user_id' => $monthUserSelectorDataObj['user_id'], 'sched_id' => $date['workSchedule_id']]) }}"
                                                                     method="post">
                                                                     @csrf
                                                                     <div class="mb-3">
                                                                         <input type="hidden" name="yearmonth"
-                                                                            value="{{ $year . '-' . $month }}">
+                                                                            value="{{ $monthUserSelectorDataObj['year'] . '-' . $monthUserSelectorDataObj['month'] }}">
                                                                         <label class="mb-2">出欠種別</label><br>
                                                                         @foreach ($leaveTypes as $leaveType)
                                                                             <input type="radio"

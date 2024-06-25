@@ -305,6 +305,24 @@
     /* 高さがビューポートを超える場合にスクロール可能にする */
 }
 
+.negative-mb {
+    margin-bottom: -9px;
+    /* 必要に応じて調整 */
+}
+
+
+.no-underline {
+    color: inherit;
+    /* 親要素の色を継承 */
+    text-decoration: none;
+    /* 下線を削除 */
+}
+
+.no-margin {
+    margin: 0;
+    /* マージンをリセット */
+}
+
 /* 
 .app-title {
     color: #06283B !important;
