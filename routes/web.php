@@ -40,9 +40,7 @@ use App\Http\Controllers\Admin\Workschedule\CreateWorkscheduleController;
 use App\Http\Controllers\Admin\Workschedule\DeleteWorkscheduleController;
 use App\Http\Controllers\Admin\Workschedule\IndexWorkscheduleController;
 use App\Http\Controllers\Admin\Workschedule\StoreWorkscheduleController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\AdminAttendanceController;
-use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\User\Attendance\CheckInController;
 use App\Http\Controllers\User\Attendance\CheckOutController;
 use App\Http\Controllers\User\Attendance\OvertimeEndController;
@@ -52,9 +50,6 @@ use App\Http\Controllers\User\Attendance\RestStartController;
 use App\Http\Controllers\User\Attendance\ShowAttendanceController;
 use App\Http\Controllers\User\Attendance\UpdateWorkCommentController;
 use App\Http\Controllers\User\Timecard\ShowTimecardController;
-// use App\Http\Controllers\AdminTimecard\IndexTimecardController;
-use App\Models\Attendance;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -67,7 +62,7 @@ use App\Models\Attendance;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->action([AuthenticatedSessionController::class, 'create']);
 });
 
 Route::get('/dashboard', function () {
