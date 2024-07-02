@@ -1,66 +1,104 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Step Support
+就労継続支援B型事業所向けの出退勤管理Webアプリ。
+施設利用者の方(施設で叩く障害者の方)向け画面と管理者(施設の職員)向け画面に分かれている。
+<br />
+- 施設利用者向け画面:打刻機能、出勤情報の確認機能
+<br>
+- 管理者向け機能:利用者の出退勤情報確認、管理者コメント入力、月次勤務データExcel出力、月次出勤情報レポート、各アカウントの作成、出勤日の編集、相談員･住居情報の管理
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<br />
 
-## About Laravel
+## URL
+https://step-support.com/
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<br />
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## サービス開発の背景
+就労継続支援B型事業所(障害者の方の就労支援施設)の経営者から、欲しいと思える出退勤管理システムがないと相談を受け開発に至りました。
+<br>
+通常の出退勤管理ステムとは異なり、障害者の方の日々の精神状況を記録をつけたり、国に申請する補助金のための出退勤実績の計算など、支援施設特有の必要な機能が多くありました。<br>
+これらのニーズを経営者からヒアリングをし、当該事業所の運営に必要な機能に絞り込んだ出退勤管理システムを開発しました。
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+<br />
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## サービス画面･機能の説明
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+<br />
 
-## Laravel Sponsors
+### 利用者画面
+|打刻画面|出勤記録|
+|----|----|
+|![打刻画面](/docs/images/readme_user_1-1.png)|![出勤記録](/docs/images/readme_user_1-2.png)|
+|ログイン直後の画面です。現在の日次と各ボタンが表示されます。|事業所では出勤時に体温の記録を行っているため、体温を記録しています。|
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+|退勤記録|タイムカード|
+|----|----|
+|![退勤記録](/docs/images/readme_user_2_1.png)|![タイムカード](/docs/images/readme_user_2_2.png)|
+|退勤時には作業内容とコメントを入力します。昼休憩の自動入力や、15:30を過ぎて打刻をすると残業の有無を聞くポップアップが現れる等、事業所特有のルールを適応させています。|タイムカード画面で月ごとの出席情報が把握できます。|
 
-### Premium Partners
+<br />
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
 
-## Contributing
+### 管理者画面
+|タイムカード画面|日別出勤状況|
+|----|----|
+|![タイムカード](/docs/images/readme_admin_1-1.png)|![出勤記録](/docs/images/readme_admin_1-2.png)|
+|月ごと、利用者ごとの勤怠情報が確認できます。|出勤日ごとの利用者の勤務状況の一覧と管理者コメントの保存ができます。|
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+|月次勤務データ出力|月次勤務レポート|
+|----|----|
+|![タイムカード](/docs/images/readme_admin_2-1.png)|![出勤記録](/docs/images/readme_admin_2-2.png)|
+|月ごとの全ての利用者の勤怠データをエクセルに出力します。事業所で別で管理しているスプレッドシートにフォーマットを合わせています。|月ごとの事業所全体の出勤率、各ユーザーの出勤率等を表示。補助金の申請資格時間を目標勤務時間として、当月あと何時間出勤すれば達成できるかが把握できます。|
 
-## Code of Conduct
+|利用者アカウント管理|利用者アカウント編集|
+|----|----|
+|![タイムカード](/docs/images/readme_admin_3-1.png)|![出勤記録](/docs/images/readme_admin_3-2.png)|
+|利用者･管理者のアカウントの発行機能|利用者･管理者アカウントの編集|
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+|相談員情報･住居情報の登録、編集|開所日の編集|
+|----|----|
+|![タイムカード](/docs/images/readme_admin_4-1.png)|![出勤記録](/docs/images/readme_admin_4-2.png)|
+|1人の障害者の方に1名自治体が指定する相談員が付きます。また、精神状態のケアのためにグループホームや家族の方との連絡を密に取る必要があります。そのため、各利用者に紐づける相談員･住居情報を管理する機能を開発しました。|カレンダーとは別に事業所全体の月ごとの最低開所日数が定められており、柔軟な開所日、所定休日の設定が必要となるため、管理者側で各日の開所日区分を自由に変えられる機能をつけました。|
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 使用技術
 
-## License
+| Category          | Technology Stack                                     |
+| ----------------- | --------------------------------------------------   |
+| Frontend          | Blade, Bootstrap(5.3.0)                                     |
+| Backend           | Laravel (10.30.1)                                     |
+| Infrastructure    | さくらのVPS(Ubuntu 20.04), Nginx, Let's Encrypt               |
+| Database          | MariaDB                                              |
+| Environment setup | Docker                                               |
+| Design            | Figma, Lucid                                         |
+| etc.              | Git, GitHub                                          |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<br />
+
+## 開発手法
+
+- **RepositoryパターンとServiceクラスの採用**：
+  - 各モデルのデータ操作をRepositoryクラスに分離し、ビジネスロジックをServiceクラスに実装することで、コードの再利用性とテストの容易性を高めました。
+  
+- **シングルアクションコントローラーの採用**：
+  - 各コントローラーが単一のアクションのみを担当することで、コントローラーの責任範囲を明確にし、コードの可読性とメンテナンス性を向上させました。
+
+- **Domainフォルダの使用**：
+  - リファクタ時にDomainフォルダを作成し、OOPのアプローチを試みましたが、プロジェクトの規模から明確なメリットが出せないことが判明し、途中で断念しました。そのため、一部のコードにOOPの名残があります。
+
+
+## システム構成図
+![システム構成図](/docs/images/readme_system_structure.png)
+<br />
+
+
+## ER図
+https://lucid.app/lucidchart/7f9151d2-3593-488b-b70f-9ddc12f176f2/view
+<br />
+
+## 今後の改修予定
+
+- 各ページの見た目を整える(特に一覧表の表示部分)
+- 国へ提出する帳票の出力機能
