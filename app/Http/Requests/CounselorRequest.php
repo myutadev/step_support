@@ -22,9 +22,9 @@ class CounselorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:50|',
-            'contact_phone' => 'regex:/^[\+\d\s\-()]+$/u', // 電話番号のバリデーション（数字、プラス記号、スペース、ハイフン、括弧を許可）
-            'contact_email' => 'email:rfc', // メールアドレスのバリデーション（RFC準拠、DNSチェックを含む）
+            'name' => 'required|string|max:50',
+            'contact_phone' => 'nullable|regex:/^[\+\d\s\-()]+$/u', // 電話番号のバリデーション（数字、プラス記号、スペース、ハイフン、括弧を許可）
+            'contact_email' => 'nullable|email:rfc', // メールアドレスのバリデーション（RFC準拠、DNSチェックを含む）
         ];
     }
 }
