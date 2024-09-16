@@ -37,7 +37,8 @@
                 <div class="row mb-3">
                     <label for="beneficiary_number" class="col-sm-2 col-form-label">受給者番号</label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control" id="beneficiary_number" name="beneficiary_number">
+                        <input type="number" class="form-control" id="beneficiary_number" name="beneficiary_number"
+                            value={{ old('beneficiary_number') }}>
                     </div>
                 </div>
                 <div class="row mb-3">

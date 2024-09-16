@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Services\UserWriteService;
-use Illuminate\Http\Request;
 
 
 class StoreUserController extends Controller
@@ -17,7 +17,7 @@ class StoreUserController extends Controller
         $this->userCreateService = $userCreateService;
     }
 
-    public function __invoke(Request $request)
+    public function __invoke(UserRequest $request)
     {
         $this->userCreateService->storeUser($request);
         return redirect()->action(IndexUserController::class);
