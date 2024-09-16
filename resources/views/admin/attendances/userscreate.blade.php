@@ -41,6 +41,14 @@
                     </div>
                 </div>
                 <div class="row mb-3">
+                    <label for="beneficiary_number_expiration" class="col-sm-2 col-form-label">受給者番号有効期限</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" id="beneficiary_number_expiration"
+                            name="beneficiary_number_expiration" value={{ old('beneficiary_number_expiration') }}>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
                     <label for="fullname" class="col-sm-2 col-form-label">名前</label>
                     <div class="col">
                         <input type="text" class="form-control" id='last_name' name='last_name' placeholder="姓"
@@ -224,6 +232,8 @@
         document.addEventListener('DOMContentLoaded', (event) => {
             document.querySelector("#store-button").addEventListener('click', function() {
                 const beneficiaryNumber = document.getElementById('beneficiary_number').value;
+                const beneficiaryNumberExpiration = document.getElementById('beneficiary_number_expiration')
+                    .value;
                 const lastName = document.getElementById('last_name').value;
                 const firstName = document.getElementById('first_name').value;
                 const birthdate = document.getElementById('birthdate').value;
@@ -256,6 +266,7 @@
                 document.querySelector('.confirmation-area').innerHTML =
                     `
                 <h4 class="mb-3">受給者番号: ${beneficiaryNumber}</h4>
+                <h4 class="mb-3">受給者番号有効期限: ${beneficiaryNumberExpiration}</h4>
                 <h4 class="mb-3">名前: ${name}</h4>
                 <h4 class="mb-3">生年月日: ${birthdate}</h4>
                 <h4 class="mb-3">メールアドレス: ${email}</h4>

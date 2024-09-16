@@ -22,6 +22,7 @@
                     <thead>
                         <tr>
                             <th scope="col">受給者番号</th>
+                            <th scope="col">受給者番号有効期限</th>
                             <th scope="col">利用者名</th>
                             <th scope="col">生年月日</th>
                             <th scope="col">メールアドレス</th>
@@ -38,6 +39,7 @@
                         @foreach ($userInfoArray as $userInfo)
                             <tr>
                                 <td>{{ $userInfo['beneficiary_number'] }}</td>
+                                <td>{{ $userInfo['beneficiary_number_expiration'] }}</td>
                                 <td>{{ $userInfo['name'] }}</td>
                                 <td>{{ $userInfo['birthdate'] }}</td>
                                 <td>{{ $userInfo['email'] }}</td>

@@ -61,6 +61,7 @@ class UserWriteService
         $userDetail = $this->userRepository->getUserDetailByUser($user);
         $userDetail->birthdate = $request->birthdate;
         $userDetail->beneficiary_number = $request->beneficiary_number;
+        $userDetail->beneficiary_number_expiration = $request->beneficiary_number_expiration;
         $userDetail->disability_category_id = $request->disability_category_id;
         //is_on_welfareの有無をチェック
         $userDetail->is_on_welfare = $request->is_on_welfare == 1 ? 1 : 0;
@@ -105,6 +106,7 @@ class UserWriteService
         $user->update();
 
         $user->userDetail->beneficiary_number = $request->beneficiary_number;
+        $user->userDetail->beneficiary_number_expiration = $request->beneficiary_number_expiration;
         $user->userDetail->disability_category_id = $request->disability_category_id;
         $user->userDetail->birthdate = $request->birthdate;
         //is_on_welfareの有無をチェック

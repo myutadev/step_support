@@ -55,6 +55,7 @@ class UserService
 
             $curUserInfo = [
                 'beneficiary_number' => $user->userDetail->beneficiary_number,
+                'beneficiary_number_expiration' => $user->userDetail->beneficiary_number_expiration,
                 'name' => $user->full_name,
                 'email' => $user->email,
                 'is_on_welfare' => $user->userDetail->is_on_welfare == 1 ? "有" : "無",
