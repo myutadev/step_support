@@ -34,6 +34,7 @@ class ShowReportController extends Controller
     public function __invoke(Request $request)
     {
         $TARGET_HOURS = 4;
+        
         $sortField = $request->input('sortField', 'name');
         $sortOrder = $request->input('sortOrder', 'asc');
         $yearmonth = $request->input('yearmonth');

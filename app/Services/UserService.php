@@ -73,4 +73,23 @@ class UserService
 
         return $userInfoArray;
     }
+
+    /**
+     *利用者アカウント管理画面に表示する用の利用者アカウントオブジェクトを並び替え
+     *コントローラーから渡された$sortedField, $sortOrder情報を受け取り、指定のフィールドで並べ替えを行う
+     *@return array ユーザー情報の入ったオブジェクト
+     */
+
+    public function sortUserAccountInfoObj($userInfoArray, $field, $order)
+    {
+        usort($userInfoArray, function ($a, $b) use ($field, $order) {
+            if ($order == "asc") {
+                return $a[$field] <=> $b[$field];
+            } else {
+                return $b[$field] <=> $a[$field];
+            };
+        });
+
+        return $userInfoArray;
+    }
 }

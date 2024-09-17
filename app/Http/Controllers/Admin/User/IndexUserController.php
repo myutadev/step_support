@@ -22,7 +22,18 @@ class IndexUserController extends Controller
 
     public function __invoke(Request $request)
     {
+        if ($request->input('sortField')) {
+            $sortField = $request->input('sortField');
+            $sortOrder = $request->input('sortOrder');
+        } else {
+            //デフォルトは受給者番号の有効期限が近い人にする
+            $sortField = 'beneficiary_number_expiration';
+            $sortOrder = 'asc';
+        }
+
         $userInfoArray = $this->userService->createUserAccountInfoObj();
-        return view('admin.attendances.users', compact('userInfoArray'));
+        $userInfoArray = $this->userService->sortUserAccountInfoObj($userInfoArray, $sortField, $sortOrder);
+
+        return view('admin.attendances.users', compact('userInfoArray', 'sortField', 'sortOrder'));
     }
 }
