@@ -39,6 +39,7 @@
                             <th>退勤時間</th>
                             <th>休憩</th>
                             <th>残業</th>
+                            <th>勤務時間</th>
                             <th>作業内容</th>
                             <th>作業コメント</th>
                             <th>管理者作業</th>
@@ -61,6 +62,7 @@
                                         <td>{{ $attendance['check_out_time'] }}</td>
                                         <td> {!! $attendance['rest'] !!} </td>
                                         <td>{{ $attendance['over_time'] }}</td>
+                                        <td>{{ $attendance['duration'] }}</td>
                                         <td>{{ $attendance['work_description'] }}</td>
                                         <td>{{ $attendance['work_comment'] }}</td>
                                         @if ($attendance['admin_comments']->first()->admin_id == null)

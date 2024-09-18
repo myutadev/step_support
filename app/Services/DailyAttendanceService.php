@@ -2,14 +2,17 @@
 
 namespace App\Services;
 
+
 use App\Models\AdminComment;
 use App\Models\Attendance;
-use App\Models\WorkSchedule;
 use App\Repositories\AdminCommentRepository;
 use App\Repositories\AdminRepository;
 use App\Repositories\WorkScheduleRepository;
 use App\Traits\AttendanceTrait;
+use App\Utils\CalcDuration;
+use App\Utils\TimeFormatter;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -107,6 +110,9 @@ class DailyAttendanceService
         $this->sortAdminCommentsByAdminId($selectedAttendances);
 
         foreach ($selectedAttendances as $curAttendance) {
+            // dd($curAttendance->work_schedule);
+            // $this->generateNetWorkDuration($curAttendance);
+
             $curAttendanceRecord = [
                 'attendance_id' => $curAttendance->id,
                 'beneficialy_number' => $curAttendance->user->userDetail->beneficiary_number,
@@ -116,6 +122,7 @@ class DailyAttendanceService
                 'check_out_time' => $curAttendance->check_out_time,
                 'rest' => $this->generateStartEndString($curAttendance->rests),
                 'over_time' => $this->generateStartEndString($curAttendance->overtimes),
+                'duration' => TimeFormatter::carbonIntervalToStringHours($this->generateNetWorkDuration($curAttendance)),
                 'work_description' => $curAttendance->work_description,
                 'work_comment' => $curAttendance->work_comment,
                 'admin_comments' => $curAttendance->adminComments,
@@ -124,6 +131,28 @@ class DailyAttendanceService
         }
         return $dailyAttendanceData;
     }
+
+    /**
+     *日別出勤状況に表示する用の勤務時間を算出
+     *
+     *退勤時間 - 出勤時間 - 休憩時間 + 残業時間
+     *@return CarbonInterval 表示用の連想配列を含んだ配列
+     */
+    public function generateNetWorkDuration($curAttendance): CarbonInterval
+    {
+        //dailyUserAttendanceクラスのshowNetWorkDurationメソッドが使えれば良いが複雑すぎるので、通常のメソッドを作る
+        $workStartEndDuration = CalcDuration::getCarbonIntervalStartFromStr($curAttendance->check_in_time, $curAttendance->check_out_time);
+        $restDurationTotal = CarbonInterval::seconds(0);
+        foreach ($curAttendance->rests as $curRest) {
+            $restDurationTotal->add(CalcDuration::getCarbonIntervalStartFromStr($curRest->start_time, $curRest->end_time));
+        };
+        $overtimeDurationTotal = CarbonInterval::seconds(0);
+        foreach ($curAttendance->overtimes as $curOvertime) {
+            $overtimeDurationTotal->add(CalcDuration::getCarbonIntervalStartFromStr($curOvertime->start_time, $curOvertime->end_time));
+        };
+        return $workStartEndDuration->add($overtimeDurationTotal)->sub($restDurationTotal);
+    }
+
 
     /**
      *日別出勤状況画面で管理者コメントを更新するメソッド
