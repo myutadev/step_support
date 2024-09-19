@@ -43,7 +43,7 @@ class WholeCompanyAttendance
         $companyTotalWorkDurationInterval = $this->getCompanyTotalWorkDurationInterval($this->firstWorkScheduleId, $this->lastWorkScheduleId);
         return TimeFormatter::convertDaysToHours($companyTotalWorkDurationInterval->cascade())->format('%H:%I:%S');
     }
-
+    // attendace_typeが1:通常勤務,2:遅刻のものを取得
     public function getTotalClaimCount(): int
     {
         $totalClaimsCount = 0;

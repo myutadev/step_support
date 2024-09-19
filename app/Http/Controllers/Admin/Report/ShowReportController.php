@@ -34,7 +34,7 @@ class ShowReportController extends Controller
     public function __invoke(Request $request)
     {
         $TARGET_HOURS = 4;
-        
+
         $sortField = $request->input('sortField', 'name');
         $sortOrder = $request->input('sortOrder', 'asc');
         $yearmonth = $request->input('yearmonth');
@@ -67,6 +67,7 @@ class ShowReportController extends Controller
         $companyTotalWorkDurationInterval = $this->attendanceReportService->generateCompanyTotalWorkDurationInterval();
 
 
+
         //事業所全体の目標請求時間の算出 1人あたり4時間
         $companyTotalWorkDuration = $this->attendanceReportService->generateCompanyTotalWorkDuration();
         $totalClaimsCount = $this->attendanceReportService->generateTotalClaimsCount();
@@ -75,6 +76,10 @@ class ShowReportController extends Controller
         $restToAchieveCompanyTarget = $this->attendanceReportService->generateRestToAchieveCompanyTarget($TARGET_HOURS);
         //月次勤務時間の上限
         $maxTotalWorkDuration = $this->attendanceReportService->generateMaxTotalWorkDuration($openingSoFarThisMonth);
+
+        // 請求人数1人あたりの労働時間
+        $monthlyWorkHourPerClaimedPerson = $this->attendanceReportService->getMonthlyWorkHourPerClaimedPerson();
+
 
 
         return view(
@@ -92,7 +97,8 @@ class ShowReportController extends Controller
                 'companyTotalWorkDuration',
                 'targetTotalWorkDuration',
                 'maxTotalWorkDuration',
-                'restToAchieveCompanyTarget'
+                'restToAchieveCompanyTarget',
+                'monthlyWorkHourPerClaimedPerson'
             )
         );
     }

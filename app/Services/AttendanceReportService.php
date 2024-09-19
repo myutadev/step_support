@@ -6,8 +6,10 @@ use App\Domains\UserAttendanceRange;
 use App\Domains\WholeCompanyAttendance;
 use App\Repositories\UserRepository;
 use App\Repositories\WorkScheduleRepository;
+use App\Utils\TimeFormatter;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Round;
 
 class AttendanceReportService
 {
@@ -203,5 +205,23 @@ class AttendanceReportService
         });
 
         return $userInfoArray;
+    }
+
+    /**
+     * 月次の請求員数1人あたりの実労働時間を求める。
+     * @return String 形式の時間 ex:'04:15:00'
+     */
+    public function getMonthlyWorkHourPerClaimedPerson(): string
+    {
+
+        $claimedCount = $this->generateTotalClaimsCount();
+
+        // CarbonInterval to Secounds
+        $totalWorkDurationInterval = $this->generateCompanyTotalWorkDurationInterval();
+        $totalInSecounds = $totalWorkDurationInterval->totalSeconds;
+        $workHourPerClaimedPersonInSecounds = Round($totalInSecounds / $claimedCount);
+        $workHourPerClaimedPersonInterval = CarbonInterval::seconds($workHourPerClaimedPersonInSecounds);
+
+        return TimeFormatter::convertDaysToHours($workHourPerClaimedPersonInterval->cascade())->format('%H:%I:%S');
     }
 }
