@@ -108,19 +108,25 @@ class AttendanceReportService
         return $this->userRepository->getActiveUsers($dischargeDateCondition);
     }
     //1回のループで出勤時間とUserInfoの作成を同時にできるが、わかりにくくなるのであえて2回ループさせる
-    public function generateUserInfoArray(): array
+    public function generateUserInfoArray($year, $month): array
     {
         $userInfoArray = [];
         $activeUsers = $this->getActiveUsersThisMonth();
         $firstWorkScheduleId = $this->getFirstId();
         $lastWorkScheduleId = $this->getLastId();
         $openingSoFarThisMonth = $this->getTotalOpenCountSoFar();
+        $firstTargetHoursByMonthInterval = $this->getFirstTargetHoursByMonthInterval($year, $month);
+
         foreach ($activeUsers as $user) {
             //当月の出勤対象のAttendancesのみを抽出:出勤が遅刻or 正常
             $thisMonthAttendancesByUser = UserAttendanceRange::create($user, $firstWorkScheduleId, $lastWorkScheduleId);
 
             //目標時間80h 
             $restToAchieveTarget = $thisMonthAttendancesByUser->getRestToAchieveTarget(80);
+
+            //1つ目の目標時間までの残り時間を算出
+            $restToAchiveFirstTargetInterval =  $thisMonthAttendancesByUser->getTotalWorkDurationInterval()->sub($firstTargetHoursByMonthInterval);
+            $restToAchieveString = TimeFormatter::convertDaysToHours($restToAchiveFirstTargetInterval->cascade())->format('%H:%I:%S');
 
             $curInfoObj = [
                 'beneficiary_number' => $user->UserDetail->beneficiary_number,
@@ -129,6 +135,7 @@ class AttendanceReportService
                 'daysPresentSoFarThisMonth' => $thisMonthAttendancesByUser->getPresentCount(),
                 'attendanceRate' => $thisMonthAttendancesByUser->getPresentRate($openingSoFarThisMonth),
                 'workedHourTotalSoFarThisMonth' => $thisMonthAttendancesByUser->getFormattedTotalWorkDuration(),
+                'restToAchiveFirstTarget' => $restToAchiveFirstTargetInterval->invert == 1 ? "-" . $restToAchieveString : $restToAchieveString,
                 'restToAchieveTarget' => $restToAchieveTarget->invert == 1 ? "-" . $restToAchieveTarget->format('%H:%I:%S') : "" . $restToAchieveTarget->format('%H:%I:%S'),
             ];
             array_push($userInfoArray, $curInfoObj);
@@ -215,7 +222,7 @@ class AttendanceReportService
     {
 
         $claimedCount = $this->generateTotalClaimsCount();
-
+        if ($claimedCount == 0) return '0';
         // CarbonInterval to Secounds
         $totalWorkDurationInterval = $this->generateCompanyTotalWorkDurationInterval();
         $totalInSecounds = $totalWorkDurationInterval->totalSeconds;
@@ -223,5 +230,26 @@ class AttendanceReportService
         $workHourPerClaimedPersonInterval = CarbonInterval::seconds($workHourPerClaimedPersonInSecounds);
 
         return TimeFormatter::convertDaysToHours($workHourPerClaimedPersonInterval->cascade())->format('%H:%I:%S');
+    }
+
+    /**
+     * 毎月の第一段階の目標労働時間を求める。
+     */
+    public function getFirstTargetHoursByMonthInterval($year, $month): CarbonInterval
+    {
+        //CONSTANT VALUE 2.29 = 1段階目の労働時間目標を計算するための定数。 日数 x 2.29
+        $TARGET_WORK_HOURS_PER_DAY_MULTIPLIER = 2.29;
+        $numberOfDaysInMonth = $this->workScheduleRepository->getAllSchedulesCountForMonth($year, $month);
+        $targetHoursInt = round($TARGET_WORK_HOURS_PER_DAY_MULTIPLIER * $numberOfDaysInMonth);
+        return CarbonInterval::hours($targetHoursInt);
+    }
+
+    /**
+     * 毎月の第一段階の目標労働時間を文字列としてフォーマットして返す
+     */
+    public function getFirstTargetHoursByMonthString($year, $month): string
+    {
+        $targetHoursInterval = $this->getFirstTargetHoursByMonthInterval($year, $month);
+        return TimeFormatter::convertDaysToHours($targetHoursInterval->cascade())->format('%H:%I:%S');
     }
 }

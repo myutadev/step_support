@@ -61,8 +61,8 @@ class ShowReportController extends Controller
         //1.アクティブなユーザーを全て取得 - 退所日が前月以前の人
         $activeUsers = $this->attendanceReportService->getActiveUsersThisMonth();
 
-        $userInfoArray = $this->attendanceReportService->generateUserInfoArray();
-        $sorteUserInfoArray  = $this->attendanceReportService->sortUserInfoArray($userInfoArray, $sortField, $sortOrder);
+        $userInfoArray = $this->attendanceReportService->generateUserInfoArray($year, $month);
+        $sortedUserInfoArray  = $this->attendanceReportService->sortUserInfoArray($userInfoArray, $sortField, $sortOrder);
 
         $companyTotalWorkDurationInterval = $this->attendanceReportService->generateCompanyTotalWorkDurationInterval();
 
@@ -80,6 +80,8 @@ class ShowReportController extends Controller
         // 請求人数1人あたりの労働時間
         $monthlyWorkHourPerClaimedPerson = $this->attendanceReportService->getMonthlyWorkHourPerClaimedPerson();
 
+        // 毎月の目標勤務時間1
+        $firstTargetHoursByMonth = $this->attendanceReportService->getFirstTargetHoursByMonthString($year, $month);
 
 
         return view(
@@ -90,7 +92,7 @@ class ShowReportController extends Controller
                 'sortOrder',
                 'year',
                 'month',
-                'sorteUserInfoArray',
+                'sortedUserInfoArray',
                 'openingSoFarThisMonth',
                 'totalOpeningThisMonth',
                 'totalClaimsCount',
@@ -98,7 +100,8 @@ class ShowReportController extends Controller
                 'targetTotalWorkDuration',
                 'maxTotalWorkDuration',
                 'restToAchieveCompanyTarget',
-                'monthlyWorkHourPerClaimedPerson'
+                'monthlyWorkHourPerClaimedPerson',
+                'firstTargetHoursByMonth',
             )
         );
     }

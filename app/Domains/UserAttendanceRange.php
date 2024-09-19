@@ -129,4 +129,5 @@ class UserAttendanceRange
 
         return TimeFormatter::convertDaysToHours($restToAchieveTargetByDays);
     }
+
 }

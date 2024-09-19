@@ -59,6 +59,14 @@ class WorkScheduleRepository
         return $thisMonthAllSchedules;
     }
 
+    public function getAllSchedulesCountForMonth(int $year, int $month): int
+    {
+        $allSchedForMonth = $this->getAllSchedulesForMonth($year, $month);
+
+        return $allSchedForMonth->count();
+    }
+
+
     /**
      *日別出勤状況に表示させるデータを抽出する
      *companyId, $selectedDateでデータを絞る
@@ -146,5 +154,4 @@ class WorkScheduleRepository
             }
         ])->where('date', $today)->first();
     }
-
 }

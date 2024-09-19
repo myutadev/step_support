@@ -48,10 +48,17 @@
                     </div>
                     <div class="col-2 mt-4 d-flex flex-column align-items-start">
                         <div class="text-center ">
-                            <h5 class="mb-3">1請求あたり実労働時間</h5>
+                            <h5 class="mb-3">請求あたり実労働時間</h5>
                             <h5>{{ $monthlyWorkHourPerClaimedPerson }}</h5>
                         </div>
                     </div>
+                    <div class="col-md-2 mt-4 d-flex flex-column align-items-start">
+                        <div class="text-center ">
+                            <h5 class="mb-3">当月個人目標合計勤務時間</h5>
+                            <h5>{{ $firstTargetHoursByMonth }}</h5>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <div class="row">
@@ -69,7 +76,7 @@
                 </div>
                 <div class="col-md-2 mt-4 d-flex flex-column align-items-start">
                     <div class="text-center ">
-                        <h5 class="mb-3">目標勤務時間計</h5>
+                        <h5 class="mb-3">目標合計勤務時間2</h5>
                         <h5>{{ $targetTotalWorkDuration }}</h5>
                     </div>
                 </div>
@@ -208,6 +215,24 @@
                                     <a class="no-underline d-flex align-items-center"
                                         href="{{ route('admin.report', [
                                             'yearmonth' => $year . '-' . $month,
+                                            'sortField' => 'restToAchiveFirstTarget',
+                                            'sortOrder' => $sortField == 'restToAchiveFirstTarget' && $sortOrder == 'asc' ? 'desc' : 'asc',
+                                        ]) }}">目標1までの不足
+                                        <div class="d-flex flex-column ms-2">
+                                            <i class="bi bi-chevron-up negative-mb"
+                                                style="color:{{ $sortField == 'restToAchiveFirstTarget' && $sortOrder == 'asc' ? 'black' : 'gray' }}"></i>
+                                            <i class="bi bi-chevron-down"
+                                                style="color:{{ $sortField == 'restToAchiveFirstTarget' && $sortOrder == 'desc' ? 'black' : 'gray' }}"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            </th>
+
+                            <th scope="col">
+                                <div>
+                                    <a class="no-underline d-flex align-items-center"
+                                        href="{{ route('admin.report', [
+                                            'yearmonth' => $year . '-' . $month,
                                             'sortField' => 'restToAchieveTarget',
                                             'sortOrder' => $sortField == 'restToAchieveTarget' && $sortOrder == 'asc' ? 'desc' : 'asc',
                                         ]) }}">目標までの不足
@@ -223,7 +248,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($sorteUserInfoArray as $userInfo)
+                        @foreach ($sortedUserInfoArray as $userInfo)
                             <tr>
                                 <td>{{ $userInfo['beneficiary_number'] }}</td>
                                 <td> {{ $userInfo['name'] }}</td>
@@ -233,6 +258,9 @@
                                 <td>{{ $userInfo['daysPresentSoFarThisMonth'] }}</td>
                                 <td>{{ $userInfo['attendanceRate'] }}%</td>
                                 <td>{{ $userInfo['workedHourTotalSoFarThisMonth'] }}</td>
+                                <td
+                                    class="{{ substr($userInfo['restToAchiveFirstTarget'], 0, 1) == '-' ? 'text-danger' : '' }}">
+                                    {{ $userInfo['restToAchiveFirstTarget'] }}</td>
                                 <td
                                     class="{{ substr($userInfo['restToAchieveTarget'], 0, 1) == '-' ? 'text-danger' : '' }}">
                                     {{ $userInfo['restToAchieveTarget'] }}</td>
